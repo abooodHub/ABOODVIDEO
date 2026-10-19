@@ -133,7 +133,7 @@ def main():
             if page_id=='content':
                 page.wait_for_selector('.drive-table tbody tr[data-id]')
                 assert 'إضافة محتوى' in page.locator('.drive-table tbody').inner_text()
-                assert gettext_for_language('فيديو',options.language) in page.locator('.drive-table tbody').inner_text()
+                assert gettext_for_language('فيديو',options.language) in page.locator('.drive-table tbody').text_content()
             page.wait_for_timeout(900)
             suffix='-en' if options.language=='en' else ''
             page.screenshot(path=str(OUT / (name+suffix+'.png')))
