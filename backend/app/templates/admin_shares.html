@@ -1,7 +1,7 @@
 {% extends 'admin_base.html' %}
 {% block title %}روابط المشاركة{% endblock %}
 {% block topbar_title %}روابط المشاركة{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_shares.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/system/layout-admin-operations.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/shares-motion-v1.css?v=m6-admin-platform-20261016-fix2">
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_shares.css?v=i18n-110-controls"><link rel="stylesheet" href="/static/css/system/layout-admin-operations.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/shares-motion-v1.css?v=m6-admin-platform-20261016-fix2">
 {% endblock %}
 
 {% block content %}
@@ -40,6 +40,12 @@
   <button class="tab-btn"           data-tab="revoked" role="tab" aria-selected="false"><span>ملغاة</span><span class="share-tab-count" data-share-count="revoked">—</span></button>
 </div>
 
+<div class="shares-list-controls">
+  <label>بحث في المشاركات<input id="sharesSearch" class="input" type="search" placeholder="بحث في المشاركات" autocomplete="off"></label>
+  <label>الترتيب<select id="sharesSort" class="input"><option value="created_at:desc">الأحدث أولاً</option><option value="created_at:asc">الأقدم أولاً</option><option value="expires_at:asc">الانتهاء الأقرب</option></select></label>
+  <label>المشاركات في الصفحة<select id="sharesPageSize" class="input"><option value="20">20</option><option value="50">50</option><option value="100">100</option></select></label>
+</div>
+
 <!-- ===== Shares Table ===== -->
 <div class="admin-panel">
   <div class="table-responsive">
@@ -69,6 +75,12 @@
     </table>
   </div>
 </div>
+
+<nav class="shares-pagination" aria-label="صفحات المشاركات">
+  <button id="sharesPrev" class="btn btn-secondary" type="button" disabled>السابق</button>
+  <span id="sharesPageStatus" role="status" aria-live="polite">—</span>
+  <button id="sharesNext" class="btn btn-secondary" type="button" disabled>التالي</button>
+</nav>
 
 <!-- ===== Revoke Confirm Modal ===== -->
 <div class="modal-overlay" id="revokeModal" role="dialog" aria-modal="true" aria-labelledby="revokeModalTitle" hidden>

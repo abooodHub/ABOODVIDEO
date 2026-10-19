@@ -8,6 +8,7 @@
 - User titles, filenames, subtitle content, authentication and private-media access remain unchanged.
 - Bilingual Windows installer, English README, Arabic README and screenshots in both languages.
 - Localization validation and browser coverage. No database migration or media changes.
+- Restored missing share-list search, sorting and pagination controls required by its existing script.
 
 ## 1.0.0 — 2026-10-19
 

@@ -16,7 +16,7 @@ pytestmark = pytest.mark.skipif(os.getenv('ABOODVIDEO_RUN_BROWSER_TEST') != '1',
 def test_localized_platform_and_studio_layout(language, width, tmp_path):
     root = Path(__file__).resolve().parents[1]
     subprocess.run([sys.executable, str(root / 'scripts/generate_documentation_visuals.py'),
-                    '--language', language, '--width', str(width), '--output', str(tmp_path)],
+                    '--language', language, '--width', str(width), '--output', str(tmp_path), '--extended'],
                    cwd=root, check=True, timeout=120)
 
 

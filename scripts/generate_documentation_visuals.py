@@ -24,6 +24,7 @@ def main():
     args.add_argument('--language',choices=['ar','en'],default='ar')
     args.add_argument('--output',type=Path,default=OUT)
     args.add_argument('--width',type=int,default=1600)
+    args.add_argument('--extended',action='store_true',help='Also check library, settings and management pages')
     options=args.parse_args()
     OUT=options.output
     OUT.mkdir(parents=True, exist_ok=True)
@@ -42,7 +43,7 @@ def main():
     fixtures = {
         '/api/v1/admin/dashboard': data,
         '/api/v1/admin/transcodes': {'items': [], 'total': 0},
-        '/api/v1/health': {'status': 'healthy', 'version': '1.0.0'},
+        '/api/v1/health': {'status': 'healthy', 'version': '1.1.0'},
         '/api/v1/admin/quality-settings/encoder': {'preset': 'veryfast', 'video_bitrate_percent': 100, 'enabled_qualities': ['720p','1080p'], 'available_qualities': ['360p','480p','720p','1080p'], 'four_k_allowed': False},
         '/api/config': {'converted_output_folder': 'D:\\Media\\Packages', 'default_encoder': 'cpu', 'default_preset': 'balanced', 'first_run_complete': True, 'server_url': '', 'cpu_concurrent_jobs': 1, 'gpu_concurrent_jobs': 1},
         '/api/hardware': {'hardware': {'cpu_ram': {'cpu_util_pct':12,'cpu_cores_physical':8,'cpu_cores_logical':16,'ram_used_mb':8192,'ram_total_mb':32768,'ram_util_pct':25}, 'gpu': {'gpu_detected':True,'gpu_name':'Compatible GPU','gpu_util_pct':4,'vram_used_mb':512,'vram_total_mb':8192,'vram_util_pct':6,'gpu_temp_c':36}}},
@@ -52,13 +53,21 @@ def main():
         '/api/server/status': {'connected': False, 'configured': False, 'authenticated': False},
     }
     evidence = []
+    pages = [
+        ('platform-dashboard', 'admin_dashboard.html', '/admin', 'dashboard', admin),
+        ('platform-upload', 'admin_upload.html', '/admin/upload', 'upload', admin),
+        ('studio', 'index_v3.html', '/', 'studio', studio),
+    ]
+    if options.extended:
+        pages += [(f'platform-{name}',template,'/admin/'+route,name,admin) for name,template,route in [
+            ('content','drive.html','videos'), ('settings','admin_settings.html','settings'),
+            ('shares','admin_shares.html','shares'), ('users','admin_users.html','users'),
+            ('api-keys','admin_api_keys.html','api-keys'), ('analytics','admin_analytics.html','analytics'),
+            ('processing','admin_processing.html','processing'), ('audit','admin_audit.html','audit'),
+        ]]
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        for name, template, route_path, page_id, base in [
-            ('platform-dashboard', 'admin_dashboard.html', '/admin', 'dashboard', admin),
-            ('platform-upload', 'admin_upload.html', '/admin/upload', 'upload', admin),
-            ('studio', 'index_v3.html', '/', 'studio', studio),
-        ]:
+        for name, template, route_path, page_id, base in pages:
             context = browser.new_context(viewport={'width': options.width, 'height': 1000}, device_scale_factor=1)
             context.add_cookies([{'name':'av_language','value':options.language,'url':'http://127.0.0.1:18899/'}])
             context.route_web_socket('**/*', lambda ws: None)
@@ -103,6 +112,13 @@ def main():
                 page.wait_for_selector('#upload-processing-controls:not(.hidden)')
                 assert page.locator('[data-language-select]').is_disabled(), 'Queued files must survive language selection'
             if page_id=='dashboard':page.wait_for_function("document.getElementById('kpiVideosVal').textContent==='24'")
+            if page_id=='shares':
+                with page.expect_request(lambda req: urlsplit(req.url).path=='/api/v1/drive/shares' and 'sort=expires_at' in req.url):
+                    page.locator('#sharesSort').select_option('expires_at:asc')
+                with page.expect_request(lambda req: urlsplit(req.url).path=='/api/v1/drive/shares' and 'limit=50' in req.url):
+                    page.locator('#sharesPageSize').select_option('50')
+                with page.expect_request(lambda req: urlsplit(req.url).path=='/api/v1/drive/shares' and 'q=Synthetic' in req.url):
+                    page.locator('#sharesSearch').fill('Synthetic')
             if page_id=='studio':
                 page.locator('#add-season').click()
                 page.wait_for_selector('.review-row')
@@ -129,7 +145,7 @@ def main():
             context.close()
         browser.close()
     (OUT/('screenshots-en.json' if options.language=='en' else 'screenshots.json')).write_text(json.dumps(evidence,indent=2),encoding='utf-8')
-    print('Captured three actual interfaces with offline synthetic data.')
+    print(f'Checked {len(pages)} actual interfaces with offline synthetic data.')
 
 
 if __name__ == '__main__':main()

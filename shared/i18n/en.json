@@ -2273,5 +2273,10 @@
   "ملفات الترجمة (*.ass; *.srt; *.vtt)": "Subtitle files (*.ass; *.srt; *.vtt)",
   "اختر مجلد الموسم للمعالجة": "Choose a season folder to process",
   "اسم المسلسل": "Series name",
-  "أكمل الرفع أو امسح القائمة قبل تغيير اللغة.": "Finish uploading or clear the queue before changing the language."
+  "أكمل الرفع أو امسح القائمة قبل تغيير اللغة.": "Finish uploading or clear the queue before changing the language.",
+  "بحث في المشاركات": "Search shares",
+  "الترتيب": "Sort order",
+  "الانتهاء الأقرب": "Expiring soonest",
+  "المشاركات في الصفحة": "Shares per page",
+  "صفحات المشاركات": "Share pages"
 }

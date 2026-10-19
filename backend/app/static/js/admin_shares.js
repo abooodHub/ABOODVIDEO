@@ -67,7 +67,7 @@ window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((o
       zIndex: '99999',
       boxShadow: '0 4px 16px rgba(0,0,0,.4)',
       fontFamily: 'inherit',
-      direction: 'rtl',
+      direction: document.documentElement.dir || 'rtl',
     });
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
