@@ -37,6 +37,7 @@ RUN addgroup -g 10001 -S aboodvideo \
 
 # Copy application code and tests
 COPY backend /app
+COPY shared /app/shared
 COPY tests /app/tests
 COPY scripts/setup_test_owner.py /app/scripts/setup_test_owner.py
 COPY scripts/entrypoint.sh /entrypoint.sh

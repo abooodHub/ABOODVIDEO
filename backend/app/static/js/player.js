@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 (function() {
     let config = {};
     const configEl = document.getElementById('player-config');
@@ -25,7 +26,7 @@
             const errBox = document.getElementById('pw-error');
 
             btn.disabled = true;
-            btn.innerText = "جاري التحقق...";
+            btn.innerText = window.AVi18n.t("جاري التحقق...");
             errBox.classList.add("hidden");
 
             try {
@@ -38,15 +39,15 @@
                 if (res.ok && data.success) {
                     window.location.reload();
                 } else {
-                    errBox.innerText = data.detail || "رمز المرور غير صحيح";
+                    errBox.innerText = window.AVi18n.t(data.detail) || window.AVi18n.t("رمز المرور غير صحيح");
                     errBox.classList.remove("hidden");
                 }
             } catch (err) {
-                errBox.innerText = "تعذر الاتصال بالخادم، يرجى المحاولة لاحقاً";
+                errBox.innerText = window.AVi18n.t("تعذر الاتصال بالخادم، يرجى المحاولة لاحقاً");
                 errBox.classList.remove("hidden");
             } finally {
                 btn.disabled = false;
-                btn.innerText = "دخول للمشاهدة";
+                btn.innerText = window.AVi18n.t("دخول للمشاهدة");
             }
         });
     }
@@ -165,7 +166,7 @@
     function getQualityShortLabel(lvlIdx) {
         if (lvlIdx === -1 || lvlIdx === null || lvlIdx === undefined) return 'Auto';
         const lvl = hls?.levels?.[lvlIdx];
-        if (!lvl) return 'يدوي';
+        if (!lvl) return window.AVi18n.t('يدوي');
         if (lvl.height >= 2160) return '4K';
         if (lvl.height) return `${lvl.height}p`;
         return `${Math.round(lvl.bitrate / 1000)}k`;
@@ -350,7 +351,7 @@
                         return;
                     }
                 }
-                showFatalPlaybackError("حدث خطأ أثناء تحميل البث أو انقطع الاتصال بالخادم.");
+                showFatalPlaybackError(window.AVi18n.t("حدث خطأ أثناء تحميل البث أو انقطع الاتصال بالخادم."));
             }
 
             function showFatalPlaybackError(msg) {
@@ -361,7 +362,7 @@
                     errOverlay.className = 'player-fatal-error';
                     container.appendChild(errOverlay);
                 }
-                errOverlay.innerHTML = `
+                errOverlay.innerHTML = window.AVi18n.tpl`
                     <div class="player-error-content">
                         <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -418,11 +419,11 @@
                             currentQoEState = QoEState.STALLED;
                             // LEVEL 2 Warning with [العودة إلى تلقائي] action button
                             showQualityToast(
-                                'الاتصال غير كافٍ لهذه الجودة',
+                                window.AVi18n.t('الاتصال غير كافٍ لهذه الجودة'),
                                 'error',
                                 8000,
                                 () => selectQuality(-1),
-                                'العودة إلى تلقائي'
+                                window.AVi18n.t('العودة إلى تلقائي')
                             );
                         }
                         stallTimer = null;
@@ -466,7 +467,7 @@
                 // LEVEL 1: Bandwidth repeatedly low for >= 2 consecutive segments while playing
                 if (consecutiveLowBwCount >= 2 && !video.paused && currentQoEState === QoEState.STABLE) {
                     currentQoEState = QoEState.DEGRADED;
-                    showQualityToast('قد لا يكون الاتصال مستقراً لهذه الجودة', 'warn', 5000);
+                    showQualityToast(window.AVi18n.t('قد لا يكون الاتصال مستقراً لهذه الجودة'), 'warn', 5000);
                 }
             }
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -508,7 +509,7 @@
             if (iconPlay) { iconPlay.classList.add('hidden'); iconPlay.style.display = 'none'; }
             if (iconPause) { iconPause.classList.remove('hidden'); iconPause.style.display = ''; }
             if (bigPlayBtn) { bigPlayBtn.classList.add('hidden'); bigPlayBtn.style.display = 'none'; }
-            if (playBtn) playBtn.setAttribute('title', 'إيقاف مؤقت (Space/K)');
+            if (playBtn) playBtn.setAttribute('title', window.AVi18n.t('إيقاف مؤقت (Space/K)'));
             showControls();
             trackAnalytics('start');
         });
@@ -517,7 +518,7 @@
             if (iconPlay) { iconPlay.classList.remove('hidden'); iconPlay.style.display = ''; }
             if (iconPause) { iconPause.classList.add('hidden'); iconPause.style.display = 'none'; }
             if (bigPlayBtn) { bigPlayBtn.classList.remove('hidden'); bigPlayBtn.style.display = ''; }
-            if (playBtn) playBtn.setAttribute('title', 'تشغيل (Space/K)');
+            if (playBtn) playBtn.setAttribute('title', window.AVi18n.t('تشغيل (Space/K)'));
             showControls();
         });
 
@@ -600,13 +601,13 @@
                     const s = Math.floor(savedTime % 60);
                     const timeStr = `${m}:${s < 10 ? '0' : ''}${s}`;
                     showQualityToast(
-                        `استئناف المشاهدة من ${timeStr}`,
+                        window.AVi18n.tpl`استئناف المشاهدة من ${timeStr}`,
                         'info',
                         6000,
                         () => {
                             video.currentTime = savedTime;
                         },
-                        'استئناف'
+                        window.AVi18n.t('استئناف')
                     );
                 }
             } catch (_) {}
@@ -708,7 +709,7 @@
                 const remaining = video.duration - video.currentTime;
                 if (remaining <= 15 && remaining > 0.5) {
                     nextCard.classList.remove('hidden');
-                    if (nextCountdown) nextCountdown.textContent = `تبدأ خلال ${Math.ceil(remaining)} ثوانٍ`;
+                    if (nextCountdown) nextCountdown.textContent = window.AVi18n.tpl`تبدأ خلال ${Math.ceil(remaining)} ثوانٍ`;
                 } else if (remaining <= 0.5) {
                     triggerNextEpisode();
                 } else {
@@ -805,13 +806,13 @@
                 volHigh.style.display = 'none';
                 volMute.classList.remove('hidden');
                 volMute.style.display = '';
-                if (muteBtn) muteBtn.setAttribute('title', 'إلغاء كتم الصوت (M)');
+                if (muteBtn) muteBtn.setAttribute('title', window.AVi18n.t('إلغاء كتم الصوت (M)'));
             } else {
                 volHigh.classList.remove('hidden');
                 volHigh.style.display = '';
                 volMute.classList.add('hidden');
                 volMute.style.display = 'none';
-                if (muteBtn) muteBtn.setAttribute('title', 'كتم الصوت (M)');
+                if (muteBtn) muteBtn.setAttribute('title', window.AVi18n.t('كتم الصوت (M)'));
             }
         }
 
@@ -837,7 +838,7 @@
                     iconFsExit.classList.toggle('hidden', !isFs);
                     iconFsExit.style.display = isFs ? '' : 'none';
                 }
-                if (fsBtn) fsBtn.setAttribute('title', isFs ? 'الخروج من ملء الشاشة (F)' : 'ملء الشاشة (F)');
+                if (fsBtn) fsBtn.setAttribute('title', isFs ? window.AVi18n.t('الخروج من ملء الشاشة (F)') : window.AVi18n.t('ملء الشاشة (F)'));
             });
         }
 
@@ -982,7 +983,7 @@
             stallStartTime = null;
             hls.nextLevel = -1; // Let ABR adapt freely
             updateQualityMenuSelection(actualQualityIndex);
-            showQualityToast('تلقائي (Auto)', false, 2500);
+            showQualityToast(window.AVi18n.t('تلقائي (Auto)'), false, 2500);
             return;
         }
 
@@ -1001,8 +1002,8 @@
         const targetLabel = getQualityShortLabel(lvlIdx);
 
         // Immediate UI feedback: "جاري التبديل إلى 4K..."
-        updateQualityMenuSelection(actualQualityIndex, `جاري التبديل إلى ${targetLabel}...`);
-        showQualityToast(`جاري التبديل إلى ${targetLabel}...`, false, 4000);
+        updateQualityMenuSelection(actualQualityIndex, window.AVi18n.tpl`جاري التبديل إلى ${targetLabel}...`);
+        showQualityToast(window.AVi18n.tpl`جاري التبديل إلى ${targetLabel}...`, false, 4000);
 
         // Safe Buffer Strategy:
         // Do not blindly destroy the entire buffer or stall playback.
@@ -1046,7 +1047,7 @@
         const auto = document.getElementById('qual-opt-auto');
         const actual = hls?.levels?.[currentIdx];
         const actualLabel = actual ? (actual.height >= 2160 ? '4K · 2160p' : (actual.height ? `${actual.height}p` : `${Math.round(actual.bitrate / 1000)}k`)) : '';
-        if (auto) auto.textContent = `تلقائي (Auto)${actualLabel ? ` · الآن ${actualLabel}` : ''}`;
+        if (auto) auto.textContent = window.AVi18n.tpl`تلقائي (Auto)${actualLabel ? window.AVi18n.tpl` · الآن ${actualLabel}` : ''}`;
         document.querySelectorAll('#quality-menu .menu-item').forEach(el => {
             const active = el.id === (selectedQualityIndex === -1 ? 'qual-opt-auto' : `qual-opt-${selectedQualityIndex}`);
             el.classList.toggle('active', active);
@@ -1067,7 +1068,7 @@
             } else if (selectedQualityIndex === -1) {
                 summary.textContent = `Auto${actualLabel ? ` · ${actualLabel}` : ''}`;
             } else if (isQualitySwitching && pendingQualityIndex !== null) {
-                summary.textContent = `جاري التبديل إلى ${getQualityShortLabel(pendingQualityIndex)}...`;
+                summary.textContent = window.AVi18n.tpl`جاري التبديل إلى ${getQualityShortLabel(pendingQualityIndex)}...`;
             } else {
                 summary.textContent = `${getQualityShortLabel(selectedQualityIndex)} ✓`;
             }
@@ -1083,7 +1084,7 @@
             button.type = 'button';
             button.className = 'menu-item';
             button.dataset.speed = String(speed);
-            button.textContent = speed === 1 ? 'طبيعي · 1x' : `${speed}x`;
+            button.textContent = speed === 1 ? window.AVi18n.t('طبيعي · 1x') : `${speed}x`;
             button.addEventListener('click', () => setSpeed(speed));
             menu.appendChild(button);
         });
@@ -1102,7 +1103,7 @@
             if (active) { const check = document.createElement('span'); check.className = 'menu-check'; check.textContent = '✓'; el.appendChild(check); }
         });
         const summary = document.getElementById('speed-summary');
-        if (summary) summary.textContent = speed === 1 ? 'طبيعي' : `${speed}x`;
+        if (summary) summary.textContent = speed === 1 ? window.AVi18n.t('طبيعي') : `${speed}x`;
     }
 
     function readEmbeddedFontFamily(bytes) {
@@ -1330,7 +1331,7 @@
             if (!notice) {
                 notice = document.createElement('div');
                 notice.className = 'caption-style-disabled-notice';
-                notice.textContent = 'ترجمة ASS تحتفظ بتنسيقها، خطوطها ومؤثراتها الأصلية. إعدادات المظهر تطبق على ترجمات WebVTT فقط.';
+                notice.textContent = window.AVi18n.t('ترجمة ASS تحتفظ بتنسيقها، خطوطها ومؤثراتها الأصلية. إعدادات المظهر تطبق على ترجمات WebVTT فقط.');
                 const backBtn = captionScreen.querySelector('.player-menu-back');
                 if (backBtn && backBtn.nextSibling) {
                     captionScreen.insertBefore(notice, backBtn.nextSibling);
@@ -1353,7 +1354,7 @@
         subOff.type = 'button';
         subOff.className = 'menu-item active';
         subOff.id = 'sub-opt-off';
-        subOff.textContent = 'إيقاف';
+        subOff.textContent = window.AVi18n.t('إيقاف');
         subOff.addEventListener('click', () => selectSubtitle(-1));
         menu.appendChild(subOff);
 
@@ -1382,9 +1383,9 @@
             } else if (sub.label && sub.label !== sub.name) {
                 displayLabel = `${displayLabel} (${sub.label})`;
             }
-            if (sub.is_default) displayLabel += ' · افتراضية';
-            if (sub.is_forced) displayLabel += ' · إجبارية';
-            if (!sub.is_playable) displayLabel += ' · أرشيف فقط';
+            if (sub.is_default) displayLabel += window.AVi18n.t(' · افتراضية');
+            if (sub.is_forced) displayLabel += window.AVi18n.t(' · إجبارية');
+            if (!sub.is_playable) displayLabel += window.AVi18n.t(' · أرشيف فقط');
 
             item.textContent = displayLabel;
             if (sub.is_playable) {
@@ -1445,11 +1446,11 @@
         const summary = document.getElementById('subtitle-summary');
         if (summary) {
             if (subIdx === -1) {
-                summary.textContent = 'إيقاف';
+                summary.textContent = window.AVi18n.t('إيقاف');
             } else {
                 const s = SUBTITLES_LIST[subIdx];
                 const isAss = (s?.format || '').toLowerCase() === 'ass' || (s?.format || '').toLowerCase() === 'ssa' || s?.renderer === 'libass';
-                summary.textContent = isAss ? `${s?.name || s?.label} ASS` : (s?.label || s?.name || 'تشغيل');
+                summary.textContent = isAss ? `${s?.name || s?.label} ASS` : (s?.label || s?.name || window.AVi18n.t('تشغيل'));
             }
         }
     }

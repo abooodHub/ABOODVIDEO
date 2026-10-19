@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* ABOODVIDEO Admin Series index (Phase 9). */
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('series-grid');
@@ -21,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!Array.isArray(series) || !series.length) {
                 const empty = el('div', '', ['empty-state']);
                 empty.append(
-                    el('div', 'لا توجد مسلسلات بعد', ['empty-state-title']),
-                    el('p', 'ارفع فيديو واربطه باسم مسلسل ليظهر هنا منظماً بالمواسم.', ['empty-state-desc']),
+                    el('div', window.AVi18n.t('لا توجد مسلسلات بعد'), ['empty-state-title']),
+                    el('p', window.AVi18n.t('ارفع فيديو واربطه باسم مسلسل ليظهر هنا منظماً بالمواسم.'), ['empty-state-desc']),
                 );
-                const link = el('a', 'رفع حلقة جديدة', ['btn', 'btn-primary']);
+                const link = el('a', window.AVi18n.t('رفع حلقة جديدة'), ['btn', 'btn-primary']);
                 link.href = '/admin/upload';
                 empty.appendChild(link);
                 grid.replaceChildren(empty);
@@ -41,14 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
                 const stats = el('div', '', ['series-stats']);
                 stats.append(
-                    (() => { const d = el('div', '', ['series-stat']); d.append(el('b', s.seasons), el('span', 'موسم')); return d; })(),
-                    (() => { const d = el('div', '', ['series-stat']); d.append(el('b', s.episodes), el('span', 'حلقة')); return d; })(),
-                    (() => { const d = el('div', '', ['series-stat']); d.append(el('b', fmtBytes(s.total_size_bytes)), el('span', 'الحجم')); return d; })(),
+                    (() => { const d = el('div', '', ['series-stat']); d.append(el('b', s.seasons), el('span', window.AVi18n.t('موسم'))); return d; })(),
+                    (() => { const d = el('div', '', ['series-stat']); d.append(el('b', s.episodes), el('span', window.AVi18n.t('حلقة'))); return d; })(),
+                    (() => { const d = el('div', '', ['series-stat']); d.append(el('b', fmtBytes(s.total_size_bytes)), el('span', window.AVi18n.t('الحجم'))); return d; })(),
                 );
                 const foot = el('div', '', ['series-foot']);
                 foot.append(
-                    el('span', `${s.ready_count} جاهز`, ['badge', 'badge-quality']),
-                    s.processing_count ? el('span', `${s.processing_count} قيد المعالجة`, ['badge', 'status-processing']) : el('span', '', ['hidden']),
+                    el('span', window.AVi18n.tpl`${s.ready_count} جاهز`, ['badge', 'badge-quality']),
+                    s.processing_count ? el('span', window.AVi18n.tpl`${s.processing_count} قيد المعالجة`, ['badge', 'status-processing']) : el('span', '', ['hidden']),
                 );
                 card.append(head, stats, foot);
                 return card;
@@ -56,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.classList.remove('hidden');
         } catch (_) {
             loading.classList.add('hidden');
-            feedback.textContent = 'تعذر تحميل المسلسلات — أعد المحاولة.';
+            feedback.textContent = window.AVi18n.t('تعذر تحميل المسلسلات — أعد المحاولة.');
             feedback.classList.remove('hidden');
             feedback.classList.add('is-error');
         }

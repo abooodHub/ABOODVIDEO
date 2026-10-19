@@ -10,6 +10,9 @@ from studio.web.routes.api import router as api_router
 from studio.web.routes.batch_api import router as batch_api_router
 from studio.config import VERSION
 from studio.web.local_security import local_request_error
+from shared.i18n import configure_environment, WEB_DIR
+from shared.i18n.middleware import LocaleMiddleware
+from studio.config import load_studio_config
 
 
 def get_base_web_dir() -> Path:
@@ -48,8 +51,11 @@ async def studio_security_headers(request: Request, call_next):
     response.headers["X-Frame-Options"] = "DENY"
     return response
 
+app.add_middleware(LocaleMiddleware, fallback=lambda: load_studio_config().get('language', 'ar'))
+app.mount('/static/i18n', StaticFiles(directory=str(WEB_DIR)), name='i18n')
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+configure_environment(templates.env)
 
 app.include_router(api_router)
 app.include_router(batch_api_router)

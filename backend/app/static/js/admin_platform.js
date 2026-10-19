@@ -1,15 +1,16 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 (() => {
   'use strict';
 
   const $ = (id) => document.getElementById(id);
   const state = { userOffset: 0, auditOffset: 0, limit: 50, userQuery: '', auditAction: '', auditResult: '' };
   const labels = {
-    database: 'PostgreSQL', redis: 'Redis', storage: 'التخزين',
-    published_media: 'الوسائط المنشورة', trash_media: 'سلة المحذوفات',
-    unpublished_video_storage: 'وسائط غير منشورة', orphan_video_storage: 'وسائط بلا سجل فيديو',
-    upload_staging: 'رفع الملفات', studio_package_staging: 'حزم Studio المؤقتة',
-    temporary_processing: 'المعالجة المؤقتة', source_import: 'استيراد المصدر',
-    other_managed_storage: 'ملفات مُدارة أخرى',
+    database: 'PostgreSQL', redis: 'Redis', storage: window.AVi18n.t('التخزين'),
+    published_media: window.AVi18n.t('الوسائط المنشورة'), trash_media: window.AVi18n.t('سلة المحذوفات'),
+    unpublished_video_storage: window.AVi18n.t('وسائط غير منشورة'), orphan_video_storage: window.AVi18n.t('وسائط بلا سجل فيديو'),
+    upload_staging: window.AVi18n.t('رفع الملفات'), studio_package_staging: window.AVi18n.t('حزم Studio المؤقتة'),
+    temporary_processing: window.AVi18n.t('المعالجة المؤقتة'), source_import: window.AVi18n.t('استيراد المصدر'),
+    other_managed_storage: window.AVi18n.t('ملفات مُدارة أخرى'),
   };
 
   function csrfToken() {
@@ -27,7 +28,7 @@
     }
     const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options, headers });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.detail || `HTTP ${response.status}`);
+    if (!response.ok) throw new Error(window.AVi18n.t(body.detail) || `HTTP ${response.status}`);
     return body;
   }
 
@@ -49,7 +50,7 @@
     if (!root) return;
     const body = $('users-rows');
     const stat = $('users-status');
-    status(stat, 'جارٍ تحميل الحسابات…');
+    status(stat, window.AVi18n.t('جارٍ تحميل الحسابات…'));
     try {
       const query = new URLSearchParams({ limit: String(state.limit), offset: String(state.userOffset) });
       if (state.userQuery) query.set('q', state.userQuery);
@@ -60,43 +61,43 @@
         cell(tr, user.username);
         cell(tr, user.email);
         const roleCell = cell(tr, user.role);
-        cell(tr, user.active ? 'نشط' : 'معطّل');
-        cell(tr, user.created_at ? new Date(user.created_at).toLocaleDateString('ar') : '—');
+        cell(tr, user.active ? window.AVi18n.t('نشط') : window.AVi18n.t('معطّل'));
+        cell(tr, user.created_at ? new Date(user.created_at).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-US' : 'ar')) : '—');
         if (root.dataset.canManage === 'true') {
           const actions = document.createElement('td');
           const rowActions = document.createElement('div');
           rowActions.className = 'platform-inline-action';
           if (user.id !== root.dataset.userId) {
             const select = document.createElement('select');
-            select.setAttribute('aria-label', `رتبة ${user.username}`);
-            for (const [value, label] of [['USER', 'مستخدم'], ['VIP', 'VIP'], ['ADMIN', 'مدير'], ['OWNER', 'مالك'], ['BANNED', 'محظور']]) {
+            select.setAttribute('aria-label', window.AVi18n.tpl`رتبة ${user.username}`);
+            for (const [value, label] of [['USER', window.AVi18n.t('مستخدم')], ['VIP', 'VIP'], ['ADMIN', window.AVi18n.t('مدير')], ['OWNER', window.AVi18n.t('مالك')], ['BANNED', window.AVi18n.t('محظور')]]) {
               const option = document.createElement('option'); option.value = value; option.textContent = label;
               option.selected = user.role === value; select.append(option);
             }
-            const save = document.createElement('button'); save.type = 'button'; save.className = 'btn btn-secondary'; save.textContent = 'حفظ الرتبة';
+            const save = document.createElement('button'); save.type = 'button'; save.className = 'btn btn-secondary'; save.textContent = window.AVi18n.t('حفظ الرتبة');
             save.addEventListener('click', async () => {
               try { await api(`/api/v1/admin/users/${encodeURIComponent(user.id)}/role`, { method: 'PATCH', body: JSON.stringify({ role: select.value }) }); await loadUsers(); }
-              catch (error) { status(stat, error.message, true); }
+              catch (error) { status(stat, window.AVi18n.t(error.message), true); }
             });
-            const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'btn btn-secondary'; toggle.textContent = user.active ? 'تعطيل' : 'تفعيل';
+            const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'btn btn-secondary'; toggle.textContent = user.active ? window.AVi18n.t('تعطيل') : window.AVi18n.t('تفعيل');
             toggle.addEventListener('click', async () => {
               try { await api(`/api/v1/admin/users/${encodeURIComponent(user.id)}/status`, { method: 'PATCH', body: JSON.stringify({ active: !user.active }) }); await loadUsers(); }
-              catch (error) { status(stat, error.message, true); }
+              catch (error) { status(stat, window.AVi18n.t(error.message), true); }
             });
             rowActions.append(select, save, toggle);
           } else {
-            rowActions.textContent = 'الحساب الحالي';
+            rowActions.textContent = window.AVi18n.t('الحساب الحالي');
           }
           actions.append(rowActions); tr.append(actions);
         }
         body.append(tr);
       }
       const end = Math.min(state.userOffset + data.items.length, data.total);
-      $('users-page').textContent = `${data.total ? state.userOffset + 1 : 0}–${end} من ${data.total}`;
+      $('users-page').textContent = window.AVi18n.tpl`${data.total ? state.userOffset + 1 : 0}–${end} من ${data.total}`;
       $('users-prev').disabled = state.userOffset === 0;
       $('users-next').disabled = end >= data.total;
-      status(stat, data.items.length ? `تم عرض ${data.items.length} حسابات.` : 'لا توجد حسابات مطابقة.');
-    } catch (error) { status(stat, error.message, true); }
+      status(stat, data.items.length ? window.AVi18n.tpl`تم عرض ${data.items.length} حسابات.` : window.AVi18n.t('لا توجد حسابات مطابقة.'));
+    } catch (error) { status(stat, window.AVi18n.t(error.message), true); }
   }
 
   function setupUsers() {
@@ -146,7 +147,7 @@
         try {
           await api('/api/v1/admin/users', { method: 'POST', body: JSON.stringify(payload) });
           form.reset(); dialog.close(); state.userOffset = 0; await loadUsers();
-        } catch (err) { error.textContent = err.message; }
+        } catch (err) { error.textContent = window.AVi18n.t(err.message); }
       });
     }
     loadUsers();
@@ -155,7 +156,7 @@
   async function loadAudit() {
     if (!$('audit-rows')) return;
     const target = $('audit-rows'); const stat = $('audit-status');
-    status(stat, 'جارٍ تحميل الأحداث…');
+    status(stat, window.AVi18n.t('جارٍ تحميل الأحداث…'));
     try {
       const query = new URLSearchParams({ limit: String(state.limit), offset: String(state.auditOffset) });
       if (state.auditAction) query.set('action', state.auditAction);
@@ -164,7 +165,7 @@
       target.replaceChildren();
       for (const event of data.items) {
         const tr = document.createElement('tr');
-        cell(tr, new Date(event.created_at).toLocaleString('ar'));
+        cell(tr, new Date(event.created_at).toLocaleString((document.documentElement.lang === 'en' ? 'en-US' : 'ar')));
         cell(tr, event.action);
         cell(tr, event.actor_id);
         cell(tr, [event.target_type, event.target_id].filter(Boolean).join(' · '));
@@ -173,11 +174,11 @@
         target.append(tr);
       }
       const end = Math.min(state.auditOffset + data.items.length, data.total);
-      $('audit-page').textContent = `${data.total ? state.auditOffset + 1 : 0}–${end} من ${data.total}`;
+      $('audit-page').textContent = window.AVi18n.tpl`${data.total ? state.auditOffset + 1 : 0}–${end} من ${data.total}`;
       $('audit-prev').disabled = state.auditOffset === 0;
       $('audit-next').disabled = end >= data.total;
-      status(stat, data.items.length ? `تم عرض ${data.items.length} حدثًا.` : 'لا توجد أحداث مطابقة.');
-    } catch (error) { status(stat, error.message, true); }
+      status(stat, data.items.length ? window.AVi18n.tpl`تم عرض ${data.items.length} حدثًا.` : window.AVi18n.t('لا توجد أحداث مطابقة.'));
+    } catch (error) { status(stat, window.AVi18n.t(error.message), true); }
   }
 
   function setupAudit() {
@@ -201,8 +202,8 @@
   }
 
   const bytes = (value) => {
-    if (value == null) return 'غير متاح';
-    const units = ['بايت', 'ك.بايت', 'م.بايت', 'ج.بايت', 'ت.بايت'];
+    if (value == null) return window.AVi18n.t('غير متاح');
+    const units = [window.AVi18n.t('بايت'), window.AVi18n.t('ك.بايت'), window.AVi18n.t('م.بايت'), window.AVi18n.t('ج.بايت'), window.AVi18n.t('ت.بايت')];
     let n = Number(value); let i = 0;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i += 1; }
     return `${n.toFixed(i ? 2 : 0)} ${units[i]}`;
@@ -210,7 +211,7 @@
 
   async function loadStorage() {
     if (!$('storage-categories')) return;
-    status($('storage-status'), 'جارٍ فحص التخزين…');
+    status($('storage-status'), window.AVi18n.t('جارٍ فحص التخزين…'));
     try {
       const data = await api('/api/v1/admin/storage/summary');
       const cards = $('storage-categories'); cards.replaceChildren();
@@ -227,7 +228,7 @@
         ...(data.orphan_temporary_resources?.candidates || []),
       ];
       if (!orphanRows.length) {
-        const item = document.createElement('li'); item.textContent = 'لم تُكتشف عناصر مؤقتة يتيمة ضمن المسارات المعروفة.'; orphanList.append(item);
+        const item = document.createElement('li'); item.textContent = window.AVi18n.t('لم تُكتشف عناصر مؤقتة يتيمة ضمن المسارات المعروفة.'); orphanList.append(item);
       } else {
         for (const row of orphanRows) {
           const item = document.createElement('li'); item.textContent = `${row.kind}: ${row.identity}`; orphanList.append(item);
@@ -238,16 +239,16 @@
         الحجم_الإجمالي: bytes(data.filesystem?.total_bytes),
         المستخدم: bytes(data.filesystem?.used_bytes),
         المتاح: bytes(data.filesystem?.free_bytes),
-        اكتمال_الفحص: data.scan_complete ? 'مكتمل' : 'غير مكتمل',
+        اكتمال_الفحص: data.scan_complete ? window.AVi18n.t('مكتمل') : window.AVi18n.t('غير مكتمل'),
         الملفات_المعدودة: data.file_count,
       });
-      status($('storage-status'), data.scan_complete ? 'اكتمل الفحص من الملفات الحالية.' : 'الفحص غير مكتمل؛ راجع توفر مسارات التخزين. ', !data.scan_complete);
-    } catch (error) { status($('storage-status'), error.message, true); }
+      status($('storage-status'), data.scan_complete ? window.AVi18n.t('اكتمل الفحص من الملفات الحالية.') : window.AVi18n.t('الفحص غير مكتمل؛ راجع توفر مسارات التخزين. '), !data.scan_complete);
+    } catch (error) { status($('storage-status'), window.AVi18n.t(error.message), true); }
   }
 
   async function loadSystem() {
     if (!$('system-services')) return;
-    status($('system-status'), 'جارٍ فحص الخدمات…');
+    status($('system-status'), window.AVi18n.t('جارٍ فحص الخدمات…'));
     const [overall, worker, reconciler] = await Promise.allSettled([
       api('/api/v1/health/readiness'), api('/api/v1/health/worker'), api('/api/v1/health/reconciler'),
     ]);
@@ -260,15 +261,15 @@
       card.append(h, strong); container.append(card);
     }
     const facts = {};
-    facts['صحة التطبيق'] = services?.status || 'غير متاح';
-    facts['إصدار التطبيق'] = services?.version || 'غير متاح';
-    facts['حالة العامل'] = worker.status === 'fulfilled' ? worker.value.worker_status : 'غير متاح';
-    facts['عمق الطابور'] = worker.status === 'fulfilled' ? worker.value.queue_depth : 'غير متاح';
-    facts['حالة المصالح'] = reconciler.status === 'fulfilled' ? reconciler.value.status : 'غير متاح';
-    facts['آخر نبض للمصالح (ثانية)'] = reconciler.status === 'fulfilled' ? reconciler.value.last_seen_seconds_ago : 'غير متاح';
+    facts['صحة التطبيق'] = services?.status || window.AVi18n.t('غير متاح');
+    facts['إصدار التطبيق'] = services?.version || window.AVi18n.t('غير متاح');
+    facts['حالة العامل'] = worker.status === 'fulfilled' ? worker.value.worker_status : window.AVi18n.t('غير متاح');
+    facts['عمق الطابور'] = worker.status === 'fulfilled' ? worker.value.queue_depth : window.AVi18n.t('غير متاح');
+    facts['حالة المصالح'] = reconciler.status === 'fulfilled' ? reconciler.value.status : window.AVi18n.t('غير متاح');
+    facts['آخر نبض للمصالح (ثانية)'] = reconciler.status === 'fulfilled' ? reconciler.value.last_seen_seconds_ago : window.AVi18n.t('غير متاح');
     renderFacts($('system-workers'), facts);
     const okay = services?.status === 'healthy' && worker.status === 'fulfilled' && reconciler.status === 'fulfilled';
-    status($('system-status'), okay ? 'الخدمات المطلوبة ومكوّنات التشغيل متاحة.' : 'هناك خدمة غير متاحة أو لم تستجب للفحص.', !okay);
+    status($('system-status'), okay ? window.AVi18n.t('الخدمات المطلوبة ومكوّنات التشغيل متاحة.') : window.AVi18n.t('هناك خدمة غير متاحة أو لم تستجب للفحص.'), !okay);
   }
 
   setupUsers(); setupAudit();

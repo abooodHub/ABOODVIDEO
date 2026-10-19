@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
+from shared.i18n import gettext
 from app.models.video import Video, VideoStatus, VideoRendition, VideoSubtitle, VideoFontAsset
 
 
@@ -91,17 +92,17 @@ class PlaybackInspectorService:
                 "status": "FAIL",
                 "inspected_at": inspected_at,
                 "duration_ms": round((time.perf_counter() - start_time) * 1000, 2),
-                "error": "الفيديو أو معرّف المشاركة غير موجود في النظام.",
+                "error": gettext("الفيديو أو معرّف المشاركة غير موجود في النظام."),
                 "identifier_provided": self._sanitize_string(clean_id),
                 "summary": {"total": 1, "passed": 0, "warnings": 0, "failed": 1, "score_pct": 0},
                 "checks": [
                     {
                         "id": "video_exists",
                         "category": "video_state",
-                        "title": "وجود الفيديو في قاعدة البيانات",
+                        "title": gettext("وجود الفيديو في قاعدة البيانات"),
                         "status": "FAIL",
-                        "message": "لم يتم العثور على أي فيديو يطابق المعرّف أو رابط المشاركة.",
-                        "detail": f"المعرف: {self._sanitize_string(clean_id)}",
+                        "message": gettext("لم يتم العثور على أي فيديو يطابق المعرّف أو رابط المشاركة."),
+                        "detail": gettext(f"المعرف: {self._sanitize_string(clean_id)}"),
                     }
                 ],
             }
@@ -542,6 +543,11 @@ class PlaybackInspectorService:
 
         score_pct = int((passed / total) * 100) if total > 0 else 0
         duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
+
+        for check in checks:
+            for key in ('title', 'message', 'detail'):
+                if isinstance(check.get(key), str):
+                    check[key] = gettext(check[key])
 
         return {
             "status": overall_status,

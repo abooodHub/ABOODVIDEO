@@ -3,7 +3,7 @@ import asyncio
 import os
 import shutil
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Literal
 from fastapi import APIRouter, File, UploadFile, HTTPException, WebSocket, WebSocketDisconnect, Request
 from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel
@@ -42,6 +42,7 @@ class FontsAnalyzeRequest(BaseModel):
 
 
 class ConfigUpdateRequest(BaseModel):
+    language: Optional[Literal['ar', 'en']] = None
     server_url: Optional[str] = None
     api_key: Optional[str] = None
     default_encoder: Optional[str] = None

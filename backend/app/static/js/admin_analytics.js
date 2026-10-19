@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /**
  * Admin Analytics Dashboard Client Logic
  * Handles telemetry fetching, KPI updating, quality distribution, and one-click embed copying.
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const empty = document.getElementById('geo-map-empty');
         const entries = Object.entries(countries || {}).filter(([code, count]) => /^[A-Z]{2}$/.test(code) && Number(count) > 0);
         const badge = document.getElementById('geo-map-count');
-        if (badge) badge.textContent = `${formatNumber(entries.length)} دولة`;
+        if (badge) badge.textContent = window.AVi18n.tpl`${formatNumber(entries.length)} دولة`;
         if (empty) empty.classList.toggle('hidden', entries.length > 0);
         if (!host || !window.jsVectorMap) return;
 
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (geoResponse.ok) renderGeoMap((await geoResponse.json()).countries);
         } catch (error) {
             const status = document.getElementById('geo-policy-status');
-            if (status) status.textContent = 'تعذر تحميل إعدادات الموقع الجغرافي.';
+            if (status) status.textContent = window.AVi18n.t('تعذر تحميل إعدادات الموقع الجغرافي.');
         }
     }
 
@@ -105,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('quality-bars-container');
         if (!container) return;
         if (!qualities || qualities.length === 0) {
-            container.innerHTML = '<div class="text-muted py-3 text-center">لا توجد بيانات جودات مسجلة بعد.</div>';
+            container.innerHTML = window.AVi18n.t('<div class="text-muted py-3 text-center">لا توجد بيانات جودات مسجلة بعد.</div>');
             return;
         }
 
@@ -140,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('referrers-container');
         if (!container) return;
         if (!referrers || referrers.length === 0) {
-            container.innerHTML = `
+            container.innerHTML = window.AVi18n.tpl`
                 <div class="text-muted py-3 text-center">
                     المشغل متاح للتضمين في المواقع المصرّح بها ضمن إعدادات المنصة.
                 </div>
@@ -152,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         referrers.forEach(item => {
             const el = document.createElement('div');
             el.className = 'referrer-item';
-            el.innerHTML = `
+            el.innerHTML = window.AVi18n.tpl`
                 <span class="referrer-domain dir-ltr">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                     ${escapeHTML(item.domain)}
@@ -170,15 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = document.getElementById('analytics-videos-tbody');
         if (!tbody) return;
         if (!videos || videos.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">لا توجد فيديوهات مسجلة بعد.</td></tr>';
+            tbody.innerHTML = window.AVi18n.t('<tr><td colspan="6" class="text-center py-4 text-muted">لا توجد فيديوهات مسجلة بعد.</td></tr>');
             return;
         }
 
         tbody.innerHTML = '';
         videos.forEach(v => {
             const tr = document.createElement('tr');
-            const epLabel = String(v.title || '').trim() || (v.episode_number ? `الحلقة ${v.episode_number}` : 'فيديو بدون اسم');
-            const contextLabel = [v.series_name && v.series_name !== 'عام' ? v.series_name : '', v.episode_number ? `الحلقة ${v.episode_number}` : ''].filter(Boolean).join(' · ') || v.series_name || '—';
+            const epLabel = String(v.title || '').trim() || (v.episode_number ? window.AVi18n.tpl`الحلقة ${v.episode_number}` : window.AVi18n.t('فيديو بدون اسم'));
+            const contextLabel = [v.series_name && v.series_name !== 'عام' ? v.series_name : '', v.episode_number ? window.AVi18n.tpl`الحلقة ${v.episode_number}` : ''].filter(Boolean).join(' · ') || v.series_name || '—';
             tr.innerHTML = `
                 <td><strong>${escapeHTML(epLabel)}</strong></td>
                 <td><span class="text-muted">${escapeHTML(contextLabel)}</span></td>

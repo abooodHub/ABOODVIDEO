@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /**
  * ABOODVIDEO — Video Drive & Media File Manager Client Controller (V5)
  * Modern, high performance, full Drag & Drop, Context Menus, Breadcrumb sibling navigation,
@@ -314,12 +315,12 @@
             const res = await fetch(url, options);
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
-                throw new Error(errData.detail || `Request failed (${res.status})`);
+                throw new Error(window.AVi18n.t(errData.detail) || `Request failed (${res.status})`);
             }
             return await res.json();
         } catch (err) {
             console.error('API Error:', err);
-            if (!silentError) showToast(err.message || 'حدث خطأ في الاتصال بالخادم', 'error');
+            if (!silentError) showToast(window.AVi18n.t(err.message) || window.AVi18n.t('حدث خطأ في الاتصال بالخادم'), 'error');
             throw err;
         }
     }
@@ -423,7 +424,7 @@
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = `crumb-btn ${isLast ? 'is-current' : ''}`;
-            btn.textContent = crumb.name || 'مكتبة المحتوى';
+            btn.textContent = crumb.name || window.AVi18n.t('مكتبة المحتوى');
             if (!isLast) {
                 btn.addEventListener('click', () => {
                     if (crumb.type === 'trash') {
@@ -463,7 +464,7 @@
                 const jumpBtn = document.createElement('button');
                 jumpBtn.type = 'button';
                 jumpBtn.className = 'crumb-jump-btn';
-                jumpBtn.title = 'تخطي سريع للعناصر المجاورة';
+                jumpBtn.title = window.AVi18n.t('تخطي سريع للعناصر المجاورة');
                 jumpBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
 
                 const jumpMenu = document.createElement('div');
@@ -514,19 +515,19 @@
         const lowerType = String(type).toLowerCase().trim();
         if (lowerType === 'folder' || lowerType === 'مجلد') {
             type = 'folder';
-            type_label = type_label || 'مجلد';
+            type_label = type_label || window.AVi18n.t('مجلد');
         } else if (lowerType === 'series' || lowerType === 'مسلسل') {
             type = 'series';
-            type_label = type_label || 'مسلسل';
+            type_label = type_label || window.AVi18n.t('مسلسل');
         } else if (lowerType === 'season' || lowerType === 'موسم') {
             type = 'season';
-            type_label = type_label || 'موسم';
+            type_label = type_label || window.AVi18n.t('موسم');
         } else {
-            type_label = type_label || (type === 'حلقة' || raw.episode_number != null ? 'حلقة' : 'فيديو');
+            type_label = type_label || (type === 'حلقة' || raw.episode_number != null ? window.AVi18n.t('حلقة') : window.AVi18n.t('فيديو'));
             type = 'video';
         }
 
-        const name = raw.name || raw.title || 'عنصر';
+        const name = raw.name || raw.title || window.AVi18n.t('عنصر');
         const filename = raw.filename || raw.source_filename || name;
         const has_subtitles = Boolean(raw.has_subtitles || (raw.subtitles && raw.subtitles !== 'لا يوجد' && raw.subtitles !== '—' && raw.subtitles !== 'بدون'));
 
@@ -583,9 +584,9 @@
             rawItems = data.items.slice();
         } else {
             rawItems = [
-                ...(data.folders || []).map(f => ({ ...f, type: 'folder', type_label: 'مجلد' })),
-                ...(data.series || []).map(s => ({ ...s, type: 'series', type_label: 'مسلسل' })),
-                ...(data.seasons || []).map(sn => ({ ...sn, type: 'season', type_label: 'موسم' })),
+                ...(data.folders || []).map(f => ({ ...f, type: 'folder', type_label: window.AVi18n.t('مجلد') })),
+                ...(data.series || []).map(s => ({ ...s, type: 'series', type_label: window.AVi18n.t('مسلسل') })),
+                ...(data.seasons || []).map(sn => ({ ...sn, type: 'season', type_label: window.AVi18n.t('موسم') })),
                 ...(data.videos || []).map(v => ({ ...v, type: 'video' })),
                 ...(data.trash_items || []),
             ];
@@ -601,13 +602,13 @@
         if (elements.pageInfo) {
             const first = items.length ? pageStart + 1 : 0;
             const last = Math.min(pageStart + state.pageSize, totalItems);
-            elements.pageInfo.textContent = `عرض ${first}–${last} من ${totalItems.toLocaleString('ar')}`;
+            elements.pageInfo.textContent = window.AVi18n.tpl`عرض ${first}–${last} من ${totalItems.toLocaleString((document.documentElement.lang === 'en' ? 'en-US' : 'ar'))}`;
         }
         if (elements.prevPage) elements.prevPage.disabled = state.page <= 1;
         if (elements.nextPage) elements.nextPage.disabled = state.page >= pageCount;
 
         // 5. Update Badge
-        elements.itemCountBadge.textContent = `${totalItems} عنصر`;
+        elements.itemCountBadge.textContent = window.AVi18n.tpl`${totalItems} عنصر`;
 
         // 6. Populate Table
         elements.tableBody.innerHTML = '';
@@ -619,9 +620,9 @@
                 <td colspan="10">
                     <div class="empty-state">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                        <h4>${isTrash ? 'سلة المحذوفات فارغة' : filtered ? 'لا توجد نتائج ضمن الفلتر الحالي' : 'هذا المجلد فارغ'}</h4>
-                        <p>${isTrash ? 'لا توجد عناصر محذوفة حالياً.' : filtered ? 'قد توجد عناصر مستبعدة بسبب نوع المحتوى أو البحث.' : 'قم برفع ملف فيديو أو إنشاء مجلد جديد لبدء التنظيم.'}</p>
-                        ${filtered ? '<button type="button" class="btn btn-secondary" id="showAllEmptyResults">إظهار الكل وإلغاء البحث</button>' : ''}
+                        <h4>${isTrash ? window.AVi18n.t('سلة المحذوفات فارغة') : filtered ? window.AVi18n.t('لا توجد نتائج ضمن الفلتر الحالي') : window.AVi18n.t('هذا المجلد فارغ')}</h4>
+                        <p>${isTrash ? window.AVi18n.t('لا توجد عناصر محذوفة حالياً.') : filtered ? window.AVi18n.t('قد توجد عناصر مستبعدة بسبب نوع المحتوى أو البحث.') : window.AVi18n.t('قم برفع ملف فيديو أو إنشاء مجلد جديد لبدء التنظيم.')}</p>
+                        ${filtered ? window.AVi18n.t('<button type="button" class="btn btn-secondary" id="showAllEmptyResults">إظهار الكل وإلغاء البحث</button>') : ''}
                     </div>
                 </td>
             `;
@@ -693,22 +694,22 @@
             // Secondary subtitle calculation
             let subtitleText = '';
             if (isTrash) {
-                subtitleText = `المكان السابق: ${item.previous_location || 'مكتبة المحتوى'}`;
+                subtitleText = window.AVi18n.tpl`المكان السابق: ${item.previous_location || window.AVi18n.t('مكتبة المحتوى')}`;
             } else if (item.location_path) {
                 subtitleText = item.location_path;
             } else if (item.type === 'folder') {
-                subtitleText = item.items_count != null ? `مجلد · ${item.items_count} عنصر` : 'مجلد';
+                subtitleText = item.items_count != null ? window.AVi18n.tpl`مجلد · ${item.items_count} عنصر` : window.AVi18n.t('مجلد');
             } else if (item.type === 'series') {
-                subtitleText = `${item.seasons_count || 0} مواسم · ${item.episodes_count || 0} حلقة`;
+                subtitleText = window.AVi18n.tpl`${item.seasons_count || 0} مواسم · ${item.episodes_count || 0} حلقة`;
             } else if (item.type === 'season') {
-                subtitleText = `${item.episodes_count || 0} حلقة · ${item.size_formatted || '—'}`;
+                subtitleText = window.AVi18n.tpl`${item.episodes_count || 0} حلقة · ${item.size_formatted || '—'}`;
             } else {
                 if (item.series_name) {
                     const s = item.season_number ? `S${String(item.season_number).padStart(2, '0')}` : '';
                     const ep = item.episode_number ? `E${String(item.episode_number).padStart(2, '0')}` : '';
                     subtitleText = `${item.series_name} · ${s}${ep}`;
                 } else {
-                    subtitleText = item.filename || 'فيديو';
+                    subtitleText = item.filename || window.AVi18n.t('فيديو');
                 }
             }
 
@@ -719,7 +720,7 @@
             let policyHtml = '—';
             if (!isTrash && item.allow_download_policy) {
                 const pol = item.allow_download_policy.toLowerCase();
-                const polText = pol === 'allow' ? 'مسموح' : pol === 'deny' ? 'معطل' : 'موروث';
+                const polText = pol === 'allow' ? window.AVi18n.t('مسموح') : pol === 'deny' ? window.AVi18n.t('معطل') : window.AVi18n.t('موروث');
                 policyHtml = `<span class="policy-badge policy-${pol}">${polText}</span>`;
             }
 
@@ -732,7 +733,7 @@
             // Subtitle badge
             let subHtml = '—';
             if (item.has_subtitles) {
-                subHtml = `<span class="quality-badge">${escapeHtml(item.subtitles_count || 'نعم')}</span>`;
+                subHtml = `<span class="quality-badge">${escapeHtml(item.subtitles_count || window.AVi18n.t('نعم'))}</span>`;
             }
 
             // Checkbox
@@ -742,7 +743,7 @@
                 ? `<div class="drive-grid-poster" aria-hidden="true">${gridPosterUrl ? `<img src="${escapeHtml(gridPosterUrl)}" alt="" loading="lazy" decoding="async">` : ''}<span class="drive-grid-poster-fallback">${getEntitySvg('video')}</span></div>`
                 : '';
 
-            tr.innerHTML = `
+            tr.innerHTML = window.AVi18n.tpl`
                 <td class="col-check">
                     <input type="checkbox" class="drive-checkbox" ${isChecked ? 'checked' : ''} aria-label="تحديد ${escapeHtml(item.name)}" />
                 </td>
@@ -903,7 +904,7 @@
         syncSelectAllCheckboxes();
 
         if (count > 0) {
-            elements.selectedCountText.textContent = `${count} عنصر محدد`;
+            elements.selectedCountText.textContent = window.AVi18n.tpl`${count} عنصر محدد`;
             elements.multiActionBar.classList.add('is-visible');
 
             if (isTrash) {
@@ -1221,21 +1222,21 @@
     // CLIPBOARD ACTIONS
     function copyItemToClipboard(item, action) {
         if (action === 'copy') {
-            showToast('نسخ العناصر غير مدعوم حالياً؛ استخدم قص ثم لصق لنقل العنصر دون تكرار ملفات الوسائط.', 'warning');
+            showToast(window.AVi18n.t('نسخ العناصر غير مدعوم حالياً؛ استخدم قص ثم لصق لنقل العنصر دون تكرار ملفات الوسائط.'), 'warning');
             return;
         }
         state.clipboard = {
             action: action,
             items: [{ id: item.id, type: item.type, name: item.name }]
         };
-        const label = action === 'cut' ? 'قص' : 'نسخ';
-        showToast(`تم ${label} «${item.name}» إلى الحافظة`, 'info');
+        const label = action === 'cut' ? window.AVi18n.t('قص') : window.AVi18n.t('نسخ');
+        showToast(window.AVi18n.tpl`تم ${label} «${item.name}» إلى الحافظة`, 'info');
         updateEmptyContextMenuRules();
     }
 
     function copySelectedToClipboard(action) {
         if (action === 'copy') {
-            showToast('نسخ العناصر غير مدعوم حالياً؛ استخدم قص ثم لصق لنقل العناصر دون تكرار ملفات الوسائط.', 'warning');
+            showToast(window.AVi18n.t('نسخ العناصر غير مدعوم حالياً؛ استخدم قص ثم لصق لنقل العناصر دون تكرار ملفات الوسائط.'), 'warning');
             return;
         }
         const items = Array.from(state.selectedItems.values());
@@ -1244,18 +1245,18 @@
             action: action,
             items: items.map(x => ({ id: x.id, type: x.type, name: x.name }))
         };
-        const label = action === 'cut' ? 'قص' : 'نسخ';
-        showToast(`تم ${label} ${items.length} عنصر إلى الحافظة`, 'info');
+        const label = action === 'cut' ? window.AVi18n.t('قص') : window.AVi18n.t('نسخ');
+        showToast(window.AVi18n.tpl`تم ${label} ${items.length} عنصر إلى الحافظة`, 'info');
         updateEmptyContextMenuRules();
     }
 
     async function executePaste() {
         if (!state.clipboard || !state.clipboard.items || !state.clipboard.items.length) {
-            showToast('الحافظة فارغة', 'warning');
+            showToast(window.AVi18n.t('الحافظة فارغة'), 'warning');
             return;
         }
         if (state.clipboard.action !== 'cut') {
-            showToast('عمليات اللصق المتاحة حالياً هي نقل العناصر المقصوصة فقط.', 'warning');
+            showToast(window.AVi18n.t('عمليات اللصق المتاحة حالياً هي نقل العناصر المقصوصة فقط.'), 'warning');
             return;
         }
         const destinationId = state.currentScopeId === 'root' ? null : state.currentScopeId;
@@ -1263,7 +1264,7 @@
 
         // Cycle check: destination cannot be in clipboard items
         if (destinationId && state.clipboard.items.some(x => x.id === destinationId)) {
-            showToast('لا يمكن نقل العنصر إلى داخل نفسه', 'error');
+            showToast(window.AVi18n.t('لا يمكن نقل العنصر إلى داخل نفسه'), 'error');
             return;
         }
 
@@ -1274,7 +1275,7 @@
             if (action === 'cut') {
                 state.clipboard = null;
             }
-            showToast(`تم لصق ${count} عنصر بنجاح`, 'success');
+            showToast(window.AVi18n.tpl`تم لصق ${count} عنصر بنجاح`, 'success');
             updateEmptyContextMenuRules();
         } catch (err) {
             console.error('Paste error:', err);
@@ -1304,8 +1305,8 @@
 
         if (items.length === 1) {
             const item = items[0];
-            elements.deleteModalTitle.textContent = 'نقل إلى سلة المحذوفات';
-            elements.deleteModalDesc.textContent = `هل أنت متأكد من رغبتك في نقل ${item.name} إلى سلة المحذوفات؟`;
+            elements.deleteModalTitle.textContent = window.AVi18n.t('نقل إلى سلة المحذوفات');
+            elements.deleteModalDesc.textContent = window.AVi18n.tpl`هل أنت متأكد من رغبتك في نقل ${item.name} إلى سلة المحذوفات؟`;
 
             // If folder or series, check for descendants
             if (['folder', 'series'].includes(item.type)) {
@@ -1316,22 +1317,22 @@
                         elements.deleteModalWarningBox.classList.remove('is-hidden');
                         if (summary.series_count > 0) {
                             const li = document.createElement('li');
-                            li.textContent = `• ${summary.series_count} مسلسلات`;
+                            li.textContent = window.AVi18n.tpl`• ${summary.series_count} مسلسلات`;
                             elements.deleteModalWarningList.appendChild(li);
                         }
                         if (summary.seasons_count > 0) {
                             const li = document.createElement('li');
-                            li.textContent = `• ${summary.seasons_count} مواسم`;
+                            li.textContent = window.AVi18n.tpl`• ${summary.seasons_count} مواسم`;
                             elements.deleteModalWarningList.appendChild(li);
                         }
                         if (summary.videos_count > 0) {
                             const li = document.createElement('li');
-                            li.textContent = `• ${summary.videos_count} فيديوهات وحلقات`;
+                            li.textContent = window.AVi18n.tpl`• ${summary.videos_count} فيديوهات وحلقات`;
                             elements.deleteModalWarningList.appendChild(li);
                         }
                         if (summary.folders_count > 0) {
                             const li = document.createElement('li');
-                            li.textContent = `• ${summary.folders_count} مجلدات فرعية`;
+                            li.textContent = window.AVi18n.tpl`• ${summary.folders_count} مجلدات فرعية`;
                             elements.deleteModalWarningList.appendChild(li);
                         }
                     }
@@ -1340,8 +1341,8 @@
                 }
             }
         } else {
-            elements.deleteModalTitle.textContent = 'نقل العناصر المحددة إلى سلة المحذوفات';
-            elements.deleteModalDesc.textContent = `نقل ${items.length} عنصراً إلى سلة المحذوفات؟`;
+            elements.deleteModalTitle.textContent = window.AVi18n.t('نقل العناصر المحددة إلى سلة المحذوفات');
+            elements.deleteModalDesc.textContent = window.AVi18n.tpl`نقل ${items.length} عنصراً إلى سلة المحذوفات؟`;
         }
 
         elements.deleteModal.classList.add('is-open');
@@ -1380,18 +1381,18 @@
             const moved = requested.length - failed.length;
             if (failed.length) {
                 console.error('Trash did not remove all selected roots', { requested: payloadItems, failed: failed.map(item => ({ id: item.id, type: item.type })), response: res });
-                showToast(`تم نقل ${moved} عنصراً إلى السلة، وتعذر نقل ${failed.length} عناصر.`, 'error');
+                showToast(window.AVi18n.tpl`تم نقل ${moved} عنصراً إلى السلة، وتعذر نقل ${failed.length} عناصر.`, 'error');
             } else {
-                showToast(`تم نقل ${moved} عنصراً إلى سلة المحذوفات`, 'success');
+                showToast(window.AVi18n.tpl`تم نقل ${moved} عنصراً إلى سلة المحذوفات`, 'success');
             }
         } catch (err) {
             console.error('Trash error:', err);
             if (posted) {
                 elements.deleteModal.classList.remove('is-open');
                 state.pendingDeleteItems = [];
-                showToast('تم نقل العناصر إلى السلة، لكن تعذر تحديث عرض المكتبة. حدّث الصفحة.', 'warning');
+                showToast(window.AVi18n.t('تم نقل العناصر إلى السلة، لكن تعذر تحديث عرض المكتبة. حدّث الصفحة.'), 'warning');
             } else {
-                showToast('تعذر نقل العناصر إلى السلة. حدّث المكتبة قبل إعادة المحاولة.', 'error');
+                showToast(window.AVi18n.t('تعذر نقل العناصر إلى السلة. حدّث المكتبة قبل إعادة المحاولة.'), 'error');
             }
         } finally {
             state.trashBusy = false;
@@ -1409,7 +1410,7 @@
         const total = first.total_items ?? first.items.length;
         const items = new Map();
         const addPage = data => {
-            if ((data.total_items ?? data.items.length) !== total) throw new Error('تغيّرت السلة أثناء القراءة؛ حدّث الصفحة وأعد المحاولة.');
+            if ((data.total_items ?? data.items.length) !== total) throw new Error(window.AVi18n.t('تغيّرت السلة أثناء القراءة؛ حدّث الصفحة وأعد المحاولة.'));
             for (const item of data.items) items.set(`${item.type}:${item.id}`, item);
         };
         addPage(first);
@@ -1417,7 +1418,7 @@
             url.searchParams.set('page', String(page));
             addPage(await apiRequest(url.pathname + url.search));
         }
-        if (items.size !== total) throw new Error('تغيّرت السلة أثناء القراءة؛ حدّث الصفحة وأعد المحاولة.');
+        if (items.size !== total) throw new Error(window.AVi18n.t('تغيّرت السلة أثناء القراءة؛ حدّث الصفحة وأعد المحاولة.'));
         return Array.from(items.values());
     }
 
@@ -1427,7 +1428,7 @@
                 method: 'POST',
                 body: { items },
             });
-            showToast(`تمت استعادة ${res.count} عنصر إلى مكانه الأصلي بنجاح`, 'success');
+            showToast(window.AVi18n.tpl`تمت استعادة ${res.count} عنصر إلى مكانه الأصلي بنجاح`, 'success');
             clearSelection();
             loadScope(state.currentScopeId, state.currentScopeType);
         } catch (err) {
@@ -1438,14 +1439,14 @@
     function promptPermanentDelete(items) {
         if (!items.length) return;
         state.pendingPermanentDeleteItems = items;
-        elements.permanentDeleteModalDesc.textContent = `حذف ${items.length} عنصراً نهائياً؟ لا يمكن التراجع عن هذا الإجراء. ستُحذف السجلات وفق سياسة الخادم، دون حذف ملفات الوسائط من القرص.`;
+        elements.permanentDeleteModalDesc.textContent = window.AVi18n.tpl`حذف ${items.length} عنصراً نهائياً؟ لا يمكن التراجع عن هذا الإجراء. ستُحذف السجلات وفق سياسة الخادم، دون حذف ملفات الوسائط من القرص.`;
         elements.permanentDeleteConfirmation.value = '';
         elements.btnConfirmPermanentDelete.disabled = true;
         elements.permanentDeleteModal.classList.add('is-open');
     }
 
     async function executePermanentDeletePending() {
-        if (!state.pendingPermanentDeleteItems.length || elements.permanentDeleteConfirmation.value.trim() !== 'حذف') return;
+        if (!state.pendingPermanentDeleteItems.length || elements.permanentDeleteConfirmation.value.trim() !== (window.AVi18n.deleteWord || 'حذف')) return;
         const payloadItems = state.pendingPermanentDeleteItems.map(it => ({ id: it.id, type: it.type }));
         elements.btnConfirmPermanentDelete.disabled = true;
 
@@ -1455,18 +1456,18 @@
                 body: { items: payloadItems },
             });
             if (res.success !== true || !Number.isInteger(res.count) || res.count < 1) {
-                throw new Error('لم يؤكد الخادم حذف أي عنصر');
+                throw new Error(window.AVi18n.t('لم يؤكد الخادم حذف أي عنصر'));
             }
             elements.permanentDeleteModal.classList.remove('is-open');
             state.pendingPermanentDeleteItems = [];
-            showToast(`تم الحذف النهائي لـ ${res.count} عنصر بنجاح`, 'success');
+            showToast(window.AVi18n.tpl`تم الحذف النهائي لـ ${res.count} عنصر بنجاح`, 'success');
             clearSelection();
             await loadScope('trash', 'trash');
         } catch (err) {
             console.error('Permanent delete error:', err);
-            showToast(err.message || 'تعذر الحذف النهائي؛ بقيت العناصر في السلة.', 'error');
+            showToast(window.AVi18n.t(err.message) || window.AVi18n.t('تعذر الحذف النهائي؛ بقيت العناصر في السلة.'), 'error');
         } finally {
-            elements.btnConfirmPermanentDelete.disabled = elements.permanentDeleteConfirmation.value.trim() !== 'حذف';
+            elements.btnConfirmPermanentDelete.disabled = elements.permanentDeleteConfirmation.value.trim() !== (window.AVi18n.deleteWord || 'حذف');
         }
     }
 
@@ -1528,8 +1529,8 @@
                 targetId: targetId,
             };
 
-            showToast(`تم نقل ${res.moved_count} عنصر بنجاح`, 'success', {
-                actionText: 'تراجع',
+            showToast(window.AVi18n.tpl`تم نقل ${res.moved_count} عنصر بنجاح`, 'success', {
+                actionText: window.AVi18n.t('تراجع'),
                 onAction: executeUndoMove,
             });
 
@@ -1560,7 +1561,7 @@
             }
         }
 
-        showToast('تم التراجع عن النقل بنجاح', 'success');
+        showToast(window.AVi18n.t('تم التراجع عن النقل بنجاح'), 'success');
         loadScope(state.currentScopeId, state.currentScopeType);
     }
 
@@ -1593,12 +1594,12 @@
         if (!elements.drawerSubsList) return;
         const item = normalizeItem(rawItem);
         if (item.type !== 'video') {
-            elements.drawerSubsList.innerHTML = '<div class="drawer-empty-msg">الترجمات متاحة لمقاطع الفيديو فقط</div>';
+            elements.drawerSubsList.innerHTML = window.AVi18n.t('<div class="drawer-empty-msg">الترجمات متاحة لمقاطع الفيديو فقط</div>');
             if (elements.drawerSubsCountBadge) elements.drawerSubsCountBadge.classList.add('is-hidden');
             return;
         }
 
-        elements.drawerSubsList.innerHTML = '<div class="drawer-empty-msg">جاري تحميل الترجمات...</div>';
+        elements.drawerSubsList.innerHTML = window.AVi18n.t('<div class="drawer-empty-msg">جاري تحميل الترجمات...</div>');
 
         try {
             const data = await apiRequest(`/api/v1/admin/videos/${item.id}/subtitles`);
@@ -1613,17 +1614,17 @@
             }
 
             if (tracks.length === 0) {
-                elements.drawerSubsList.innerHTML = '<div class="drawer-empty-msg">لا توجد ترجمات</div>';
+                elements.drawerSubsList.innerHTML = window.AVi18n.t('<div class="drawer-empty-msg">لا توجد ترجمات</div>');
                 return;
             }
 
             let html = '';
             tracks.forEach(track => {
-                const lang = escapeHtml(track.language_name || track.label || track.language_code || 'ترجمة');
+                const lang = escapeHtml(track.language_name || track.label || track.language_code || window.AVi18n.t('ترجمة'));
                 const fmt = escapeHtml((track.format || 'ASS').toUpperCase());
-                const isDef = track.is_default ? '<span class="sub-badge-default">افتراضية</span>' : '';
-                const isForced = track.is_forced ? '<span class="sub-badge-default">إجبارية</span>' : '';
-                const isEmbedded = track.is_playable ? '<span class="text-xs text-muted">مضمنة</span>' : '';
+                const isDef = track.is_default ? window.AVi18n.t('<span class="sub-badge-default">افتراضية</span>') : '';
+                const isForced = track.is_forced ? window.AVi18n.t('<span class="sub-badge-default">إجبارية</span>') : '';
+                const isEmbedded = track.is_playable ? window.AVi18n.t('<span class="text-xs text-muted">مضمنة</span>') : '';
 
                 html += `
                     <div class="sub-track-card">
@@ -1640,7 +1641,7 @@
             });
             elements.drawerSubsList.innerHTML = html;
         } catch (err) {
-            elements.drawerSubsList.innerHTML = '<div class="drawer-empty-msg">تعذر تحميل الترجمات</div>';
+            elements.drawerSubsList.innerHTML = window.AVi18n.t('<div class="drawer-empty-msg">تعذر تحميل الترجمات</div>');
         }
     }
 
@@ -1653,12 +1654,12 @@
             if (res && res.exists) {
                 elements.drawerNoShareBox.classList.add('is-hidden');
                 elements.drawerActiveShareBox.classList.remove('is-hidden');
-                if (elements.drawerShareStatus) elements.drawerShareStatus.textContent = 'نشط';
+                if (elements.drawerShareStatus) elements.drawerShareStatus.textContent = window.AVi18n.t('نشط');
                 if (elements.drawerShareExpiry) {
-                    elements.drawerShareExpiry.textContent = res.expires_at ? new Date(res.expires_at).toLocaleDateString('ar-EG') : 'دائم (بلا انتهاء)';
+                    elements.drawerShareExpiry.textContent = res.expires_at ? new Date(res.expires_at).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-US' : 'ar-EG')) : window.AVi18n.t('دائم (بلا انتهاء)');
                 }
                 if (elements.drawerShareAllowDl) {
-                    elements.drawerShareAllowDl.textContent = res.allow_download ? 'مسموح' : 'معطل';
+                    elements.drawerShareAllowDl.textContent = res.allow_download ? window.AVi18n.t('مسموح') : window.AVi18n.t('معطل');
                 }
                 const shareUrl = `${window.location.origin}${res.share_url}`;
                 if (elements.drawerShareUrlInput) {
@@ -1669,10 +1670,10 @@
                     elements.btnDrawerRevokeShare.onclick = async () => {
                         try {
                             await apiRequest(`/api/v1/drive/shares/${res.token}/revoke`, { method: 'PATCH' });
-                            showToast('تم إلغاء رابط المشاركة بنجاح', 'success');
+                            showToast(window.AVi18n.t('تم إلغاء رابط المشاركة بنجاح'), 'success');
                             loadDrawerShare(item);
                         } catch (err) {
-                            showToast('تعذر إلغاء رابط المشاركة', 'error');
+                            showToast(window.AVi18n.t('تعذر إلغاء رابط المشاركة'), 'error');
                         }
                     };
                 }
@@ -1701,7 +1702,7 @@
         document.getElementById('drawerEmbedCode').value = '';
         if (item.type !== 'video') return;
         document.getElementById('drawerEmbedSettings').href = `/admin/videos/detail?v=${encodeURIComponent(item.id)}`;
-        status.textContent = 'جارٍ التحقق من إتاحة الحلقة…';
+        status.textContent = window.AVi18n.t('جارٍ التحقق من إتاحة الحلقة…');
         try {
             const response = await fetch(`/api/v1/admin/videos/${encodeURIComponent(item.id)}`, {
                 credentials: 'same-origin', cache: 'no-store'
@@ -1710,25 +1711,25 @@
             const video = await response.json();
             if (generation !== embedRequestGeneration) return;
             if (video.status !== 'READY' || !video.active_generation_id) {
-                status.textContent = 'الحلقة غير جاهزة للتشغيل بعد.'; return;
+                status.textContent = window.AVi18n.t('الحلقة غير جاهزة للتشغيل بعد.'); return;
             }
             if (video.share_revoked) {
-                status.textContent = 'المشاركة موقوفة لهذه الحلقة. راجع إعدادات المشاركة.'; return;
+                status.textContent = window.AVi18n.t('المشاركة موقوفة لهذه الحلقة. راجع إعدادات المشاركة.'); return;
             }
             if (!['PUBLIC', 'UNLISTED', 'PASSWORD_PROTECTED'].includes(video.visibility)) {
-                status.textContent = 'هذه الحلقة خاصة؛ لن تعمل للزوار. غيّر الإتاحة من إعدادات الحلقة إذا أردت مشاركتها.'; return;
+                status.textContent = window.AVi18n.t('هذه الحلقة خاصة؛ لن تعمل للزوار. غيّر الإتاحة من إعدادات الحلقة إذا أردت مشاركتها.'); return;
             }
             const url = new URL(`/embed/${encodeURIComponent(item.id)}`, window.location.origin).href;
-            const code = `<iframe src="${url}" title="مشغّل ABOODVIDEO" width="100%" height="480" style="border:0;max-width:100%;aspect-ratio:16/9" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+            const code = window.AVi18n.tpl`<iframe src="${url}" title="مشغّل ABOODVIDEO" width="100%" height="480" style="border:0;max-width:100%;aspect-ratio:16/9" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
             embedData = {id: item.id, url, code};
             document.getElementById('drawerEmbedUrl').value = url;
             document.getElementById('drawerEmbedCode').value = code;
             fields.classList.remove('is-hidden');
             status.textContent = video.visibility === 'PASSWORD_PROTECTED'
-                ? 'الحلقة محمية بكلمة مرور؛ سيطلبها المشغّل من الزائر.'
-                : 'جاهز للنسخ. يخضع التشغيل لقيود المواقع المسموح بها في إعدادات التضمين.';
+                ? window.AVi18n.t('الحلقة محمية بكلمة مرور؛ سيطلبها المشغّل من الزائر.')
+                : window.AVi18n.t('جاهز للنسخ. يخضع التشغيل لقيود المواقع المسموح بها في إعدادات التضمين.');
         } catch (_) {
-            if (generation === embedRequestGeneration) status.textContent = 'تعذّر التحقق من الحلقة. أعد فتح التفاصيل وحاول مرة أخرى.';
+            if (generation === embedRequestGeneration) status.textContent = window.AVi18n.t('تعذّر التحقق من الحلقة. أعد فتح التفاصيل وحاول مرة أخرى.');
         }
     }
 
@@ -1737,10 +1738,10 @@
         const field = document.getElementById(kind === 'code' ? 'drawerEmbedCode' : 'drawerEmbedUrl');
         try {
             await navigator.clipboard.writeText(kind === 'code' ? embedData.code : embedData.url);
-            showToast(kind === 'code' ? 'تم نسخ كود iframe' : 'تم نسخ رابط التضمين', 'success');
+            showToast(kind === 'code' ? window.AVi18n.t('تم نسخ كود iframe') : window.AVi18n.t('تم نسخ رابط التضمين'), 'success');
         } catch (_) {
             field.focus(); field.select();
-            showToast('حدّدنا النص لك؛ انسخه يدويًا من الحقل.', 'info');
+            showToast(window.AVi18n.t('حدّدنا النص لك؛ انسخه يدويًا من الحقل.'), 'info');
         }
     }
 
@@ -1755,9 +1756,9 @@
         switchDrawerTab('info');
 
         // Header and hero info
-        if (elements.drawerTitle) elements.drawerTitle.textContent = item.name || 'تفاصيل العنصر';
+        if (elements.drawerTitle) elements.drawerTitle.textContent = item.name || window.AVi18n.t('تفاصيل العنصر');
         if (elements.drawerInfoTitle) elements.drawerInfoTitle.textContent = item.name || '—';
-        if (elements.drawerTypeBadge) elements.drawerTypeBadge.textContent = item.type_label || (item.type === 'video' ? 'فيديو' : item.type);
+        if (elements.drawerTypeBadge) elements.drawerTypeBadge.textContent = item.type_label || (item.type === 'video' ? window.AVi18n.t('فيديو') : item.type);
         if (elements.drawerFilename) elements.drawerFilename.textContent = item.filename || item.name || '—';
         if (elements.drawerQuality) elements.drawerQuality.textContent = item.quality || '—';
         if (elements.drawerDuration) elements.drawerDuration.textContent = item.duration_formatted || '—';
@@ -1767,20 +1768,20 @@
         // Download policy human text
         const pol = (item.allow_download_policy || 'INHERIT').toUpperCase();
         if (elements.drawerDownloadPolicyText) {
-            elements.drawerDownloadPolicyText.textContent = pol === 'ALLOW' ? 'سماح بالتنزيل دائماً' : pol === 'DENY' ? 'تعطيل التنزيل' : 'موروثة من الأصل';
+            elements.drawerDownloadPolicyText.textContent = pol === 'ALLOW' ? window.AVi18n.t('سماح بالتنزيل دائماً') : pol === 'DENY' ? window.AVi18n.t('تعطيل التنزيل') : window.AVi18n.t('موروثة من الأصل');
         }
         if (elements.drawerPolicySelect) {
             elements.drawerPolicySelect.value = pol;
         }
         if (elements.drawerEffectiveBadge) {
-            elements.drawerEffectiveBadge.textContent = (pol === 'DENY') ? 'معطل' : 'مسموح';
+            elements.drawerEffectiveBadge.textContent = (pol === 'DENY') ? window.AVi18n.t('معطل') : window.AVi18n.t('مسموح');
         }
 
         // Advanced details
         if (elements.drawerAdvId) elements.drawerAdvId.textContent = item.id || '—';
         if (elements.drawerAdvShareId) elements.drawerAdvShareId.textContent = item.share_id || '—';
         if (elements.drawerAdvFilename) elements.drawerAdvFilename.textContent = item.filename || item.name || '—';
-        if (elements.drawerSubtitles) elements.drawerSubtitles.textContent = item.has_subtitles ? 'متوفرة' : 'لا يوجد';
+        if (elements.drawerSubtitles) elements.drawerSubtitles.textContent = item.has_subtitles ? window.AVi18n.t('متوفرة') : window.AVi18n.t('لا يوجد');
 
         const isVideo = (item.type === 'video');
 
@@ -1807,7 +1808,7 @@
                     const posterImg = document.createElement('img');
                     posterImg.id = 'drawerPosterImg';
                     posterImg.className = 'drawer-poster-img is-hidden';
-                    posterImg.alt = 'بوستر الفيديو';
+                    posterImg.alt = window.AVi18n.t('بوستر الفيديو');
                     posterImg.loading = 'lazy';
                     posterImg.decoding = 'async';
                     posterImg.onload = () => {
@@ -1826,11 +1827,11 @@
 
             const isReady = (item.status === 'READY' || item.is_ready !== false);
             if (elements.drawerBadgeStatus) {
-                elements.drawerBadgeStatus.textContent = isReady ? 'READY' : (item.status || 'معالجة');
+                elements.drawerBadgeStatus.textContent = isReady ? 'READY' : (item.status || window.AVi18n.t('معالجة'));
                 elements.drawerBadgeStatus.className = isReady ? 'poster-badge badge-status' : 'poster-badge badge-status is-pending';
             }
             if (elements.drawerStatusText) {
-                elements.drawerStatusText.textContent = isReady ? 'جاهز للتشغيل' : (item.status || 'قيد المعالجة');
+                elements.drawerStatusText.textContent = isReady ? window.AVi18n.t('جاهز للتشغيل') : (item.status || window.AVi18n.t('قيد المعالجة'));
             }
             if (elements.drawerBadgeQuality) {
                 elements.drawerBadgeQuality.textContent = item.quality || '';
@@ -1866,7 +1867,7 @@
                 elements.btnDrawerCopyLink.onclick = async () => {
                     try {
                         await navigator.clipboard.writeText(canonicalWatchUrl);
-                        showToast('تم نسخ رابط المشاهدة بنجاح', 'success');
+                        showToast(window.AVi18n.t('تم نسخ رابط المشاهدة بنجاح'), 'success');
                     } catch (e) {
                         showToast(canonicalWatchUrl, 'info');
                     }
@@ -1881,7 +1882,7 @@
                 elements.btnDrawerCopyWatchUrl.onclick = async () => {
                     try {
                         await navigator.clipboard.writeText(canonicalWatchUrl);
-                        showToast('تم نسخ رابط المشاهدة بنجاح', 'success');
+                        showToast(window.AVi18n.t('تم نسخ رابط المشاهدة بنجاح'), 'success');
                     } catch (e) {
                         showToast(canonicalWatchUrl, 'info');
                     }
@@ -1925,7 +1926,7 @@
         if (state.currentData && state.currentData.breadcrumbs && state.currentData.breadcrumbs.length > 0) {
             return state.currentData.breadcrumbs.map(b => b.name).join(' / ');
         }
-        return 'مكتبة المحتوى';
+        return window.AVi18n.t('مكتبة المحتوى');
     }
 
     function openCreateFolderModal() {
@@ -1952,7 +1953,7 @@
                 method: 'POST',
                 body: { name, parent_id: parentId },
             });
-            showToast('تم إنشاء المجلد بنجاح', 'success');
+            showToast(window.AVi18n.t('تم إنشاء المجلد بنجاح'), 'success');
             loadScope(state.currentScopeId, state.currentScopeType);
         } catch (err) {
             console.error(err);
@@ -1987,7 +1988,7 @@
                 method: 'POST',
                 body: { title, parent_folder_id: parentFolderId, year, description },
             });
-            showToast('تم إنشاء المسلسل بنجاح', 'success');
+            showToast(window.AVi18n.t('تم إنشاء المسلسل بنجاح'), 'success');
             loadScope(state.currentScopeId, state.currentScopeType);
         } catch (err) {
             console.error(err);
@@ -2019,7 +2020,7 @@
                     display_name: displayName,
                 },
             });
-            showToast('تمت إضافة الموسم بنجاح', 'success');
+            showToast(window.AVi18n.t('تمت إضافة الموسم بنجاح'), 'success');
             loadScope(state.currentScopeId, state.currentScopeType);
         } catch (err) {
             console.error(err);
@@ -2056,7 +2057,7 @@
                     name: newName,
                 },
             });
-            showToast('تمت إعادة التسمية بنجاح', 'success');
+            showToast(window.AVi18n.t('تمت إعادة التسمية بنجاح'), 'success');
             loadScope(state.currentScopeId, state.currentScopeType);
         } catch (err) {
             console.error(err);
@@ -2069,7 +2070,7 @@
         if (elements.sharePasswordInput && elements.sharePasswordToggle) {
             elements.sharePasswordInput.disabled = !elements.sharePasswordToggle.checked;
             elements.sharePasswordInput.placeholder = shareHasPassword
-                ? 'اتركها فارغة للإبقاء على كلمة المرور الحالية' : 'أدخل كلمة مرور للمشاركة';
+                ? window.AVi18n.t('اتركها فارغة للإبقاء على كلمة المرور الحالية') : window.AVi18n.t('أدخل كلمة مرور للمشاركة');
         }
     }
 
@@ -2114,7 +2115,7 @@
             const password = elements.sharePasswordInput?.value || '';
             if (password) payload.password = password;
             else if (!shareHasPassword) {
-                showToast('أدخل كلمة مرور للمشاركة', 'error');
+                showToast(window.AVi18n.t('أدخل كلمة مرور للمشاركة'), 'error');
                 elements.sharePasswordInput?.focus();
                 return;
             }
@@ -2133,7 +2134,7 @@
             shareHasPassword = Boolean(res.password_required);
             if (elements.sharePasswordInput) elements.sharePasswordInput.value = '';
             updateSharePasswordInput();
-            showToast('تم إنشاء الرابط بنجاح', 'success');
+            showToast(window.AVi18n.t('تم إنشاء الرابط بنجاح'), 'success');
         } catch (err) {
             console.error(err);
         }
@@ -2148,7 +2149,7 @@
             await apiRequest(`/api/v1/drive/shares/${token}`, { method: 'DELETE' });
             elements.shareLinkResultBox.classList.add('is-hidden');
             elements.shareUrlDisplay.value = '';
-            showToast('تم تعطيل الرابط بنجاح', 'success');
+            showToast(window.AVi18n.t('تم تعطيل الرابط بنجاح'), 'success');
         } catch (err) {
             console.error(err);
         }
@@ -2160,7 +2161,7 @@
 
         const rootOpt = document.createElement('option');
         rootOpt.value = 'root';
-        rootOpt.textContent = 'مكتبة المحتوى (المستوى الرئيسي)';
+        rootOpt.textContent = window.AVi18n.t('مكتبة المحتوى (المستوى الرئيسي)');
         elements.moveDestinationSelect.appendChild(rootOpt);
 
         if (state.treeData && state.treeData.tree) {
@@ -2210,13 +2211,13 @@
 
         // Update filter label
         const labels = {
-            content: 'المحتوى',
-            uncategorized: 'غير مصنف',
-            test: 'بيانات الاختبار',
-            all: 'الكل',
-            trash: 'سلة المحذوفات',
+            content: window.AVi18n.t('المحتوى'),
+            uncategorized: window.AVi18n.t('غير مصنف'),
+            test: window.AVi18n.t('بيانات الاختبار'),
+            all: window.AVi18n.t('الكل'),
+            trash: window.AVi18n.t('سلة المحذوفات'),
         };
-        elements.currentFilterLabel.textContent = labels[filterValue] || 'المحتوى';
+        elements.currentFilterLabel.textContent = labels[filterValue] || window.AVi18n.t('المحتوى');
 
         // Load scope
         if (preserveScope) {
@@ -2373,14 +2374,14 @@
             try {
                 const items = await collectAllCurrentTrashItems();
                 if (items.length) await restoreItems(items.map(x => ({id: x.id, type: x.type})));
-            } catch (err) { showToast(err.message || 'تعذّر قراءة السلة.', 'error'); }
+            } catch (err) { showToast(window.AVi18n.t(err.message) || window.AVi18n.t('تعذّر قراءة السلة.'), 'error'); }
             finally { elements.btnRestoreAllTrash.disabled = false; }
         });
 
         if (elements.btnEmptyTrash) elements.btnEmptyTrash.addEventListener('click', async () => {
             elements.btnEmptyTrash.disabled = true;
             try { promptPermanentDelete(await collectAllCurrentTrashItems()); }
-            catch (err) { showToast(err.message || 'تعذّر قراءة السلة.', 'error'); }
+            catch (err) { showToast(window.AVi18n.t(err.message) || window.AVi18n.t('تعذّر قراءة السلة.'), 'error'); }
             finally { elements.btnEmptyTrash.disabled = false; }
         });
 
@@ -2438,7 +2439,7 @@
                     const url = `${window.location.origin}/watch/${state.contextTarget.id}`;
                     try {
                         await navigator.clipboard.writeText(url);
-                        showToast('تم نسخ رابط المشاهدة بنجاح', 'success');
+                        showToast(window.AVi18n.t('تم نسخ رابط المشاهدة بنجاح'), 'success');
                     } catch (e) {
                         showToast(url, 'info');
                     }
@@ -2570,7 +2571,7 @@
         if (elements.emptyCtxRefresh) elements.emptyCtxRefresh.addEventListener('click', () => {
             closeAllContextMenus();
             loadScope(state.currentScopeId, state.currentScopeType, undefined, true);
-            showToast('تم تحديث المحتوى بنجاح', 'info');
+            showToast(window.AVi18n.t('تم تحديث المحتوى بنجاح'), 'info');
         });
 
         // Sort items in context menu
@@ -2719,7 +2720,7 @@
             if (e.key === 'F5') {
                 e.preventDefault();
                 loadScope(state.currentScopeId, state.currentScopeType, undefined, true);
-                showToast('تم تحديث المحتوى بنجاح', 'info');
+                showToast(window.AVi18n.t('تم تحديث المحتوى بنجاح'), 'info');
                 return;
             }
 
@@ -2805,7 +2806,7 @@
                 if (elements.drawerShareUrlInput && elements.drawerShareUrlInput.value) {
                     try {
                         await navigator.clipboard.writeText(elements.drawerShareUrlInput.value);
-                        showToast('تم نسخ رابط المشاركة بنجاح', 'success');
+                        showToast(window.AVi18n.t('تم نسخ رابط المشاركة بنجاح'), 'success');
                     } catch (e) {
                         showToast(elements.drawerShareUrlInput.value, 'info');
                     }
@@ -2827,12 +2828,12 @@
                         },
                     });
                     state.contextTarget.allow_download_policy = policy;
-                    const eff = (policy === 'DENY') ? 'معطل' : 'مسموح';
+                    const eff = (policy === 'DENY') ? window.AVi18n.t('معطل') : window.AVi18n.t('مسموح');
                     if (elements.drawerEffectiveBadge) elements.drawerEffectiveBadge.textContent = eff;
                     if (elements.drawerDownloadPolicyText) {
-                        elements.drawerDownloadPolicyText.textContent = policy === 'ALLOW' ? 'سماح بالتنزيل دائماً' : policy === 'DENY' ? 'تعطيل التنزيل' : 'موروثة من الأصل';
+                        elements.drawerDownloadPolicyText.textContent = policy === 'ALLOW' ? window.AVi18n.t('سماح بالتنزيل دائماً') : policy === 'DENY' ? window.AVi18n.t('تعطيل التنزيل') : window.AVi18n.t('موروثة من الأصل');
                     }
-                    showToast('تم تحديث سياسة التنزيل بنجاح', 'success');
+                    showToast(window.AVi18n.t('تم تحديث سياسة التنزيل بنجاح'), 'success');
                     loadScope(state.currentScopeId, state.currentScopeType);
                 } catch (err) {
                     console.error(err);
@@ -2864,7 +2865,7 @@
         if (elements.btnRevokeShare) elements.btnRevokeShare.addEventListener('click', handleRevokeShare);
         if (elements.btnCopyShareUrl) elements.btnCopyShareUrl.addEventListener('click', () => {
             navigator.clipboard.writeText(elements.shareUrlDisplay.value);
-            showToast('تم نسخ رابط المشاركة إلى الحافظة', 'success');
+            showToast(window.AVi18n.t('تم نسخ رابط المشاركة إلى الحافظة'), 'success');
         });
 
         if (elements.btnCancelMove) elements.btnCancelMove.addEventListener('click', () => elements.moveModal.classList.remove('is-open'));
@@ -2878,7 +2879,7 @@
         if (elements.btnCancelPermanentDelete) elements.btnCancelPermanentDelete.addEventListener('click', () => elements.permanentDeleteModal.classList.remove('is-open'));
         if (elements.btnClosePermDeleteModalX) elements.btnClosePermDeleteModalX.addEventListener('click', () => elements.permanentDeleteModal.classList.remove('is-open'));
         if (elements.permanentDeleteConfirmation) elements.permanentDeleteConfirmation.addEventListener('input', () => {
-            elements.btnConfirmPermanentDelete.disabled = elements.permanentDeleteConfirmation.value.trim() !== 'حذف';
+            elements.btnConfirmPermanentDelete.disabled = elements.permanentDeleteConfirmation.value.trim() !== (window.AVi18n.deleteWord || 'حذف');
         });
         if (elements.btnConfirmPermanentDelete) elements.btnConfirmPermanentDelete.addEventListener('click', executePermanentDeletePending);
 

@@ -1,11 +1,12 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* ABOODVIDEO Admin Video Details (Phase 5). */
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get('v');
     const feedback = document.getElementById('video-feedback');
 
-    const statusLabels = { READY: 'جاهز', PROCESSING: 'قيد المعالجة', FAILED: 'فشل', CANCELLED: 'ملغى', UPLOADING: 'جارٍ الرفع', UPLOADED: 'تم الرفع', QUEUED: 'بالانتظار', PROBING: 'فحص المصدر', VERIFYING: 'تحقق' };
-    const visibilityLabels = { PRIVATE: 'خاص', UNLISTED: 'غير مدرج', PUBLIC: 'عام', PASSWORD_PROTECTED: 'محمي بكلمة سر' };
+    const statusLabels = { READY: window.AVi18n.t('جاهز'), PROCESSING: window.AVi18n.t('قيد المعالجة'), FAILED: window.AVi18n.t('فشل'), CANCELLED: window.AVi18n.t('ملغى'), UPLOADING: window.AVi18n.t('جارٍ الرفع'), UPLOADED: window.AVi18n.t('تم الرفع'), QUEUED: window.AVi18n.t('بالانتظار'), PROBING: window.AVi18n.t('فحص المصدر'), VERIFYING: window.AVi18n.t('تحقق') };
+    const visibilityLabels = { PRIVATE: window.AVi18n.t('خاص'), UNLISTED: window.AVi18n.t('غير مدرج'), PUBLIC: window.AVi18n.t('عام'), PASSWORD_PROTECTED: window.AVi18n.t('محمي بكلمة سر') };
 
     const fmtBytes = (bytes) => {
         if (!bytes) return '0 B';
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const fmtDate = (iso) => {
         if (!iso) return '—';
-        try { return new Date(iso).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' }); }
+        try { return new Date(iso).toLocaleString((document.documentElement.lang === 'en' ? 'en-US' : 'ar'), { dateStyle: 'medium', timeStyle: 'short' }); }
         catch (_) { return iso; }
     };
     const fmtDuration = (sec) => {
@@ -82,14 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
     selectFromUrl();
 
     async function loadAll() {
-        if (!videoId) { showError('لم يتم تحديد فيديو. ارجع للمكتبة واختر فيديو.'); return; }
+        if (!videoId) { showError(window.AVi18n.t('لم يتم تحديد فيديو. ارجع للمكتبة واختر فيديو.')); return; }
         let video;
         try {
             const res = await fetch(`/api/v1/admin/videos/${encodeURIComponent(videoId)}`, { credentials: 'include', cache: 'no-store' });
             if (!res.ok) throw new Error();
             video = await res.json();
         } catch (_) {
-            showError('تعذر تحميل بيانات الفيديو — قد يكون محذوفاً.');
+            showError(window.AVi18n.t('تعذر تحميل بيانات الفيديو — قد يكون محذوفاً.'));
             return;
         }
         render(video);
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = `${video.title} | ABOODVIDEO`;
 
         document.getElementById('detail-title').textContent = video.title;
-        const parts = [video.category, video.series_name, video.season_number ? `الموسم ${video.season_number}` : '', video.episode_number ? `الحلقة ${video.episode_number}` : ''].filter(Boolean);
+        const parts = [video.category, video.series_name, video.season_number ? window.AVi18n.tpl`الموسم ${video.season_number}` : '', video.episode_number ? window.AVi18n.tpl`الحلقة ${video.episode_number}` : ''].filter(Boolean);
         document.getElementById('detail-subtitle').textContent = parts.join(' · ') || video.source_filename;
 
         const badges = document.getElementById('detail-badges');
@@ -115,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const top = video.available_renditions && video.available_renditions.length
             ? video.available_renditions[video.available_renditions.length - 1].quality : null;
         if (top) badges.appendChild(el('span', top === '2160p' ? '4K' : top, ['badge', 'badge-quality']));
-        if (video.subtitle_count) badges.appendChild(el('span', `${video.subtitle_count} ترجمة`, ['badge', 'badge-muted']));
+        if (video.subtitle_count) badges.appendChild(el('span', window.AVi18n.tpl`${video.subtitle_count} ترجمة`, ['badge', 'badge-muted']));
 
         const bcrumb = document.getElementById('breadcrumb-title');
         if (bcrumb) bcrumb.textContent = video.title;
@@ -161,8 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const link = video.share_id && !video.share_revoked
                 ? `${window.location.origin}/watch/${video.share_id}`
                 : `${window.location.origin}/admin/videos/${video.id}/watch`;
-            try { await navigator.clipboard.writeText(link); feedbackMessage('تم نسخ رابط المشاهدة.'); }
-            catch (_) { feedbackMessage('تعذر نسخ الرابط.', true); }
+            try { await navigator.clipboard.writeText(link); feedbackMessage(window.AVi18n.t('تم نسخ رابط المشاهدة.')); }
+            catch (_) { feedbackMessage(window.AVi18n.t('تعذر نسخ الرابط.'), true); }
         });
 
         // Populate Header & Human-readable Specs box
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (specSize) specSize.textContent = fmtBytes(video.source_size_bytes);
 
         const specSubs = document.getElementById('spec-subtitles');
-        if (specSubs) specSubs.textContent = video.subtitle_count ? `${video.subtitle_count} مسار متوفر` : 'لا يوجد';
+        if (specSubs) specSubs.textContent = video.subtitle_count ? window.AVi18n.tpl`${video.subtitle_count} مسار متوفر` : window.AVi18n.t('لا يوجد');
 
         // Download Policy Controls
         const policySelect = document.getElementById('detail-policy-select');
@@ -200,10 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
         function updatePolicyBadge(allowed) {
             if (!effectiveBadge) return;
             if (allowed) {
-                effectiveBadge.textContent = 'مسموح';
+                effectiveBadge.textContent = window.AVi18n.t('مسموح');
                 effectiveBadge.className = 'policy-live-badge allowed';
             } else {
-                effectiveBadge.textContent = 'معطل';
+                effectiveBadge.textContent = window.AVi18n.t('معطل');
                 effectiveBadge.className = 'policy-live-badge denied';
             }
         }
@@ -232,12 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 video.effective_download_allowed = updated.effective_download_allowed;
                 updatePolicyBadge(updated.effective_download_allowed);
                 if (policyFeedback) {
-                    policyFeedback.textContent = '✓ تم حفظ سياسة التنزيل بنجاح';
+                    policyFeedback.textContent = window.AVi18n.t('✓ تم حفظ سياسة التنزيل بنجاح');
                     setTimeout(() => { policyFeedback.textContent = ''; }, 3500);
                 }
-                feedbackMessage('تم حفظ سياسة التنزيل بنجاح.');
+                feedbackMessage(window.AVi18n.t('تم حفظ سياسة التنزيل بنجاح.'));
             } catch (_) {
-                feedbackMessage('تعذر حفظ سياسة التنزيل.', true);
+                feedbackMessage(window.AVi18n.t('تعذر حفظ سياسة التنزيل.'), true);
             }
         }
 
@@ -247,27 +248,27 @@ document.addEventListener('DOMContentLoaded', () => {
         // Overview Grid
         const overview = document.getElementById('overview-grid');
         overview.replaceChildren();
-        dtPair(overview, 'العنوان', video.title);
-        dtPair(overview, 'الوصف', video.description || '—');
-        dtPair(overview, 'المسلسل', video.series_name || '—');
-        dtPair(overview, 'الموسم', video.season_number || '—');
-        dtPair(overview, 'الحلقة', video.episode_number || '—');
-        dtPair(overview, 'المجلد', video.category || '—');
-        dtPair(overview, 'سياسة التنزيل المحددة', video.allow_download_policy === 'ALLOW' ? 'سماح بالتنزيل دائماً (ALLOW)' : (video.allow_download_policy === 'DENY' ? 'تعطيل التنزيل دائماً (DENY)' : 'موروثة من الأصل (INHERIT)'));
-        dtPair(overview, 'الوضع الفعلي للتنزيل', video.effective_download_allowed ? 'مسموح' : 'معطل');
-        dtPair(overview, 'سياسة الظهور', `${visibilityLabels[video.visibility] || video.visibility} (${video.visibility})`);
-        dtPair(overview, 'الحالة', statusLabels[video.status] || video.status);
-        dtPair(overview, 'أضيف في', fmtDate(video.created_at));
+        dtPair(overview, window.AVi18n.t('العنوان'), video.title);
+        dtPair(overview, window.AVi18n.t('الوصف'), video.description || '—');
+        dtPair(overview, window.AVi18n.t('المسلسل'), video.series_name || '—');
+        dtPair(overview, window.AVi18n.t('الموسم'), video.season_number || '—');
+        dtPair(overview, window.AVi18n.t('الحلقة'), video.episode_number || '—');
+        dtPair(overview, window.AVi18n.t('المجلد'), video.category || '—');
+        dtPair(overview, window.AVi18n.t('سياسة التنزيل المحددة'), video.allow_download_policy === 'ALLOW' ? window.AVi18n.t('سماح بالتنزيل دائماً (ALLOW)') : (video.allow_download_policy === 'DENY' ? window.AVi18n.t('تعطيل التنزيل دائماً (DENY)') : window.AVi18n.t('موروثة من الأصل (INHERIT)')));
+        dtPair(overview, window.AVi18n.t('الوضع الفعلي للتنزيل'), video.effective_download_allowed ? window.AVi18n.t('مسموح') : window.AVi18n.t('معطل'));
+        dtPair(overview, window.AVi18n.t('سياسة الظهور'), `${visibilityLabels[video.visibility] || video.visibility} (${video.visibility})`);
+        dtPair(overview, window.AVi18n.t('الحالة'), statusLabels[video.status] || video.status);
+        dtPair(overview, window.AVi18n.t('أضيف في'), fmtDate(video.created_at));
 
         // Media
         const media = document.getElementById('media-grid');
         media.replaceChildren();
-        dtPair(media, 'ملف المصدر', video.source_filename);
-        dtPair(media, 'أبعاد المصدر', video.source_resolution_width ? `${video.source_resolution_width}×${video.source_resolution_height}` : 'غير معروف');
-        dtPair(media, 'الكوديك', video.source_codec || 'غير معروف');
-        dtPair(media, 'معدل البت', video.source_bitrate ? `${Math.round(video.source_bitrate / 1000)} kbps` : 'غير معروف');
-        dtPair(media, 'المدة', video.source_duration_seconds ? `${Math.round(video.source_duration_seconds)} ثانية` : 'غير معروف');
-        dtPair(media, 'حجم المصدر', fmtBytes(video.source_size_bytes));
+        dtPair(media, window.AVi18n.t('ملف المصدر'), video.source_filename);
+        dtPair(media, window.AVi18n.t('أبعاد المصدر'), video.source_resolution_width ? `${video.source_resolution_width}×${video.source_resolution_height}` : window.AVi18n.t('غير معروف'));
+        dtPair(media, window.AVi18n.t('الكوديك'), video.source_codec || window.AVi18n.t('غير معروف'));
+        dtPair(media, window.AVi18n.t('معدل البت'), video.source_bitrate ? `${Math.round(video.source_bitrate / 1000)} kbps` : window.AVi18n.t('غير معروف'));
+        dtPair(media, window.AVi18n.t('المدة'), video.source_duration_seconds ? window.AVi18n.tpl`${Math.round(video.source_duration_seconds)} ثانية` : window.AVi18n.t('غير معروف'));
+        dtPair(media, window.AVi18n.t('حجم المصدر'), fmtBytes(video.source_size_bytes));
 
         const rendTbody = document.getElementById('renditions-tbody');
         rendTbody.replaceChildren();
@@ -285,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             const tr = el('tr', '');
-            const td = el('td', 'لم تُنشر جودات بعد — الفيديو بحاجة إلى معالجة.', ['table-empty-cell']);
+            const td = el('td', window.AVi18n.t('لم تُنشر جودات بعد — الفيديو بحاجة إلى معالجة.'), ['table-empty-cell']);
             td.colSpan = 5;
             tr.appendChild(td);
             rendTbody.appendChild(tr);
@@ -294,9 +295,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Sharing
         const sharing = document.getElementById('sharing-grid');
         sharing.replaceChildren();
-        dtPair(sharing, 'سياسة الظهور', visibilityLabels[video.visibility] || video.visibility);
-        dtPair(sharing, 'الرابط السري', video.share_id && !video.share_revoked ? 'فعّال' : (video.share_revoked ? 'ملغى' : 'غير مولّد'));
-        dtPair(sharing, 'رمز مرور المشاهدين', video.has_viewer_password ? 'مفعّل' : 'غير مفعّل');
+        dtPair(sharing, window.AVi18n.t('سياسة الظهور'), visibilityLabels[video.visibility] || video.visibility);
+        dtPair(sharing, window.AVi18n.t('الرابط السري'), video.share_id && !video.share_revoked ? window.AVi18n.t('فعّال') : (video.share_revoked ? window.AVi18n.t('ملغى') : window.AVi18n.t('غير مولّد')));
+        dtPair(sharing, window.AVi18n.t('رمز مرور المشاهدين'), video.has_viewer_password ? window.AVi18n.t('مفعّل') : window.AVi18n.t('غير مفعّل'));
         const shareUrl = video.share_id ? `${window.location.origin}/watch/${video.share_id}` : '';
         const baseUrl = video.share_id ? `${window.location.origin}/embed/${video.share_id}` : '';
 
@@ -348,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const copyBtn = document.getElementById('btn-copy-share');
         copyBtn.addEventListener('click', () => {
             const link = document.getElementById('share-link').value;
-            if (link) navigator.clipboard.writeText(link).then(() => feedbackMessage('تم نسخ الرابط.'), () => feedbackMessage('تعذر النسخ.', true));
+            if (link) navigator.clipboard.writeText(link).then(() => feedbackMessage(window.AVi18n.t('تم نسخ الرابط.')), () => feedbackMessage(window.AVi18n.t('تعذر النسخ.'), true));
         });
 
         const copyIframeBtn = document.getElementById('btn-copy-iframe-code');
@@ -358,12 +359,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const feedbackSpan = document.getElementById('embed-copy-feedback');
                 if (code) {
                     navigator.clipboard.writeText(code).then(() => {
-                        feedbackMessage('تم نسخ كود الـ iframe بنجاح!');
+                        feedbackMessage(window.AVi18n.t('تم نسخ كود الـ iframe بنجاح!'));
                         if (feedbackSpan) {
-                            feedbackSpan.textContent = '✓ تم نسخ كود التضمين للحافظة!';
+                            feedbackSpan.textContent = window.AVi18n.t('✓ تم نسخ كود التضمين للحافظة!');
                             setTimeout(() => { feedbackSpan.textContent = ''; }, 3500);
                         }
-                    }, () => feedbackMessage('تعذر نسخ الكود.', true));
+                    }, () => feedbackMessage(window.AVi18n.t('تعذر نسخ الكود.'), true));
                 }
             });
         }
@@ -378,9 +379,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 const updated = await res.json();
                 document.getElementById('share-link').value = `${window.location.origin}/watch/${updated.share_id}`;
-                feedbackMessage('تم تجديد الرابط وإبطال القديم.');
+                feedbackMessage(window.AVi18n.t('تم تجديد الرابط وإبطال القديم.'));
             } else {
-                feedbackMessage('تعذر تجديد الرابط.', true);
+                feedbackMessage(window.AVi18n.t('تعذر تجديد الرابط.'), true);
             }
         });
 
@@ -388,15 +389,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const storage = document.getElementById('storage-grid');
         storage.replaceChildren();
         const renditionsSize = (video.available_renditions || []).reduce((sum, r) => sum + (r.size_bytes || 0), 0);
-        dtPair(storage, 'المصدر', fmtBytes(video.source_size_bytes));
-        dtPair(storage, 'ملفات HLS', fmtBytes(renditionsSize));
-        dtPair(storage, 'الإجمالي التقريبي', fmtBytes(video.source_size_bytes + renditionsSize));
+        dtPair(storage, window.AVi18n.t('المصدر'), fmtBytes(video.source_size_bytes));
+        dtPair(storage, window.AVi18n.t('ملفات HLS'), fmtBytes(renditionsSize));
+        dtPair(storage, window.AVi18n.t('الإجمالي التقريبي'), fmtBytes(video.source_size_bytes + renditionsSize));
 
         // Analytics
         const analytics = document.getElementById('analytics-grid');
         analytics.replaceChildren();
-        dtPair(analytics, 'المشاهدات', video.view_count);
-        dtPair(analytics, 'البيانات المنقولة', fmtBytes(video.bandwidth_bytes));
+        dtPair(analytics, window.AVi18n.t('المشاهدات'), video.view_count);
+        dtPair(analytics, window.AVi18n.t('البيانات المنقولة'), fmtBytes(video.bandwidth_bytes));
     }
 
     async function loadJobs(id) {
@@ -407,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             const jobs = data.items || [];
             if (!jobs.length) {
-                box.replaceChildren(el('div', 'لا توجد وظائف معالجة مسجلة لهذا الفيديو.', ['empty-hint-sm']));
+                box.replaceChildren(el('div', window.AVi18n.t('لا توجد وظائف معالجة مسجلة لهذا الفيديو.'), ['empty-hint-sm']));
                 return;
             }
             box.replaceChildren(...jobs.map(j => {
@@ -415,19 +416,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const header = el('div', '', ['job-item-header']);
                 header.append(
                     el('span', statusLabels[j.status] || j.status, ['badge', `status-${String(j.status).toLowerCase()}`]),
-                    el('span', `المحاولة ${j.attempt}/${j.max_attempts}`, ['badge', 'badge-muted']),
+                    el('span', window.AVi18n.tpl`المحاولة ${j.attempt}/${j.max_attempts}`, ['badge', 'badge-muted']),
                     el('span', j.id, ['job-item-id']),
                 );
                 const meta = el('div',
-                    `بدأت: ${fmtDate(j.started_at)} · اكتملت: ${fmtDate(j.completed_at)} · العامل: ${j.worker_id || '—'}` +
-                    (j.current_rendition ? ` · الجودة: ${j.current_rendition}` : '') +
+                    window.AVi18n.tpl`بدأت: ${fmtDate(j.started_at)} · اكتملت: ${fmtDate(j.completed_at)} · العامل: ${j.worker_id || '—'}` +
+                    (j.current_rendition ? window.AVi18n.tpl` · الجودة: ${j.current_rendition}` : '') +
                     (j.ffmpeg_fps ? ` · ${Math.round(j.ffmpeg_fps)} FPS` : ''), ['job-item-meta']);
                 item.append(header, meta);
-                if (j.error_message) item.appendChild(el('div', j.error_message, ['job-error']));
+                if (window.AVi18n.t(j.error_message)) item.appendChild(el('div', window.AVi18n.t(j.error_message), ['job-error']));
                 return item;
             }));
         } catch (_) {
-            box.replaceChildren(el('div', 'تعذر تحميل سجل المعالجة.', ['empty-hint-sm']));
+            box.replaceChildren(el('div', window.AVi18n.t('تعذر تحميل سجل المعالجة.'), ['empty-hint-sm']));
         }
     }
 

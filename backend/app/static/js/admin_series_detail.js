@@ -1,10 +1,11 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* ABOODVIDEO Admin Series Detail (Phase 9). */
 document.addEventListener('DOMContentLoaded', () => {
     const name = new URLSearchParams(window.location.search).get('s');
     const loading = document.getElementById('sd-loading');
     const feedback = document.getElementById('sd-feedback');
 
-    const statusLabels = { READY: 'جاهز', PROCESSING: 'قيد المعالجة', FAILED: 'فشل', CANCELLED: 'ملغى', UPLOADING: 'جارٍ الرفع', UPLOADED: 'تم الرفع', QUEUED: 'بالانتظار', PROBING: 'فحص المصدر', VERIFYING: 'تحقق' };
+    const statusLabels = { READY: window.AVi18n.t('جاهز'), PROCESSING: window.AVi18n.t('قيد المعالجة'), FAILED: window.AVi18n.t('فشل'), CANCELLED: window.AVi18n.t('ملغى'), UPLOADING: window.AVi18n.t('جارٍ الرفع'), UPLOADED: window.AVi18n.t('تم الرفع'), QUEUED: window.AVi18n.t('بالانتظار'), PROBING: window.AVi18n.t('فحص المصدر'), VERIFYING: window.AVi18n.t('تحقق') };
     const fmtBytes = (bytes) => {
         if (!bytes) return '0 B';
         const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function load() {
         if (!name) {
-            loading.textContent = 'لم يتم تحديد مسلسل.';
+            loading.textContent = window.AVi18n.t('لم يتم تحديد مسلسل.');
             return;
         }
         try {
@@ -37,18 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const ready = videos.filter(v => v.status === 'READY').length;
             const processing = videos.filter(v => ['PROCESSING', 'QUEUED', 'PROBING', 'VERIFYING'].includes(v.status)).length;
             const seasonNums = [...new Set(videos.map(v => v.season_number).filter(Boolean))].sort((a, b) => a - b);
-            document.getElementById('sd-subtitle').textContent = `مسلسل · ${seasonNums.length || (videos.length ? 1 : 0)} موسم · ${videos.length} حلقة`;
+            document.getElementById('sd-subtitle').textContent = window.AVi18n.tpl`مسلسل · ${seasonNums.length || (videos.length ? 1 : 0)} موسم · ${videos.length} حلقة`;
             const badges = document.getElementById('sd-badges');
             badges.replaceChildren(
-                el('span', `${ready} جاهز`, ['badge', 'badge-quality']),
-                el('span', `${processing} قيد المعالجة`, ['badge', 'status-processing']),
-                info ? el('span', `الحجم الإجمالي ${fmtBytes(info.total_size_bytes)}`, ['badge', 'badge-muted']) : el('span', '', ['hidden']),
+                el('span', window.AVi18n.tpl`${ready} جاهز`, ['badge', 'badge-quality']),
+                el('span', window.AVi18n.tpl`${processing} قيد المعالجة`, ['badge', 'status-processing']),
+                info ? el('span', window.AVi18n.tpl`الحجم الإجمالي ${fmtBytes(info.total_size_bytes)}`, ['badge', 'badge-muted']) : el('span', '', ['hidden']),
             );
             document.getElementById('sd-upload-link').href = `/admin/upload?series=${encodeURIComponent(name)}&season=${seasonNums.length ? seasonNums[seasonNums.length - 1] : 1}&episode=${videos.length + 1}`;
 
             renderSeasons(videos, seasonNums);
         } catch (_) {
-            loading.textContent = 'تعذر تحميل بيانات المسلسل.';
+            loading.textContent = window.AVi18n.t('تعذر تحميل بيانات المسلسل.');
         }
     }
 
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             : [{ num: null, items: videos.sort((a, b) => parseNaturalEpisode(a) - parseNaturalEpisode(b)) }];
 
         if (!videos.length) {
-            container.appendChild(el('div', 'لا توجد حلقات مرفوعة لهذا المسلسل بعد.', ['empty-state']));
+            container.appendChild(el('div', window.AVi18n.t('لا توجد حلقات مرفوعة لهذا المسلسل بعد.'), ['empty-state']));
             return;
         }
 
@@ -78,14 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const block = el('section', '', ['season-block']);
             const header = el('div', '', ['season-header']);
             header.append(
-                el('h2', group.num ? `الموسم ${group.num}` : 'حلقات بدون موسم', ['season-title']),
-                el('span', `${group.items.length} حلقة`, ['badge', 'badge-muted']),
+                el('h2', group.num ? window.AVi18n.tpl`الموسم ${group.num}` : window.AVi18n.t('حلقات بدون موسم'), ['season-title']),
+                el('span', window.AVi18n.tpl`${group.items.length} حلقة`, ['badge', 'badge-muted']),
             );
             const tableCard = el('div', '', ['table-card']);
             const table = document.createElement('table');
             const thead = document.createElement('thead');
             const headRow = document.createElement('tr');
-            for (const label of ['الحلقة', 'العنوان', 'الحالة', 'الجودة', 'الترجمة', 'الحجم', 'الإجراءات']) {
+            for (const label of [window.AVi18n.t('الحلقة'), window.AVi18n.t('العنوان'), window.AVi18n.t('الحالة'), window.AVi18n.t('الجودة'), window.AVi18n.t('الترجمة'), window.AVi18n.t('الحجم'), window.AVi18n.t('الإجراءات')]) {
                 headRow.appendChild(el('th', label));
             }
             thead.appendChild(headRow);
@@ -94,14 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 const quality = v.available_renditions && v.available_renditions.length
                     ? v.available_renditions[v.available_renditions.length - 1].quality : null;
-                const detail = el('a', 'تفاصيل', ['btn', 'btn-sm']);
+                const detail = el('a', window.AVi18n.t('تفاصيل'), ['btn', 'btn-sm']);
                 detail.href = `/admin/videos/detail?v=${encodeURIComponent(String(v.id))}`;
                 tr.append(
                     el('td', v.episode_number ? String(v.episode_number) : '—'),
                     el('td', v.title),
                     el('td', '', []),
                     el('td', quality ? (quality === '2160p' ? '4K' : quality) : '—'),
-                    el('td', v.subtitle_count ? `${v.subtitle_count} مسار` : 'بدون'),
+                    el('td', v.subtitle_count ? window.AVi18n.tpl`${v.subtitle_count} مسار` : window.AVi18n.t('بدون')),
                     el('td', fmtBytes(v.source_size_bytes)),
                     (() => { const td = el('td', ''); td.appendChild(detail); return td; })(),
                 );

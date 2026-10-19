@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /**
  * admin_shell.js — ABOODVIDEO Admin V2
  * Handles: sidebar toggle, logout, processing badge polling,
@@ -38,7 +39,7 @@
       sidebar.inert = mobile.matches && !open;
       if (main) main.inert = open;
       toggleBtn.setAttribute('aria-expanded', String(open));
-      toggleBtn.setAttribute('aria-label', open ? 'إغلاق القائمة' : 'فتح القائمة');
+      toggleBtn.setAttribute('aria-label', open ? window.AVi18n.t('إغلاق القائمة') : window.AVi18n.t('فتح القائمة'));
     };
     const open = () => {
       if (!mobile.matches) return;
@@ -171,7 +172,7 @@
           : 0;
       updateProcessingBadges(count);
     } catch (err) {
-      console.warn('[admin_shell] Processing badge fetch failed:', err.message);
+      console.warn('[admin_shell] Processing badge fetch failed:', window.AVi18n.t(err.message));
     }
   };
 
@@ -293,7 +294,7 @@
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.setAttribute('role', 'alert');
-    toast.innerHTML = `
+    toast.innerHTML = window.AVi18n.tpl`
       <span class="toast-icon">${icons[type] ?? icons.info}</span>
       <span class="toast-msg">${escapeHtml(msg)}</span>
       <button class="toast-close" aria-label="إغلاق">×</button>
@@ -348,13 +349,13 @@
   };
 
   const setStatusOk = (pill) => {
-    pill.innerHTML = '<span class="status-dot status-dot--green"></span><span>متصل</span>';
+    pill.innerHTML = window.AVi18n.t('<span class="status-dot status-dot--green"></span><span>متصل</span>');
     pill.classList.remove('pill--error');
     pill.classList.add('pill--ok');
   };
 
   const setStatusError = (pill) => {
-    pill.innerHTML = '<span class="status-dot status-dot--red"></span><span>خطأ</span>';
+    pill.innerHTML = window.AVi18n.t('<span class="status-dot status-dot--red"></span><span>خطأ</span>');
     pill.classList.remove('pill--ok');
     pill.classList.add('pill--error');
   };

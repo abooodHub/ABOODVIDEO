@@ -208,6 +208,7 @@
 
                 <!-- Settings Slide-over Menu Panel -->
                 <div class="player-menu-panel" id="player-menu-panel" role="dialog" aria-label="إعدادات المشغل" aria-hidden="true">
+                    <label class="language-control"><span>اللغة</span><select data-language-select aria-label="اللغة"><option value="ar">العربية</option><option value="en">English</option></select></label>
                     <section class="player-menu-screen is-active" data-screen="root">
                         <div class="player-menu-heading">الإعدادات</div>
                         <button class="player-menu-row" type="button" data-open-screen="quality"><span>الجودة</span><span id="quality-summary">تلقائي (Auto)</span></button>
@@ -327,5 +328,5 @@
     "hasPauseBanner": {{ 'true' if PAUSE_BANNER else 'false' }}
 }
 </script>
-<script src="/static/js/player.js?v=github-readiness-20261019" defer></script>
+<script src="/static/js/player.js?v=github-readiness-20261019-i18n-110" defer></script>
 {% endblock %}

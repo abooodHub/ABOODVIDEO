@@ -1,61 +1,73 @@
 # ABOODVIDEO
 
+**English** · [العربية](README.ar.md)
+
 <p align="center"><img src="docs/assets/hero.svg" alt="ABOODVIDEO — Your media. Your platform." width="100%"></p>
 
 <p align="center">
-  <a href="https://github.com/abooodHub/ABOODVIDEO/releases"><img alt="Release 1.0.0" src="https://img.shields.io/badge/release-1.0.0-65dfc7?style=flat-square&labelColor=10212b"></a>
+  <a href="https://github.com/abooodHub/ABOODVIDEO/releases"><img alt="Release 1.1.0" src="https://img.shields.io/badge/release-1.1.0-65dfc7?style=flat-square&labelColor=10212b"></a>
   <a href="https://github.com/abooodHub/ABOODVIDEO/actions/workflows/checks.yml"><img alt="Project checks" src="https://github.com/abooodHub/ABOODVIDEO/actions/workflows/checks.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-8aa8ba?style=flat-square&labelColor=10212b"></a>
-  <img alt="Windows desktop and self-hosted platform" src="https://img.shields.io/badge/Windows_Studio_%2B_Self--hosted_Platform-10212b?style=flat-square">
+  <img alt="Arabic and English" src="https://img.shields.io/badge/languages-Arabic_RTL_%2B_English_LTR-10212b?style=flat-square">
 </p>
 
-<p align="center"><strong>من ملفاتك إلى منصة فيديو خاصة — التحويل والرفع والمشاهدة من مكان واحد.</strong><br>Prepare, encode and upload on Windows. Manage and deliver video from your own server.</p>
+<p align="center"><strong>Prepare, encode and upload on Windows. Manage and deliver video from your own server.</strong></p>
 
-<p align="center"><a href="#واجهة-المنصة--screenshots">الصور / Screenshots</a> · <a href="#البداية-السريعة--quick-start">التثبيت / Install</a> · <a href="docs/INSTALLATION.md">دليل التشغيل / Operations</a> · <a href="https://github.com/abooodHub/ABOODVIDEO/releases">الإصدارات / Releases</a></p>
+<p align="center"><a href="#screenshots">Screenshots</a> · <a href="#quick-start">Install</a> · <a href="docs/INSTALLATION.md">Operations</a> · <a href="https://github.com/abooodHub/ABOODVIDEO/releases">Releases</a></p>
 
-## ما الذي يقدّمه؟ / What is included?
+## What is included?
 
-| | المنصة / Platform | البرنامج / Windows Studio |
+| | Platform | Windows Studio |
 | --- | --- | --- |
-| تنظيم المحتوى | ملفات ومجلدات ومسلسلات ومواسم | اكتشاف حلقات المجلد ومراجعة الطابور |
-| تجهيز الفيديو | تحويل على الخادم أو استقبال HLS/MP4 جاهز | اختيار CPU/GPU والمشفّر وإعداد التحويل |
-| الترجمة | ASS/SSA وWebVTT والخطوط المرفقة | اختيار الترجمات والخطوط ضمن حزم الرفع |
-| الرفع | بروتوكول قابل للاستئناف مع تحقق من الحزمة | طابور محفوظ وتحكم صريح ببدء العمل |
-| المشاهدة | HLS وMP4 وتضمين مع تحقق من الصلاحيات | تجهيز الحزم ورفعها إلى خادمك |
-| الإدارة | حسابات وصلاحيات وتخزين وتحليلات | إعداد اتصال خاص بك ومفتاح محمي بـWindows DPAPI |
+| Organization | Files, folders, series and seasons | Discover episodes and review the queue |
+| Video preparation | Server conversion or prepared HLS/MP4 imports | CPU/GPU encoder and conversion controls |
+| Subtitles | ASS/SSA, WebVTT and attached fonts | Select subtitles and fonts for upload packages |
+| Uploads | Resumable transfers and package validation | Persistent queue with explicit start controls |
+| Playback | Authorized HLS, MP4 and embeds | Prepare and upload to your own server |
+| Administration | Accounts, roles, storage and analytics | Connection settings and Windows DPAPI credentials |
+| Languages | Arabic RTL and English LTR | Arabic RTL and English LTR |
 
-المنصة مركز إدارة وتسليم فيديو، بدون صفحة رئيسية أو كتالوج عام. تتطلب الإدارة تسجيل الدخول، وتبقى روابط مشاهدة الفيديوهات خاضعة لسياسة الوصول.
+No public homepage or catalog. `/`, `/browse` and `/watch/` return empty HTTP 404 responses. Valid `/watch/<id>` and embed links retain their authorization, including PRIVATE protection. No deployment address or external partner is preconfigured.
 
-No public homepage or catalog. Empty HTTP 404 responses for `/`, `/browse` and `/watch/`; valid `/watch/<id>` and embed links retain their playback authorization, including PRIVATE protection. No deployment address or external partner is preconfigured.
+## Arabic and English
 
-<p align="center"><img src="docs/assets/workflow.gif" alt="Prepare → package → resumable upload → authorized playback" width="100%"></p>
+Choose **العربية** or **English** in the language selector. Arabic keeps the sidebar on the right; English places it on the left. The preference persists between visits. Studio also saves it in its local settings. Menus, forms, status messages and player controls follow the selected language. Video titles, filenames, subtitle content and saved media are preserved.
 
-## واجهة المنصة / Screenshots
+The Windows installer supports English and Arabic. Native operating-system dialog chrome follows Windows; the application's picker captions and filters follow the selected application language.
 
-لقطات من الواجهات الفعلية باستخدام بيانات توضيحية محلية، بلا دومينات أو حسابات أو وسائط مستخدمين. الأرقام والعناوين في الصور أمثلة فقط.
+<p align="center"><img src="docs/assets/workflow.gif" alt="Prepare, package, upload and play" width="100%"></p>
 
-Actual interfaces rendered with offline synthetic data. Images are demonstrations, not production measurements.
+## Screenshots
 
-### لوحة الإدارة / Platform dashboard
+Actual interfaces rendered with offline synthetic data. Counts, titles and hardware values are examples, with no production accounts or deployment addresses.
 
-![Platform dashboard with library and service status](docs/assets/platform-dashboard.png)
+### English — sidebar on the left
+
+![English platform dashboard](docs/assets/platform-dashboard-en.png)
 
 <details>
-<summary><strong>الرفع وإعدادات الإنكودر / Upload and encoder settings</strong></summary>
+<summary>Upload and encoder controls</summary>
 
-![Upload interface showing encoder controls after selecting a file](docs/assets/platform-upload.png)
+![English upload workspace](docs/assets/platform-upload-en.png)
 
 </details>
 
-### برنامج Windows / Studio
+![English Windows Studio](docs/assets/studio-en.png)
 
-![ABOODVIDEO Studio content preparation interface](docs/assets/studio.png)
+<details>
+<summary>Arabic — sidebar on the right</summary>
 
-## البداية السريعة / Quick start
+![Arabic platform dashboard](docs/assets/platform-dashboard.png)
+
+![Arabic Windows Studio](docs/assets/studio.png)
+
+</details>
+
+## Quick start
 
 ### Platform — local installation
 
-Install Docker with Compose **2.24.4+** and Python **3.12**, then clone this repository:
+Install Docker with Compose **2.24.4+** and Python **3.12**, then:
 
 ```sh
 git clone https://github.com/abooodHub/ABOODVIDEO.git
@@ -63,13 +75,11 @@ cd ABOODVIDEO
 python3 scripts/install_platform.py --ready-only --start
 ```
 
-هذا المثال لتثبيت محلي جديد دون دومين، ويستقبل فيديوهات HLS/MP4 الجاهزة. ينشئ المثبّت أسرارًا خاصة ويطلب إنشاء حساب المالك. افتح `/admin` على العنوان الذي يعرضه المثبّت.
-
-For a new local installation accepting prepared HLS/MP4. The installer creates private secrets and prompts for an owner account. Omit `--ready-only` to enable server conversion workers. For internet hosting, configure your own hostname and automatic HTTPS as described in [Installation](docs/INSTALLATION.md). Existing configuration is never overwritten.
+For a new local installation accepting prepared HLS/MP4. The installer creates private secrets and prompts for an owner account. Open `/admin` at the address it prints. Omit `--ready-only` to enable server conversion workers. For internet hosting, configure your own hostname and automatic HTTPS as described in [Installation](docs/INSTALLATION.md). Existing configuration is never overwritten.
 
 ### Studio — Windows
 
-Download the Windows portable ZIP or setup package from [Releases](https://github.com/abooodHub/ABOODVIDEO/releases). Configure **your own server URL** and Studio API key in Settings. A new installation has no server address saved.
+Download the portable ZIP or setup package from [Releases](https://github.com/abooodHub/ABOODVIDEO/releases). Configure **your own server URL** and Studio API key in Settings. A new installation has no server address saved.
 
 To run from source:
 
@@ -79,7 +89,7 @@ py -3.12 -m venv .venv
 .venv\Scripts\python.exe -m studio.main
 ```
 
-Install FFmpeg/FFprobe and the Microsoft WebView2 Runtime for source execution. See [development and builds](docs/DEVELOPMENT.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Install FFmpeg/FFprobe and Microsoft WebView2 Runtime for source execution. See [development and builds](docs/DEVELOPMENT.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ## Architecture
 
@@ -104,6 +114,7 @@ flowchart LR
 | --- | --- |
 | [Installation](docs/INSTALLATION.md) | New server, HTTPS, owner account, upgrades and Windows prerequisites |
 | [Deployment modes](docs/DEPLOYMENT_MODES.md) | Server conversion versus prepared-media imports |
+| [Languages and translation](docs/LOCALIZATION.md) | Arabic/English preferences, layout and translation contributions |
 | [Development](docs/DEVELOPMENT.md) | Dependencies, isolated tests and reproducible builds |
 | [Project map](PROJECT_MAP.md) | Platform, Studio and deployment source layout |
 | [Architecture](docs/ARCHITECTURE.md) · [API](docs/API.md) | Services, storage and API contracts |
@@ -112,7 +123,7 @@ flowchart LR
 
 ## Release status
 
-Platform and Studio source are version **1.0.0**. Automated source/browser tests and actual portable Windows launches have been exercised. The project executable and installer are **unsigned**. A clean Windows installer / upgrade / uninstall cycle, including a machine without WebView2, remains unverified. See release notes for the exact checks attached to each artifact.
+Platform and Studio source are version **1.1.0**. Automated source/browser tests and actual portable Windows launches have been exercised. The project executable and installer are **unsigned**. A clean Windows installer / upgrade / uninstall cycle, including a machine without WebView2, remains unverified. See release notes for the exact checks attached to each artifact.
 
 Runtime databases, media, private settings, local backups and development history are excluded from this repository. The screenshot generator uses offline fixtures only; [regenerate the gallery](scripts/generate_documentation_visuals.py) without accessing a deployment.
 

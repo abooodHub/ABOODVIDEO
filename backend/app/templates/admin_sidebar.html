@@ -1,7 +1,7 @@
 {% macro nav_link(href, label, icon, current=false, badge=false) -%}
 <a class="nav-item{% if current %} is-active{% endif %}" href="{{ href }}"{% if current %} aria-current="page"{% endif %}>
   <svg viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#{{ icon }}"></use></svg>
-  <span class="nav-label">{{ label }}</span>{% if badge %}<span class="nav-badge hidden" data-processing-badge id="processingBadge">0</span>{% endif %}
+  <span class="nav-label">{{ _(label) if _ is defined else label }}</span>{% if badge %}<span class="nav-badge hidden" data-processing-badge id="processingBadge">0</span>{% endif %}
 </a>
 {%- endmacro %}
 {% set current_page = page_id|default('') %}

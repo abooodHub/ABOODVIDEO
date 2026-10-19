@@ -49,7 +49,7 @@ def test_public_domain_rejects_urls_addresses_and_config_injection(domain):
 
 
 def test_windows_installer_checks_runtime_before_install_and_preserves_application_identity():
-    source = (ROOT / 'installer.iss').read_text()
+    source = (ROOT / 'installer.iss').read_text(encoding='utf-8-sig')
     assert 'function PrepareToInstall' in source and 'if HasWebView2() then' in source
     assert 'HKCU32' in source and 'HKLM32' in source
     assert "'/silent /install'" in source

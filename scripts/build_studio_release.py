@@ -45,7 +45,7 @@ def release_version():
 
 def source_manifest():
     files = []
-    for folder in ['studio', 'backend', 'nginx']:
+    for folder in ['studio', 'backend', 'nginx', 'shared']:
         for path in (ROOT / folder).rglob('*'):
             relative = path.relative_to(ROOT)
             if (not path.is_file() or any(part in {'__pycache__', '.pytest_cache', 'node_modules', 'data', 'fonts'} for part in relative.parts)
@@ -77,6 +77,8 @@ def validate_payload(folder, version, numeric):
                 '_internal/studio/web/templates/index_v3.html', '_internal/app.ico']
     required += ['_internal/licenses/ffmpeg/LICENSE', '_internal/licenses/ffmpeg/README.txt',
                  '_internal/licenses/project/LICENSE', '_internal/licenses/project/THIRD_PARTY_NOTICES.md']
+    required += ['_internal/shared/i18n/en.json', '_internal/shared/i18n/web/runtime.js',
+                 '_internal/shared/i18n/web/catalog.js', '_internal/shared/i18n/web/direction.css']
     # PyInstaller places top-level data in _internal; fail rather than shipping
     # an incomplete one-directory executable or accidentally including a profile.
     for name in required:

@@ -1,20 +1,59 @@
 [
   {
     "image": "platform-dashboard.png",
+    "language": "ar",
     "actual_template": "admin_dashboard.html",
     "synthetic_offline_data": true,
-    "page_errors": []
+    "page_errors": [],
+    "missing_messages": [],
+    "layout": {
+      "width": 1600,
+      "document_width": 1600,
+      "direction": "rtl",
+      "language": "ar",
+      "sidebar": {
+        "left": 1352,
+        "right": 1600,
+        "width": 248
+      }
+    }
   },
   {
     "image": "platform-upload.png",
+    "language": "ar",
     "actual_template": "admin_upload.html",
     "synthetic_offline_data": true,
-    "page_errors": []
+    "page_errors": [],
+    "missing_messages": [],
+    "layout": {
+      "width": 1600,
+      "document_width": 1600,
+      "direction": "rtl",
+      "language": "ar",
+      "sidebar": {
+        "left": 1352,
+        "right": 1600,
+        "width": 248
+      }
+    }
   },
   {
     "image": "studio.png",
+    "language": "ar",
     "actual_template": "index_v3.html",
     "synthetic_offline_data": true,
-    "page_errors": []
+    "page_errors": [],
+    "missing_messages": [],
+    "layout": {
+      "width": 1600,
+      "document_width": 1600,
+      "direction": "rtl",
+      "language": "ar",
+      "sidebar": {
+        "left": 1372,
+        "right": 1600,
+        "width": 228
+      }
+    }
   }
 ]

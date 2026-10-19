@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/static/css/studio_import.css?v=desktop-1">
   <link rel="stylesheet" href="/static/css/studio_desktop.css?v=desktop-6">
 </head>
-<body>
+<body data-application="studio">
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
@@ -35,6 +35,7 @@
         <div class="page-heading"><span class="workspace-label">مساحة العمل</span><h1 id="page-title">إضافة محتوى</h1><p id="page-description">جهّز حلقاتك للتحويل، ثم ارفعها عندما تكون جاهزة.</p></div>
 
         <div class="top-actions">
+          <label class="language-control"><span>اللغة</span><select data-language-select aria-label="اللغة"><option value="ar">العربية</option><option value="en">English</option></select></label>
           <span class="server-pill" role="status"><i id="server-dot"></i><span id="server-label">جارٍ فحص الخادم</span></span>
           <span class="activity" id="running-indicator"><i></i><b id="running-count">0</b> مهام نشطة</span>
           <button class="button secondary" id="refresh-button">تحديث</button>

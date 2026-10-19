@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('encoder-form');
   if (!form) return;
@@ -21,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const value = current();
     const dirty = JSON.stringify(value) !== JSON.stringify(baseline);
     bitrateValue.textContent = `${value.video_bitrate_percent}%`;
-    summary.textContent = `H.264 · ${value.preset} · ${value.video_bitrate_percent}% · ${value.enabled_qualities.join(' / ') || 'اختر دقة إخراج'}`;
+    summary.textContent = `H.264 · ${value.preset} · ${value.video_bitrate_percent}% · ${value.enabled_qualities.join(' / ') || window.AVi18n.t('اختر دقة إخراج')}`;
     save.disabled = saving || !dirty || !value.enabled_qualities.length;
     reset.disabled = saving || !dirty;
-    state.textContent = saving ? 'جارٍ الحفظ…' : dirty ? 'تغييرات غير محفوظة' : 'الإعداد محفوظ';
+    state.textContent = saving ? window.AVi18n.t('جارٍ الحفظ…') : dirty ? window.AVi18n.t('تغييرات غير محفوظة') : window.AVi18n.t('الإعداد محفوظ');
     form.querySelectorAll('[data-encoder-profile]').forEach(button => {
       const profile = profiles[button.dataset.encoderProfile];
       button.setAttribute('aria-pressed', String(value.preset === profile.preset && value.video_bitrate_percent === profile.video_bitrate_percent));
@@ -53,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
     saving = true; controls.disabled = true; update(); feedback.textContent = '';
     try {
       const response = await fetch('/api/v1/admin/quality-settings/encoder', { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() }, body: JSON.stringify(payload) });
-      if (!response.ok) throw new Error(`تعذر حفظ إعداد الإنكودر (HTTP ${response.status}).`);
+      if (!response.ok) throw new Error(window.AVi18n.tpl`تعذر حفظ إعداد الإنكودر (HTTP ${response.status}).`);
       const data = await response.json();
       baseline = { preset: data.preset, video_bitrate_percent: data.video_bitrate_percent, enabled_qualities: data.enabled_qualities };
       apply(baseline);
-      feedback.textContent = 'تم الحفظ. ستستخدم مهام التحويل الجديدة هذا الإعداد تلقائيًا.';
+      feedback.textContent = window.AVi18n.t('تم الحفظ. ستستخدم مهام التحويل الجديدة هذا الإعداد تلقائيًا.');
     } catch (error) {
-      feedback.textContent = error.message;
+      feedback.textContent = window.AVi18n.t(error.message);
     } finally {
       saving = false; controls.disabled = false; update();
     }
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   (async () => {
     try {
       const response = await fetch('/api/v1/admin/quality-settings/encoder', { credentials: 'include', cache: 'no-store' });
-      if (!response.ok) throw new Error(`تعذر تحميل إعداد الإنكودر (HTTP ${response.status}).`);
+      if (!response.ok) throw new Error(window.AVi18n.tpl`تعذر تحميل إعداد الإنكودر (HTTP ${response.status}).`);
       const data = await response.json();
       for (const preset of data.available_presets) {
         const option = document.createElement('option'); option.value = preset; option.textContent = preset; speed.appendChild(option);
@@ -84,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
       baseline = { preset: data.preset, video_bitrate_percent: data.video_bitrate_percent, enabled_qualities: data.enabled_qualities };
       controls.disabled = false; apply(baseline);
     } catch (error) {
-      feedback.textContent = error.message; state.textContent = 'الإعداد غير متاح';
+      feedback.textContent = window.AVi18n.t(error.message); state.textContent = window.AVi18n.t('الإعداد غير متاح');
     }
   })();
 });

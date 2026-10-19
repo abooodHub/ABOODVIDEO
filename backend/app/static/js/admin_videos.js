@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* ABOODVIDEO Admin Video Library (Phase 4). */
 function getCsrfToken() {
     const cookie = document.cookie.split(';').map(value => value.trim())
@@ -9,7 +10,7 @@ function getCsrfToken() {
 
 async function driveMutation(url, items) {
     const csrfToken = getCsrfToken();
-    if (!csrfToken) throw new Error('انتهت جلسة الإدارة أو رمز الحماية؛ حدّث الصفحة وسجّل الدخول مجدداً.');
+    if (!csrfToken) throw new Error(window.AVi18n.t('انتهت جلسة الإدارة أو رمز الحماية؛ حدّث الصفحة وسجّل الدخول مجدداً.'));
     const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
@@ -19,11 +20,11 @@ async function driveMutation(url, items) {
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
-        const detail = typeof result.detail === 'string' ? result.detail : `HTTP ${response.status}`;
+        const detail = typeof window.AVi18n.t(result.detail) === 'string' ? window.AVi18n.t(result.detail) : `HTTP ${response.status}`;
         throw new Error(detail);
     }
     if (result.success !== true || !Number.isInteger(result.count) || result.count < 1) {
-        throw new Error('لم يؤكد الخادم تنفيذ الإجراء. لم يتم تحديث العرض.');
+        throw new Error(window.AVi18n.t('لم يؤكد الخادم تنفيذ الإجراء. لم يتم تحديث العرض.'));
     }
     return result;
 }
@@ -39,12 +40,12 @@ let libraryView = localStorage.getItem('aboodvideo-library-view') === 'cards' ? 
 const selectedVideoIds = new Set();
 let openMenuFor = null;
 
-const statusLabels = { READY: 'جاهز', PROCESSING: 'قيد المعالجة', FAILED: 'فشل', CANCELLED: 'ملغى', UPLOADING: 'جارٍ الرفع', UPLOADED: 'تم الرفع', QUEUED: 'بالانتظار', PROBING: 'فحص المصدر', VERIFYING: 'تحقق' };
+const statusLabels = { READY: window.AVi18n.t('جاهز'), PROCESSING: window.AVi18n.t('قيد المعالجة'), FAILED: window.AVi18n.t('فشل'), CANCELLED: window.AVi18n.t('ملغى'), UPLOADING: window.AVi18n.t('جارٍ الرفع'), UPLOADED: window.AVi18n.t('تم الرفع'), QUEUED: window.AVi18n.t('بالانتظار'), PROBING: window.AVi18n.t('فحص المصدر'), VERIFYING: window.AVi18n.t('تحقق') };
 const visibilityLabels = {
-    PRIVATE: ['خاص', 'badge-private'],
-    UNLISTED: ['غير مدرج', 'badge-unlisted'],
-    PUBLIC: ['عام', 'badge-public'],
-    PASSWORD_PROTECTED: ['محمي بكلمة سر', 'badge-password'],
+    PRIVATE: [window.AVi18n.t('خاص'), 'badge-private'],
+    UNLISTED: [window.AVi18n.t('غير مدرج'), 'badge-unlisted'],
+    PUBLIC: [window.AVi18n.t('عام'), 'badge-public'],
+    PASSWORD_PROTECTED: [window.AVi18n.t('محمي بكلمة سر'), 'badge-password'],
 };
 
 function showLibraryMessage(message, isError = false) {
@@ -77,7 +78,7 @@ function formatDate(iso) {
     if (!iso) return '—';
     try {
         const d = new Date(iso);
-        return d.toLocaleDateString('ar', { year: 'numeric', month: 'short', day: 'numeric' });
+        return d.toLocaleDateString((document.documentElement.lang === 'en' ? 'en-US' : 'ar'), { year: 'numeric', month: 'short', day: 'numeric' });
     } catch (_) { return iso.slice(0, 10); }
 }
 
@@ -116,7 +117,7 @@ function initFromUrl() {
     }
     if (params.get('uncategorized') === '1') {
         const el = document.getElementById('category-filter');
-        if (el) el.placeholder = 'غير مصنف (فعّال)';
+        if (el) el.placeholder = window.AVi18n.t('غير مصنف (فعّال)');
         initFromUrl.uncategorized = true;
     }
     if (params.get('panel') === 'folders') document.body.classList.add('folders-open');
@@ -157,12 +158,12 @@ async function loadVideos() {
         const hubCount = document.getElementById('hubVideosCount');
         if (hubCount) hubCount.textContent = String(libraryTotal);
         renderTable(data.items);
-        document.getElementById('page-info').textContent = `صفحة ${libraryPage} من ${Math.max(1, Math.ceil(libraryTotal / PAGE_SIZE))} · ${libraryTotal} فيديو`;
+        document.getElementById('page-info').textContent = window.AVi18n.tpl`صفحة ${libraryPage} من ${Math.max(1, Math.ceil(libraryTotal / PAGE_SIZE))} · ${libraryTotal} فيديو`;
         document.getElementById('prev-page').disabled = libraryPage <= 1;
         document.getElementById('next-page').disabled = libraryPage * PAGE_SIZE >= libraryTotal;
     } catch (_) {
-        showLibraryMessage('تعذر تحميل المكتبة. تحقق من الاتصال ثم أعد المحاولة.', true);
-        if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="table-empty-cell">تعذر التحميل — أعد المحاولة</td></tr>';
+        showLibraryMessage(window.AVi18n.t('تعذر تحميل المكتبة. تحقق من الاتصال ثم أعد المحاولة.'), true);
+        if (tbody) tbody.innerHTML = window.AVi18n.t('<tr><td colspan="10" class="table-empty-cell">تعذر التحميل — أعد المحاولة</td></tr>');
     }
 }
 
@@ -182,14 +183,14 @@ function renderTable(videos) {
 
     if (videos.length === 0) {
         const row = document.createElement('tr');
-        const cell = createElement('td', 'لا توجد فيديوهات مطابقة للفلاتر الحالية.');
+        const cell = createElement('td', window.AVi18n.t('لا توجد فيديوهات مطابقة للفلاتر الحالية.'));
         cell.colSpan = 10;
         row.appendChild(cell);
         tbody.replaceChildren(row);
         const empty = document.createElement('div');
         empty.className = 'empty-state';
-        empty.innerHTML = '<div class="empty-state-title">لا توجد فيديوهات هنا</div>' +
-            '<p class="empty-state-desc">جرّب تعديل الفلاتر. لإضافة فيديو جديد، استخدم قسم الرفع والاستيراد.</p>';
+        empty.innerHTML = window.AVi18n.t('<div class="empty-state-title">لا توجد فيديوهات هنا</div>') +
+            window.AVi18n.t('<p class="empty-state-desc">جرّب تعديل الفلاتر. لإضافة فيديو جديد، استخدم قسم الرفع والاستيراد.</p>');
         cards.replaceChildren(empty);
         return;
     }
@@ -201,7 +202,7 @@ function renderTable(videos) {
     let previousGroup = null;
 
     for (const video of sorted) {
-        const group = groupKey ? (video[groupKey] || 'بدون تصنيف') : null;
+        const group = groupKey ? (video[groupKey] || window.AVi18n.t('بدون تصنيف')) : null;
         if (groupKey && group !== previousGroup) {
             const groupRow = document.createElement('tr');
             const groupCell = createElement('td', group, ['group-heading']);
@@ -224,7 +225,7 @@ function renderTable(videos) {
         checkbox.className = 'video-select';
         checkbox.dataset.id = video.id;
         checkbox.checked = selectedVideoIds.has(video.id);
-        checkbox.setAttribute('aria-label', `تحديد ${video.title}`);
+        checkbox.setAttribute('aria-label', window.AVi18n.tpl`تحديد ${video.title}`);
         selectCell.appendChild(checkbox);
 
         const videoCell = document.createElement('td');
@@ -244,19 +245,19 @@ function renderTable(videos) {
 
         const statusCell = document.createElement('td');
         const statusStack = document.createElement('div');
-        const statusLabel = video.status === 'READY' && quality === '2160p' ? '4K جاهز' : (statusLabels[video.status] || video.status);
+        const statusLabel = video.status === 'READY' && quality === '2160p' ? window.AVi18n.t('4K جاهز') : (statusLabels[video.status] || video.status);
         statusStack.append(
             createElement('span', statusLabel, ['badge', `status-${video.status.toLowerCase()}`]),
             createElement('span', visibilityLabel, ['badge', visibilityClass]),
         );
         statusCell.appendChild(statusStack);
 
-        const location = [video.category, video.series_name, video.season_number ? `م${video.season_number}` : '', video.episode_number ? `ح${video.episode_number}` : ''].filter(Boolean).join(' · ') || '—';
+        const location = [video.category, video.series_name, video.season_number ? window.AVi18n.tpl`م${video.season_number}` : '', video.episode_number ? window.AVi18n.tpl`ح${video.episode_number}` : ''].filter(Boolean).join(' · ') || '—';
         const locationCell = createElement('td', location);
 
         const qualityCell = createElement('td', quality ? (quality === '2160p' ? '4K' : quality) : '—');
 
-        const subsCell = createElement('td', video.subtitle_count ? `${video.subtitle_count} مسار` : 'بدون');
+        const subsCell = createElement('td', video.subtitle_count ? window.AVi18n.tpl`${video.subtitle_count} مسار` : window.AVi18n.t('بدون'));
         if (!video.subtitle_count) subsCell.className = 'muted-line';
 
         const sizeCell = createElement('td', formatBytes(video.source_size_bytes));
@@ -266,14 +267,14 @@ function renderTable(videos) {
         const actionsCell = document.createElement('td');
         actionsCell.className = 'video-actions';
         if (video.status === 'READY') {
-            const preview = createElement('a', 'معاينة', ['btn', 'btn-sm']);
+            const preview = createElement('a', window.AVi18n.t('معاينة'), ['btn', 'btn-sm']);
             preview.href = `/admin/videos/${encodeURIComponent(String(video.id))}/watch`;
             preview.target = '_blank';
             preview.rel = 'noopener';
             actionsCell.appendChild(preview);
 
             if (video.share_id) {
-                const embedBtn = createElement('button', 'تضمين', ['btn', 'btn-sm']);
+                const embedBtn = createElement('button', window.AVi18n.t('تضمين'), ['btn', 'btn-sm']);
                 embedBtn.type = 'button';
                 embedBtn.dataset.action = 'open-embed';
                 embedBtn.dataset.id = String(video.id);
@@ -285,7 +286,7 @@ function renderTable(videos) {
         menuBtn.dataset.action = 'open-menu';
         menuBtn.dataset.id = String(video.id);
         menuBtn.setAttribute('aria-haspopup', 'menu');
-        menuBtn.setAttribute('aria-label', `إجراءات ${video.title}`);
+        menuBtn.setAttribute('aria-label', window.AVi18n.tpl`إجراءات ${video.title}`);
         actionsCell.appendChild(menuBtn);
 
         row.append(selectCell, videoCell, statusCell, locationCell, qualityCell, subsCell, sizeCell, viewsCell, dateCell, actionsCell);
@@ -299,7 +300,7 @@ function renderTable(videos) {
         if (video.status === 'READY' && video.active_generation_id) {
             const poster = document.createElement('img');
             poster.src = `/api/v1/admin/videos/${encodeURIComponent(String(video.id))}/poster`;
-            poster.alt = `صورة الفيديو: ${video.title}`;
+            poster.alt = window.AVi18n.tpl`صورة الفيديو: ${video.title}`;
             poster.loading = 'lazy';
             art.appendChild(poster);
         } else {
@@ -320,15 +321,15 @@ function renderTable(videos) {
         cardBadges.append(
             createElement('span', statusLabel, ['badge', `status-${video.status.toLowerCase()}`]),
             createElement('span', visibilityLabel, ['badge', visibilityClass]),
-            quality ? createElement('span', quality === '2160p' ? '4K' : quality, ['badge', 'badge-quality']) : createElement('span', 'بدون جودات', ['badge', 'badge-muted']),
+            quality ? createElement('span', quality === '2160p' ? '4K' : quality, ['badge', 'badge-quality']) : createElement('span', window.AVi18n.t('بدون جودات'), ['badge', 'badge-muted']),
         );
 
         const cardActions = document.createElement('div');
         cardActions.className = 'video-actions';
-        const cardDetailsBtn = createActionButton('تفاصيل', 'details-video', video.id, ['btn', 'btn-secondary', 'btn-sm']);
+        const cardDetailsBtn = createActionButton(window.AVi18n.t('تفاصيل'), 'details-video', video.id, ['btn', 'btn-secondary', 'btn-sm']);
         cardActions.append(cardDetailsBtn);
         if (video.status === 'READY' && video.share_id) {
-            const cardEmbedBtn = createElement('button', 'تضمين', ['btn', 'btn-sm']);
+            const cardEmbedBtn = createElement('button', window.AVi18n.t('تضمين'), ['btn', 'btn-sm']);
             cardEmbedBtn.type = 'button';
             cardEmbedBtn.dataset.action = 'open-embed';
             cardEmbedBtn.dataset.id = String(video.id);
@@ -340,7 +341,7 @@ function renderTable(videos) {
         card.append(
             art, cardHeader, cardBadges,
             createElement('p', location, ['muted-line']),
-            createElement('p', `${formatBytes(video.source_size_bytes)} · ${video.subtitle_count ? video.subtitle_count + ' ترجمة' : 'بدون ترجمة'} · ${video.view_count} مشاهدة`, ['muted-line']),
+            createElement('p', window.AVi18n.tpl`${formatBytes(video.source_size_bytes)} · ${video.subtitle_count ? video.subtitle_count + window.AVi18n.t(' ترجمة') : window.AVi18n.t('بدون ترجمة')} · ${video.view_count} مشاهدة`, ['muted-line']),
             cardActions,
         );
         cardNodes.push(card);
@@ -375,18 +376,18 @@ function attachThumbs(root) {
 function menuItemsFor(video) {
     const items = [];
     if (video.status === 'READY') {
-        items.push({ label: 'معاينة خاصة', href: `/admin/videos/${video.id}/watch`, external: true });
+        items.push({ label: window.AVi18n.t('معاينة خاصة'), href: `/admin/videos/${video.id}/watch`, external: true });
         if (video.share_id) {
-            items.push({ label: 'كود التضمين للمواقع (Embed)', action: 'open-embed' });
+            items.push({ label: window.AVi18n.t('كود التضمين للمواقع (Embed)'), action: 'open-embed' });
         }
     }
-    items.push({ label: 'فتح صفحة التفاصيل', href: `/admin/videos/detail?v=${encodeURIComponent(String(video.id))}` });
-    items.push({ label: 'نسخ رابط المشاركة', action: 'copy-video-link' });
-    items.push({ label: 'إضافة ترجمة', action: 'open-subtitles' });
-    items.push({ label: 'المعالجة', action: 'processing-video' });
-    items.push({ label: 'تحويل HLS', action: 'transcode' });
-    items.push({ label: 'تعديل', action: 'edit-video' });
-    items.push({ label: video.status === 'UPLOADING' ? 'إلغاء الرفع وحذف' : 'حذف', action: 'delete-video', danger: true });
+    items.push({ label: window.AVi18n.t('فتح صفحة التفاصيل'), href: `/admin/videos/detail?v=${encodeURIComponent(String(video.id))}` });
+    items.push({ label: window.AVi18n.t('نسخ رابط المشاركة'), action: 'copy-video-link' });
+    items.push({ label: window.AVi18n.t('إضافة ترجمة'), action: 'open-subtitles' });
+    items.push({ label: window.AVi18n.t('المعالجة'), action: 'processing-video' });
+    items.push({ label: window.AVi18n.t('تحويل HLS'), action: 'transcode' });
+    items.push({ label: window.AVi18n.t('تعديل'), action: 'edit-video' });
+    items.push({ label: video.status === 'UPLOADING' ? window.AVi18n.t('إلغاء الرفع وحذف') : window.AVi18n.t('حذف'), action: 'delete-video', danger: true });
     return items;
 }
 
@@ -446,12 +447,12 @@ async function loadFoldersTree() {
         const uncategorized = videos.filter(v => !v.category && !v.series_name).length;
 
         tree.replaceChildren();
-        tree.appendChild(createElement('div', 'المجلدات', ['tree-group-title']));
-        const allBtn = createElement('button', 'كل الفيديوهات', ['tree-item']);
+        tree.appendChild(createElement('div', window.AVi18n.t('المجلدات'), ['tree-group-title']));
+        const allBtn = createElement('button', window.AVi18n.t('كل الفيديوهات'), ['tree-item']);
         allBtn.type = 'button';
         allBtn.addEventListener('click', () => applyTreeFilter({}));
         tree.appendChild(allBtn);
-        const uncBtn = createElement('button', 'غير مصنف', ['tree-item']);
+        const uncBtn = createElement('button', window.AVi18n.t('غير مصنف'), ['tree-item']);
         uncBtn.type = 'button';
         uncBtn.appendChild(createElement('span', String(uncategorized), ['tree-count']));
         uncBtn.addEventListener('click', () => {
@@ -471,9 +472,9 @@ async function loadFoldersTree() {
             tree.appendChild(btn);
         }
 
-        tree.appendChild(createElement('div', 'المسلسلات', ['tree-group-title']));
+        tree.appendChild(createElement('div', window.AVi18n.t('المسلسلات'), ['tree-group-title']));
         if (!series.length) {
-            tree.appendChild(createElement('div', 'لا توجد مسلسلات بعد', ['empty-hint-sm']));
+            tree.appendChild(createElement('div', window.AVi18n.t('لا توجد مسلسلات بعد'), ['empty-hint-sm']));
         }
         for (const s of (Array.isArray(series) ? series : [])) {
             const wrap = document.createElement('div');
@@ -482,11 +483,11 @@ async function loadFoldersTree() {
             head.style.alignItems = 'center';
             const toggle = createElement('button', '▸', ['tree-toggle']);
             toggle.type = 'button';
-            toggle.setAttribute('aria-label', `توسيع ${s.name}`);
+            toggle.setAttribute('aria-label', window.AVi18n.tpl`توسيع ${s.name}`);
             const btn = createElement('button', s.name, ['tree-item']);
             btn.type = 'button';
             btn.style.flex = '1';
-            btn.appendChild(createElement('span', `${s.episodes} حلقة`, ['tree-count']));
+            btn.appendChild(createElement('span', window.AVi18n.tpl`${s.episodes} حلقة`, ['tree-count']));
             btn.addEventListener('click', () => applyTreeFilter({ series_name: s.name }));
             const children = document.createElement('div');
             children.className = 'tree-children';
@@ -504,7 +505,7 @@ async function loadFoldersTree() {
             tree.appendChild(wrap);
         }
     } catch (_) {
-        tree.replaceChildren(createElement('div', 'تعذر تحميل شجرة التنظيم', ['empty-hint-sm']));
+        tree.replaceChildren(createElement('div', window.AVi18n.t('تعذر تحميل شجرة التنظيم'), ['empty-hint-sm']));
     }
 }
 
@@ -516,19 +517,19 @@ async function loadSeasons(name, container) {
         const seasons = [...new Map(items.filter(v => v.season_number).map(v => [v.season_number, v.season_number])).keys()].sort((a, b) => a - b);
         container.replaceChildren();
         if (!seasons.length) {
-            container.appendChild(createElement('div', 'بدون مواسم محددة', ['empty-hint-sm']));
+            container.appendChild(createElement('div', window.AVi18n.t('بدون مواسم محددة'), ['empty-hint-sm']));
             return;
         }
         for (const season of seasons) {
             const count = items.filter(v => v.season_number === season).length;
-            const btn = createElement('button', `الموسم ${season}`, ['tree-item']);
+            const btn = createElement('button', window.AVi18n.tpl`الموسم ${season}`, ['tree-item']);
             btn.type = 'button';
-            btn.appendChild(createElement('span', `${count} حلقة`, ['tree-count']));
+            btn.appendChild(createElement('span', window.AVi18n.tpl`${count} حلقة`, ['tree-count']));
             btn.addEventListener('click', () => applyTreeFilter({ series_name: name, season_number: season }));
             container.appendChild(btn);
         }
     } catch (_) {
-        container.replaceChildren(createElement('div', 'تعذر التحميل', ['empty-hint-sm']));
+        container.replaceChildren(createElement('div', window.AVi18n.t('تعذر التحميل'), ['empty-hint-sm']));
     }
 }
 
@@ -546,7 +547,7 @@ function applyTreeFilter({ category = '', series_name = '', season_number = '' }
 
 function updateBulkBar() {
     document.getElementById('bulk-bar').classList.toggle('hidden', selectedVideoIds.size === 0);
-    document.getElementById('selected-count').textContent = `${selectedVideoIds.size} فيديو محدد`;
+    document.getElementById('selected-count').textContent = window.AVi18n.tpl`${selectedVideoIds.size} فيديو محدد`;
     document.querySelectorAll('.video-select').forEach(input => { input.checked = selectedVideoIds.has(input.dataset.id); });
 }
 
@@ -581,7 +582,7 @@ async function applyBulkAction() {
         payload.series_name = document.getElementById('bulk-value').value.trim() || null;
         payload.season_number = Number(document.getElementById('bulk-season').value) || null;
     }
-    if (!await askConfirmation(`تطبيق «${document.getElementById('bulk-action').selectedOptions[0].textContent}» على ${payload.ids.length} فيديو؟`)) return;
+    if (!await askConfirmation(window.AVi18n.tpl`تطبيق «${document.getElementById('bulk-action').selectedOptions[0].textContent}» على ${payload.ids.length} فيديو؟`)) return;
     const button = document.getElementById('bulk-apply');
     button.disabled = true;
     try {
@@ -591,13 +592,13 @@ async function applyBulkAction() {
             body: JSON.stringify(payload),
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : `HTTP ${response.status}`);
+        if (!response.ok) throw new Error(typeof window.AVi18n.t(result.detail) === 'string' ? window.AVi18n.t(result.detail) : `HTTP ${response.status}`);
         const failed = result.results?.filter(item => !item.ok).length || 0;
-        showLibraryMessage(`اكتمل الإجراء على ${result.updated} فيديو.${failed ? ` تعذر تنفيذ ${failed} فيديو؛ راجع حالتها.` : ''}`, !!failed);
+        showLibraryMessage(window.AVi18n.tpl`اكتمل الإجراء على ${result.updated} فيديو.${failed ? window.AVi18n.tpl` تعذر تنفيذ ${failed} فيديو؛ راجع حالتها.` : ''}`, !!failed);
         selectedVideoIds.clear();
         await loadVideos();
     } catch (error) {
-        showLibraryMessage(`تعذر تنفيذ الإجراء: ${error.message}`, true);
+        showLibraryMessage(window.AVi18n.tpl`تعذر تنفيذ الإجراء: ${window.AVi18n.t(error.message)}`, true);
     } finally { button.disabled = false; }
 }
 
@@ -606,26 +607,26 @@ async function applyBulkAction() {
 function openDetailsModal(video) {
     const details = document.getElementById('details-content');
     const fields = [
-        ['المصدر', video.source_filename], ['الحجم', formatBytes(video.source_size_bytes)],
-        ['الأبعاد', video.source_resolution_width ? `${video.source_resolution_width}×${video.source_resolution_height}` : 'غير معروف'],
-        ['الكوديك', video.source_codec || 'غير معروف'],
-        ['معدل البت', video.source_bitrate ? `${Math.round(video.source_bitrate / 1000)} kbps` : 'غير معروف'],
-        ['المدة', video.source_duration_seconds ? `${Math.round(video.source_duration_seconds)} ثانية` : 'غير معروف'],
-        ['الحالة', statusLabels[video.status] || video.status], ['الظهور', visibilityLabels[video.visibility]?.[0] || video.visibility],
-        ['المجلد', video.category || '—'], ['المسلسل', video.series_name || '—'],
-        ['الموسم / الحلقة', `${video.season_number || '—'} / ${video.episode_number || '—'}`],
-        ['المشاهدات', video.view_count], ['الترجمات', video.subtitle_count],
-        ['رابط المشاركة', video.share_id && !video.share_revoked ? `${window.location.origin}/watch/${video.share_id}` : 'غير متاح'],
+        [window.AVi18n.t('المصدر'), video.source_filename], [window.AVi18n.t('الحجم'), formatBytes(video.source_size_bytes)],
+        [window.AVi18n.t('الأبعاد'), video.source_resolution_width ? `${video.source_resolution_width}×${video.source_resolution_height}` : window.AVi18n.t('غير معروف')],
+        [window.AVi18n.t('الكوديك'), video.source_codec || window.AVi18n.t('غير معروف')],
+        [window.AVi18n.t('معدل البت'), video.source_bitrate ? `${Math.round(video.source_bitrate / 1000)} kbps` : window.AVi18n.t('غير معروف')],
+        [window.AVi18n.t('المدة'), video.source_duration_seconds ? window.AVi18n.tpl`${Math.round(video.source_duration_seconds)} ثانية` : window.AVi18n.t('غير معروف')],
+        [window.AVi18n.t('الحالة'), statusLabels[video.status] || video.status], [window.AVi18n.t('الظهور'), visibilityLabels[video.visibility]?.[0] || video.visibility],
+        [window.AVi18n.t('المجلد'), video.category || '—'], [window.AVi18n.t('المسلسل'), video.series_name || '—'],
+        [window.AVi18n.t('الموسم / الحلقة'), `${video.season_number || '—'} / ${video.episode_number || '—'}`],
+        [window.AVi18n.t('المشاهدات'), video.view_count], [window.AVi18n.t('الترجمات'), video.subtitle_count],
+        [window.AVi18n.t('رابط المشاركة'), video.share_id && !video.share_revoked ? `${window.location.origin}/watch/${video.share_id}` : window.AVi18n.t('غير متاح')],
     ];
     const grid = document.createElement('dl');
     grid.className = 'details-grid';
     for (const [label, value] of fields) grid.append(createElement('dt', label), createElement('dd', value));
-    const renditions = createElement('h4', 'الجودات الجاهزة');
+    const renditions = createElement('h4', window.AVi18n.t('الجودات الجاهزة'));
     const list = document.createElement('ul');
     for (const rendition of video.available_renditions) {
-        list.appendChild(createElement('li', `${rendition.quality === '2160p' ? '4K · ' : ''}${rendition.quality} · ${rendition.width}×${rendition.height} · ${rendition.codec} · ${rendition.bitrate ? Math.round(rendition.bitrate / 1000) + ' kbps' : 'معدل غير معروف'}`));
+        list.appendChild(createElement('li', `${rendition.quality === '2160p' ? '4K · ' : ''}${rendition.quality} · ${rendition.width}×${rendition.height} · ${rendition.codec} · ${rendition.bitrate ? Math.round(rendition.bitrate / 1000) + ' kbps' : window.AVi18n.t('معدل غير معروف')}`));
     }
-    if (!video.available_renditions.length) list.appendChild(createElement('li', 'لم تُنشر جودات بعد'));
+    if (!video.available_renditions.length) list.appendChild(createElement('li', window.AVi18n.t('لم تُنشر جودات بعد')));
     details.replaceChildren(grid, renditions, list);
     document.getElementById('details-modal').classList.add('is-open');
 }
@@ -666,12 +667,12 @@ async function deleteVideo(vidId) {
     if (!video) return;
     pendingDeleteVideo = video;
     const isUploading = video.status === 'UPLOADING';
-    document.getElementById('delete-modal-title').textContent = isUploading ? 'إلغاء الرفع وحذف الفيديو' : 'حذف الفيديو';
+    document.getElementById('delete-modal-title').textContent = isUploading ? window.AVi18n.t('إلغاء الرفع وحذف الفيديو') : window.AVi18n.t('حذف الفيديو');
     document.getElementById('delete-modal-message').textContent = isUploading
-        ? 'الرفع ما زال نشطاً. سيؤدي هذا الإجراء إلى إلغاء الرفع وتنظيف الملفات المؤقتة ثم حذف الفيديو.'
-        : 'سيتم حذف الفيديو وملفاته المرتبطة نهائياً.';
-    document.getElementById('btn-cancel-delete').textContent = isUploading ? 'احتفظ بالرفع' : 'إلغاء';
-    document.getElementById('btn-confirm-delete').textContent = isUploading ? 'إلغاء الرفع وحذف' : 'حذف الفيديو';
+        ? window.AVi18n.t('الرفع ما زال نشطاً. سيؤدي هذا الإجراء إلى إلغاء الرفع وتنظيف الملفات المؤقتة ثم حذف الفيديو.')
+        : window.AVi18n.t('سيتم حذف الفيديو وملفاته المرتبطة نهائياً.');
+    document.getElementById('btn-cancel-delete').textContent = isUploading ? window.AVi18n.t('احتفظ بالرفع') : window.AVi18n.t('إلغاء');
+    document.getElementById('btn-confirm-delete').textContent = isUploading ? window.AVi18n.t('إلغاء الرفع وحذف') : window.AVi18n.t('حذف الفيديو');
     document.getElementById('delete-modal').classList.add('is-open');
 }
 
@@ -693,13 +694,13 @@ async function confirmDeleteVideo() {
         );
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            document.getElementById('delete-modal-message').textContent = err.detail || 'تعذر إتمام العملية بأمان.';
+            document.getElementById('delete-modal-message').textContent = window.AVi18n.t(err.detail) || window.AVi18n.t('تعذر إتمام العملية بأمان.');
             return;
         }
         closeDeleteModal();
         await loadVideos();
     } catch (_) {
-        document.getElementById('delete-modal-message').textContent = 'تعذر الاتصال بالخادم. لم يتم حذف الفيديو.';
+        document.getElementById('delete-modal-message').textContent = window.AVi18n.t('تعذر الاتصال بالخادم. لم يتم حذف الفيديو.');
     } finally {
         button.disabled = false;
     }
@@ -708,7 +709,7 @@ async function confirmDeleteVideo() {
 /* ---------------- Transcode ---------------- */
 
 async function triggerTranscode(vidId) {
-    if (!await askConfirmation('هل ترغب في بدء تحويل هذا الفيديو لتقنية Adaptive HLS؟')) return;
+    if (!await askConfirmation(window.AVi18n.t('هل ترغب في بدء تحويل هذا الفيديو لتقنية Adaptive HLS؟'))) return;
     try {
         const res = await fetch(`/api/v1/admin/videos/${vidId}/transcode`, {
             method: 'POST',
@@ -719,10 +720,10 @@ async function triggerTranscode(vidId) {
             window.location.href = '/admin/processing';
         } else {
             const err = await res.json();
-            showLibraryMessage('تعذر بدء التحويل: ' + (err.detail || 'خطأ غير معروف'), true);
+            showLibraryMessage(window.AVi18n.t('تعذر بدء التحويل: ') + (window.AVi18n.t(err.detail) || window.AVi18n.t('خطأ غير معروف')), true);
         }
     } catch (e) {
-        showLibraryMessage('خطأ في الاتصال أثناء بدء التحويل.', true);
+        showLibraryMessage(window.AVi18n.t('خطأ في الاتصال أثناء بدء التحويل.'), true);
     }
 }
 
@@ -730,7 +731,7 @@ async function triggerTranscode(vidId) {
 
 async function openSubtitlesModal(vidId, vidTitle) {
     currentSubVideoId = vidId;
-    document.getElementById('subs-modal-title').textContent = `إدارة ترجمات: ${vidTitle}`;
+    document.getElementById('subs-modal-title').textContent = window.AVi18n.tpl`إدارة ترجمات: ${vidTitle}`;
     document.getElementById('subtitles-modal').classList.add('is-open');
     document.getElementById('subs-upload-form').reset();
     document.getElementById('subs-feedback').classList.add('hidden');
@@ -744,16 +745,16 @@ function closeSubtitlesModal() {
 
 async function loadSubtitles(vidId) {
     const listEl = document.getElementById('subs-list');
-    showTextContainer(listEl, 'جاري التحميل...');
+    showTextContainer(listEl, window.AVi18n.t('جاري التحميل...'));
     try {
         const res = await fetch(`/api/v1/admin/videos/${vidId}/subtitles`, { credentials: 'include' });
         if (!res.ok) {
-            showTextContainer(listEl, 'فشل تحميل الترجمات');
+            showTextContainer(listEl, window.AVi18n.t('فشل تحميل الترجمات'));
             return;
         }
         const subs = await res.json();
         if (subs.length === 0) {
-            showTextContainer(listEl, 'لا توجد ملفات ترجمة مضافة لهذا الفيديو.');
+            showTextContainer(listEl, window.AVi18n.t('لا توجد ملفات ترجمة مضافة لهذا الفيديو.'));
             return;
         }
         const rows = subs.map((subtitle) => {
@@ -763,9 +764,9 @@ async function loadSubtitles(vidId) {
             badges.style.display = 'flex';
             badges.style.gap = '6px';
             badges.style.marginTop = '4px';
-            badges.appendChild(createElement('span', subtitle.is_playable ? 'قابلة للتشغيل' : 'غير قابلة للتشغيل', ['badge']));
-            if (subtitle.is_default) badges.appendChild(createElement('span', 'افتراضية', ['badge']));
-            if (subtitle.is_forced) badges.appendChild(createElement('span', 'إجبارية', ['badge']));
+            badges.appendChild(createElement('span', subtitle.is_playable ? window.AVi18n.t('قابلة للتشغيل') : window.AVi18n.t('غير قابلة للتشغيل'), ['badge']));
+            if (subtitle.is_default) badges.appendChild(createElement('span', window.AVi18n.t('افتراضية'), ['badge']));
+            if (subtitle.is_forced) badges.appendChild(createElement('span', window.AVi18n.t('إجبارية'), ['badge']));
             details.append(
                 createElement('strong', subtitle.label),
                 createElement('span', ` (${subtitle.language_name} - ${subtitle.language_code}) [${String(subtitle.format).toUpperCase()}]`),
@@ -773,18 +774,18 @@ async function loadSubtitles(vidId) {
             );
 
             const actions = document.createElement('div');
-            actions.appendChild(createActionButton('إعادة تسمية', 'rename-subtitle', subtitle.id));
+            actions.appendChild(createActionButton(window.AVi18n.t('إعادة تسمية'), 'rename-subtitle', subtitle.id));
             if (subtitle.is_playable) actions.appendChild(createActionButton(
-                subtitle.is_default ? 'إلغاء الافتراضية' : 'تعيين كافتراضية',
+                subtitle.is_default ? window.AVi18n.t('إلغاء الافتراضية') : window.AVi18n.t('تعيين كافتراضية'),
                 'set-default-subtitle', subtitle.id,
             ));
-            actions.appendChild(createActionButton('حذف', 'delete-subtitle', subtitle.id, ['btn', 'btn-sm', 'btn-danger']));
+            actions.appendChild(createActionButton(window.AVi18n.t('حذف'), 'delete-subtitle', subtitle.id, ['btn', 'btn-sm', 'btn-danger']));
             row.append(details, actions);
             return row;
         });
         listEl.replaceChildren(...rows);
     } catch (e) {
-        showTextContainer(listEl, 'خطأ في الاتصال');
+        showTextContainer(listEl, window.AVi18n.t('خطأ في الاتصال'));
     }
 }
 
@@ -801,35 +802,35 @@ async function updateSubtitle(subId, changes, successMessage) {
             await loadSubtitles(currentSubVideoId);
             showSubtitleMessage(successMessage);
         } else {
-            showSubtitleMessage('فشل تعديل الترجمة.', true);
+            showSubtitleMessage(window.AVi18n.t('فشل تعديل الترجمة.'), true);
         }
     } catch (e) {
-        showSubtitleMessage('تعذر الاتصال أثناء تعديل الترجمة.', true);
+        showSubtitleMessage(window.AVi18n.t('تعذر الاتصال أثناء تعديل الترجمة.'), true);
     }
 }
 
 async function setDefaultSubtitle(subId) {
     const row = document.querySelector(`#subs-list [data-action="set-default-subtitle"][data-id="${subId}"]`);
     const makeDefault = row?.textContent !== 'إلغاء الافتراضية';
-    await updateSubtitle(subId, { is_default: makeDefault }, 'تم تحديث الترجمة الافتراضية.');
+    await updateSubtitle(subId, { is_default: makeDefault }, window.AVi18n.t('تم تحديث الترجمة الافتراضية.'));
 }
 
 async function renameSubtitle(subId) {
     const row = document.querySelector(`#subs-list [data-action="rename-subtitle"][data-id="${subId}"]`)?.closest('div');
     const currentLabel = row?.parentElement?.querySelector('strong')?.textContent || '';
-    const label = window.prompt('اسم مسار الترجمة الجديد', currentLabel);
+    const label = window.prompt(window.AVi18n.t('اسم مسار الترجمة الجديد'), currentLabel);
     if (label === null) return;
     const trimmed = label.trim();
     if (!trimmed || trimmed.length > 100) {
-        showSubtitleMessage('اسم الترجمة يجب أن يكون بين 1 و100 حرف.', true);
+        showSubtitleMessage(window.AVi18n.t('اسم الترجمة يجب أن يكون بين 1 و100 حرف.'), true);
         return;
     }
-    if (trimmed !== currentLabel) await updateSubtitle(subId, { label: trimmed }, 'تمت إعادة تسمية الترجمة.');
+    if (trimmed !== currentLabel) await updateSubtitle(subId, { label: trimmed }, window.AVi18n.t('تمت إعادة تسمية الترجمة.'));
 }
 
 async function deleteSubtitle(subId) {
     if (!currentSubVideoId) return;
-    if (!await askConfirmation('هل أنت متأكد من حذف ملف الترجمة هذا؟')) return;
+    if (!await askConfirmation(window.AVi18n.t('هل أنت متأكد من حذف ملف الترجمة هذا؟'))) return;
     try {
         const res = await fetch(`/api/v1/admin/videos/${currentSubVideoId}/subtitles/${subId}`, {
             method: 'DELETE',
@@ -839,10 +840,10 @@ async function deleteSubtitle(subId) {
         if (res.ok) {
             await loadSubtitles(currentSubVideoId);
         } else {
-            showSubtitleMessage('فشل حذف ملف الترجمة.', true);
+            showSubtitleMessage(window.AVi18n.t('فشل حذف ملف الترجمة.'), true);
         }
     } catch (e) {
-        showSubtitleMessage('تعذر الاتصال أثناء حذف الترجمة.', true);
+        showSubtitleMessage(window.AVi18n.t('تعذر الاتصال أثناء حذف الترجمة.'), true);
     }
 }
 
@@ -886,8 +887,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (action === 'processing-video') window.location.href = '/admin/processing';
         if (action === 'copy-video-link' && video) {
             const link = video.share_id && !video.share_revoked ? `${window.location.origin}/watch/${video.share_id}` : `${window.location.origin}/admin/videos/${video.id}/watch`;
-            try { await navigator.clipboard.writeText(link); showLibraryMessage('تم نسخ رابط المشاهدة.'); }
-            catch (_) { showLibraryMessage('تعذر نسخ الرابط من المتصفح.', true); }
+            try { await navigator.clipboard.writeText(link); showLibraryMessage(window.AVi18n.t('تم نسخ رابط المشاهدة.')); }
+            catch (_) { showLibraryMessage(window.AVi18n.t('تعذر نسخ الرابط من المتصفح.'), true); }
         }
         if (action === 'set-default-subtitle') setDefaultSubtitle(id);
         if (action === 'rename-subtitle') renameSubtitle(id);
@@ -1044,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
         copyShareBtn.addEventListener('click', () => {
             const link = document.getElementById('modal-share-link').value;
             if (link) {
-                navigator.clipboard.writeText(link).then(() => showLibraryMessage('تم نسخ رابط المشاهدة.'), () => showLibraryMessage('تعذر نسخ الرابط.', true));
+                navigator.clipboard.writeText(link).then(() => showLibraryMessage(window.AVi18n.t('تم نسخ رابط المشاهدة.')), () => showLibraryMessage(window.AVi18n.t('تعذر نسخ الرابط.'), true));
             }
         });
     }
@@ -1062,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 const updated = await res.json();
                 document.getElementById('modal-share-link').value = `${window.location.origin}/watch/${updated.share_id}`;
-                showLibraryMessage('تم تجديد الرابط وإبطال الرابط القديم.');
+                showLibraryMessage(window.AVi18n.t('تم تجديد الرابط وإبطال الرابط القديم.'));
                 loadVideos();
             }
         });
@@ -1097,7 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeEditModal();
                 loadVideos();
             } else {
-                showLibraryMessage('فشل حفظ التعديلات. راجع الحقول وحاول مجددًا.', true);
+                showLibraryMessage(window.AVi18n.t('فشل حفظ التعديلات. راجع الحقول وحاول مجددًا.'), true);
             }
         });
     }
@@ -1110,7 +1111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const fileInput = document.getElementById('sub-file');
             if (!fileInput.files.length) {
-                showSubtitleMessage('الرجاء اختيار ملف ترجمة.', true);
+                showSubtitleMessage(window.AVi18n.t('الرجاء اختيار ملف ترجمة.'), true);
                 return;
             }
 
@@ -1124,7 +1125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const submitBtn = document.getElementById('btn-upload-sub');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري الرفع والمعالجة...';
+            submitBtn.textContent = window.AVi18n.t('جاري الرفع والمعالجة...');
 
             try {
                 const res = await fetch(`/api/v1/admin/videos/${currentSubVideoId}/subtitles`, {
@@ -1139,13 +1140,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     await loadSubtitles(currentSubVideoId);
                 } else {
                     const err = await res.json();
-                    showSubtitleMessage('فشل رفع الترجمة: ' + (err.detail || 'خطأ غير معروف'), true);
+                    showSubtitleMessage(window.AVi18n.t('فشل رفع الترجمة: ') + (window.AVi18n.t(err.detail) || window.AVi18n.t('خطأ غير معروف')), true);
                 }
             } catch (e) {
-                showSubtitleMessage('تعذر الاتصال أثناء رفع الترجمة.', true);
+                showSubtitleMessage(window.AVi18n.t('تعذر الاتصال أثناء رفع الترجمة.'), true);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'رفع وحفظ الترجمة';
+                submitBtn.textContent = window.AVi18n.t('رفع وحفظ الترجمة');
             }
         });
     }
@@ -1190,12 +1191,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const titleEl = document.getElementById('embed-modal-title');
         const subtitleEl = document.getElementById('embed-modal-subtitle');
-        if (titleEl) titleEl.textContent = `كود تضمين: ${video.title}`;
+        if (titleEl) titleEl.textContent = window.AVi18n.tpl`كود تضمين: ${video.title}`;
         if (subtitleEl) {
             const parts = [
                 video.series_name,
-                video.season_number ? `الموسم ${video.season_number}` : '',
-                video.episode_number ? `الحلقة ${video.episode_number}` : ''
+                video.season_number ? window.AVi18n.tpl`الموسم ${video.season_number}` : '',
+                video.episode_number ? window.AVi18n.tpl`الحلقة ${video.episode_number}` : ''
             ].filter(Boolean);
             subtitleEl.textContent = parts.join(' • ');
         }
@@ -1238,12 +1239,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await navigator.clipboard.writeText(code);
             if (feedback) {
-                feedback.textContent = 'تم نسخ الكود بنجاح ✓';
+                feedback.textContent = window.AVi18n.t('تم نسخ الكود بنجاح ✓');
                 setTimeout(() => { feedback.textContent = ''; }, 3000);
             }
         } catch (_) {
             if (feedback) {
-                feedback.textContent = 'تعذر النسخ تلقائياً';
+                feedback.textContent = window.AVi18n.t('تعذر النسخ تلقائياً');
                 setTimeout(() => { feedback.textContent = ''; }, 3000);
             }
         }
@@ -1362,13 +1363,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const totalSeries = Array.isArray(allSeriesData) ? allSeriesData.length : 0;
             if (countBadge) countBadge.textContent = String(totalSeries);
-            if (countInd) countInd.textContent = `${totalSeries} مسلسل`;
+            if (countInd) countInd.textContent = window.AVi18n.tpl`${totalSeries} مسلسل`;
 
             renderSeriesCards(allSeriesData);
         } catch (_) {
             loading.classList.add('hidden');
             if (feedback) {
-                feedback.textContent = 'تعذر تحميل المسلسلات — أعد المحاولة.';
+                feedback.textContent = window.AVi18n.t('تعذر تحميل المسلسلات — أعد المحاولة.');
                 feedback.classList.remove('hidden');
             }
         }
@@ -1379,7 +1380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!grid) return;
 
         if (!Array.isArray(seriesList) || !seriesList.length) {
-            grid.innerHTML = `
+            grid.innerHTML = window.AVi18n.tpl`
                 <div class="empty-state" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center;">
                     <div class="empty-state-title" style="font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;">لا توجد مسلسلات مسجلة بعد</div>
                     <p class="empty-state-desc" style="color: var(--text-muted); margin-bottom: 16px;">ستظهر المسلسلات هنا بعد ربط الفيديوهات بها. لإضافة محتوى جديد، استخدم قسم الرفع والاستيراد.</p>
@@ -1411,15 +1412,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const stSeasons = document.createElement('div');
             stSeasons.className = 'series-stat';
-            stSeasons.innerHTML = `<b>${s.seasons}</b><span>موسم</span>`;
+            stSeasons.innerHTML = window.AVi18n.tpl`<b>${s.seasons}</b><span>موسم</span>`;
 
             const stEpisodes = document.createElement('div');
             stEpisodes.className = 'series-stat';
-            stEpisodes.innerHTML = `<b>${s.episodes}</b><span>حلقة</span>`;
+            stEpisodes.innerHTML = window.AVi18n.tpl`<b>${s.episodes}</b><span>حلقة</span>`;
 
             const stSize = document.createElement('div');
             stSize.className = 'series-stat';
-            stSize.innerHTML = `<b>${formatBytes(s.total_size_bytes)}</b><span>الحجم</span>`;
+            stSize.innerHTML = window.AVi18n.tpl`<b>${formatBytes(s.total_size_bytes)}</b><span>الحجم</span>`;
 
             stats.append(stSeasons, stEpisodes, stSize);
 
@@ -1428,13 +1429,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const badgeReady = document.createElement('span');
             badgeReady.className = 'badge badge-quality';
-            badgeReady.textContent = `${s.ready_count} جاهز`;
+            badgeReady.textContent = window.AVi18n.tpl`${s.ready_count} جاهز`;
             foot.appendChild(badgeReady);
 
             if (s.processing_count) {
                 const badgeProc = document.createElement('span');
                 badgeProc.className = 'badge status-processing';
-                badgeProc.textContent = `${s.processing_count} قيد المعالجة`;
+                badgeProc.textContent = window.AVi18n.tpl`${s.processing_count} قيد المعالجة`;
                 foot.appendChild(badgeProc);
             }
 
@@ -1464,12 +1465,12 @@ document.addEventListener('DOMContentLoaded', () => {
             allFoldersData = Array.isArray(data.folders) ? data.folders : [];
             loading.classList.add('hidden');
 
-            if (countInd) countInd.textContent = `${allFoldersData.length} مجلد`;
+            if (countInd) countInd.textContent = window.AVi18n.tpl`${allFoldersData.length} مجلد`;
             renderFoldersCards(allFoldersData);
         } catch (_) {
             loading.classList.add('hidden');
             if (feedback) {
-                feedback.textContent = 'تعذر تحميل المجلدات — أعد المحاولة.';
+                feedback.textContent = window.AVi18n.t('تعذر تحميل المجلدات — أعد المحاولة.');
                 feedback.classList.remove('hidden');
             }
         }
@@ -1480,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!grid) return;
 
         if (!Array.isArray(foldersList) || !foldersList.length) {
-            grid.innerHTML = `
+            grid.innerHTML = window.AVi18n.tpl`
                 <div class="empty-state" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center;">
                     <div class="empty-state-title" style="font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;">لا توجد مجلدات بعد</div>
                     <p class="empty-state-desc" style="color: var(--text-muted); margin-bottom: 16px;">يمكنك إنشاء مجلدات جديدة لتنظيم وتجميع حلقات ومسلسلات الأنمي بكل سهولة.</p>
@@ -1499,7 +1500,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'folder-card';
             card.setAttribute('role', 'button');
             card.tabIndex = 0;
-            card.title = `انقر لعرض محتويات مجلد ${f.name}`;
+            card.title = window.AVi18n.tpl`انقر لعرض محتويات مجلد ${f.name}`;
 
             const icon = document.createElement('div');
             icon.className = 'folder-card-icon';
@@ -1514,7 +1515,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const count = document.createElement('div');
             count.className = 'folder-card-count';
-            count.textContent = `${f.items_count || 0} عنصر`;
+            count.textContent = window.AVi18n.tpl`${f.items_count || 0} عنصر`;
 
             info.append(name, count);
             card.append(icon, info);
@@ -1533,7 +1534,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btn-create-folder')?.addEventListener('click', async () => {
-        const name = window.prompt('أدخل اسم المجلد الجديد:');
+        const name = window.prompt(window.AVi18n.t('أدخل اسم المجلد الجديد:'));
         if (!name || !name.trim()) return;
 
         try {
@@ -1547,14 +1548,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ name: name.trim() })
             });
             if (res.ok) {
-                showLibraryMessage(`تم إنشاء المجلد "${name.trim()}" بنجاح ✓`);
+                showLibraryMessage(window.AVi18n.tpl`تم إنشاء المجلد "${name.trim()}" بنجاح ✓`);
                 loadFoldersHubData();
             } else {
                 const err = await res.json().catch(() => ({}));
-                alert(err.detail || 'تعذر إنشاء المجلد');
+                alert(window.AVi18n.t(err.detail) || window.AVi18n.t('تعذر إنشاء المجلد'));
             }
         } catch (_) {
-            alert('حدث خطأ أثناء إنشاء المجلد');
+            alert(window.AVi18n.t('حدث خطأ أثناء إنشاء المجلد'));
         }
     });
 
@@ -1595,7 +1596,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loading.classList.add('hidden');
 
             const total = allTrashData.length;
-            if (countInd) countInd.textContent = `${total} عنصر في سلة المحذوفات`;
+            if (countInd) countInd.textContent = window.AVi18n.tpl`${total} عنصر في سلة المحذوفات`;
             if (badge) {
                 badge.textContent = String(total);
                 badge.classList.toggle('hidden', total === 0);
@@ -1612,7 +1613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) {
             loading.classList.add('hidden');
             if (feedback) {
-                feedback.textContent = 'تعذر تحميل سلة المحذوفات — أعد المحاولة.';
+                feedback.textContent = window.AVi18n.t('تعذر تحميل سلة المحذوفات — أعد المحاولة.');
                 feedback.classList.remove('hidden');
             }
         }
@@ -1634,16 +1635,16 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.style.cssText = 'width:32px;height:32px;border-radius:6px;background:rgba(239,68,68,.15);color:#f87171;display:grid;place-items:center;flex-shrink:0';
             icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect width="14" height="14" x="1" y="5" rx="2"/></svg>';
             const textWrap = document.createElement('div');
-            const title = createElement('div', item.name || 'عنصر محذوف', ['video-row-title']);
+            const title = createElement('div', item.name || window.AVi18n.t('عنصر محذوف'), ['video-row-title']);
             title.style.cssText = 'font-weight:600;color:#f8fafc';
-            const location = createElement('div', `الموقع السابق: ${item.previous_location || 'المكتبة'}`, ['video-row-filename']);
+            const location = createElement('div', window.AVi18n.tpl`الموقع السابق: ${item.previous_location || window.AVi18n.t('المكتبة')}`, ['video-row-filename']);
             location.style.cssText = 'font-size:11px;color:#94a3b8';
             textWrap.append(title, location);
             nameWrap.append(icon, textWrap);
             tdName.appendChild(nameWrap);
 
             const tdType = document.createElement('td');
-            const typeBadge = createElement('span', item.type_label || item.type || 'عنصر', ['badge']);
+            const typeBadge = createElement('span', item.type_label || item.type || window.AVi18n.t('عنصر'), ['badge']);
             typeBadge.style.background = 'rgba(255,255,255,0.08)';
             tdType.appendChild(typeBadge);
 
@@ -1661,13 +1662,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const btnRestore = document.createElement('button');
             btnRestore.type = 'button';
             btnRestore.className = 'trash-restore-btn';
-            btnRestore.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> استعادة';
+            btnRestore.innerHTML = window.AVi18n.t('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> استعادة');
             btnRestore.addEventListener('click', () => restoreTrashItem(item));
 
             const btnPurge = document.createElement('button');
             btnPurge.type = 'button';
             btnPurge.className = 'trash-purge-btn';
-            btnPurge.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> حذف نهائي';
+            btnPurge.innerHTML = window.AVi18n.t('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> حذف نهائي');
             btnPurge.addEventListener('click', () => purgeTrashItem(item));
 
             tdActions.append(btnRestore, btnPurge);
@@ -1677,24 +1678,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function restoreTrashItem(item) {
-        if (!confirm(`هل أنت متأكد من استعادة "${item.name}" إلى المكتبة؟`)) return;
+        if (!confirm(window.AVi18n.tpl`هل أنت متأكد من استعادة "${item.name}" إلى المكتبة؟`)) return;
         try {
             await driveMutation('/api/v1/drive/restore', [{ id: item.id, type: item.type }]);
-            showLibraryMessage(`تمت استعادة "${item.name}" بنجاح ✓`);
+            showLibraryMessage(window.AVi18n.tpl`تمت استعادة "${item.name}" بنجاح ✓`);
             await Promise.all([loadTrashHubData(), loadVideos()]);
         } catch (error) {
-            showLibraryMessage(`تعذرت الاستعادة: ${error.message}`, true);
+            showLibraryMessage(window.AVi18n.tpl`تعذرت الاستعادة: ${window.AVi18n.t(error.message)}`, true);
         }
     }
 
     async function purgeTrashItem(item) {
-        if (!confirm(`تحذير نهائي: هل تريد حذف "${item.name}" بشكل دائم؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
+        if (!confirm(window.AVi18n.tpl`تحذير نهائي: هل تريد حذف "${item.name}" بشكل دائم؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
         try {
             await driveMutation('/api/v1/drive/trash/delete-permanent', [{ id: item.id, type: item.type }]);
-            showLibraryMessage(`تم الحذف النهائي لـ "${item.name}" ✓`);
+            showLibraryMessage(window.AVi18n.tpl`تم الحذف النهائي لـ "${item.name}" ✓`);
             await loadTrashHubData();
         } catch (error) {
-            showLibraryMessage(`تعذر الحذف النهائي: ${error.message}`, true);
+            showLibraryMessage(window.AVi18n.tpl`تعذر الحذف النهائي: ${window.AVi18n.t(error.message)}`, true);
         }
     }
 

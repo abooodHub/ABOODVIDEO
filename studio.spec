@@ -28,6 +28,8 @@ for binary_name in ("ffmpeg.exe", "ffprobe.exe"):
 # Bundle only assets used by the active v3 Studio page. The prior page remains
 # in source for legacy regression tests, but is not part of the shipped client.
 datas = [
+    (str(PROJECT_ROOT / "shared" / "i18n" / "en.json"), "shared/i18n"),
+    (str(PROJECT_ROOT / "shared" / "i18n" / "web"), "shared/i18n/web"),
     (str(PROJECT_ROOT / "studio" / "web" / "static" / "css" / "studio_desktop.css"), "studio/web/static/css"),
     (str(PROJECT_ROOT / "studio" / "web" / "static" / "css" / "studio_import.css"), "studio/web/static/css"),
     (str(PROJECT_ROOT / "studio" / "web" / "static" / "css" / "studio_platform.css"), "studio/web/static/css"),

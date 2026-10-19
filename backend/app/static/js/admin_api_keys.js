@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* ABOODVIDEO Admin UI V4 — API Keys Management Script */
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('keys-tbody') || document.getElementById('apiKeysTableBody');
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fmtDate = (iso) => {
         if (!iso) return '—';
         try {
-            return new Date(iso).toLocaleDateString('ar', { year: 'numeric', month: 'short', day: 'numeric' });
+            return new Date(iso).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-US' : 'ar'), { year: 'numeric', month: 'short', day: 'numeric' });
         } catch (_) {
             return iso.slice(0, 10);
         }
@@ -60,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const button = document.getElementById('keys-bulk-delete');
         const selectedCount = selectedKeys.size;
         if (toolbar) toolbar.hidden = selectedCount === 0;
-        if (count) count.textContent = `${selectedCount} مفتاح محدد`;
+        if (count) count.textContent = window.AVi18n.tpl`${selectedCount} مفتاح محدد`;
         if (button) button.disabled = selectedCount === 0;
     };
 
@@ -92,13 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const total = data.total || 0;
             totalPages = Math.max(1, data.total_pages || Math.ceil(total / pageSize) || 1);
 
-            if (totalCountEl) totalCountEl.textContent = `إجمالي المفاتيح: ${total}`;
-            if (pageInfoEl) pageInfoEl.textContent = `صفحة ${currentPage} من ${totalPages}`;
+            if (totalCountEl) totalCountEl.textContent = window.AVi18n.tpl`إجمالي المفاتيح: ${total}`;
+            if (pageInfoEl) pageInfoEl.textContent = window.AVi18n.tpl`صفحة ${currentPage} من ${totalPages}`;
             if (btnPrev) btnPrev.disabled = currentPage <= 1;
             if (btnNext) btnNext.disabled = currentPage >= totalPages;
 
             if (!keys.length) {
-                tbody.innerHTML = '<tr><td colspan="8" class="table-empty-cell">لا توجد مفاتيح تطابق المعايير المحددة.</td></tr>';
+                tbody.innerHTML = window.AVi18n.t('<tr><td colspan="8" class="table-empty-cell">لا توجد مفاتيح تطابق المعايير المحددة.</td></tr>');
                 updateBulkToolbar();
                 return;
             }
@@ -109,12 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const active = k.is_active && !isExpired;
 
                 const statusBadge = active
-                    ? el('span', 'نشط', ['badge', 'badge-quality'])
-                    : el('span', isExpired ? 'منتهي الصلاحية' : 'ملغى', ['badge', 'badge-muted']);
+                    ? el('span', window.AVi18n.t('نشط'), ['badge', 'badge-quality'])
+                    : el('span', isExpired ? window.AVi18n.t('منتهي الصلاحية') : window.AVi18n.t('ملغى'), ['badge', 'badge-muted']);
 
                 const actionsTd = el('td', '');
                 if (k.is_active && !isExpired) {
-                    const revokeBtn = el('button', 'إلغاء المفتاح', ['btn', 'btn-sm', 'btn-danger']);
+                    const revokeBtn = el('button', window.AVi18n.t('إلغاء المفتاح'), ['btn', 'btn-sm', 'btn-danger']);
                     revokeBtn.type = 'button';
                     revokeBtn.addEventListener('click', () => {
                         pendingRevoke = k.id;
@@ -123,14 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     actionsTd.appendChild(revokeBtn);
                 } else if (!k.is_active) {
-                    const deleteBtn = el('button', 'حذف', ['btn', 'btn-sm', 'btn-danger']);
+                    const deleteBtn = el('button', window.AVi18n.t('حذف'), ['btn', 'btn-sm', 'btn-danger']);
                     deleteBtn.type = 'button';
                     deleteBtn.addEventListener('click', () => {
-                        pendingDelete = { id: k.id, name: k.name || 'بدون اسم', prefix: k.prefix || '' };
+                        pendingDelete = { id: k.id, name: k.name || window.AVi18n.t('بدون اسم'), prefix: k.prefix || '' };
                         document.getElementById('deleteKeyName').textContent = pendingDelete.name;
                         document.getElementById('deleteKeyPrefix').textContent = `${pendingDelete.prefix}…`;
-                        document.getElementById('deleteKeyStatus').textContent = 'ملغى';
-                        document.getElementById('deleteKeyQuestion').textContent = 'هل تريد حذف هذا المفتاح من لوحة الإدارة؟';
+                        document.getElementById('deleteKeyStatus').textContent = window.AVi18n.t('ملغى');
+                        document.getElementById('deleteKeyQuestion').textContent = window.AVi18n.t('هل تريد حذف هذا المفتاح من لوحة الإدارة؟');
                         setModalOpen('keys-delete-confirm', true);
                     });
                     actionsTd.appendChild(deleteBtn);
@@ -148,23 +149,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectBox = document.createElement('input');
                 selectBox.type = 'checkbox';
                 selectBox.className = 'key-select-checkbox';
-                selectBox.setAttribute('aria-label', `تحديد المفتاح ${k.name || ''}`);
+                selectBox.setAttribute('aria-label', window.AVi18n.tpl`تحديد المفتاح ${k.name || ''}`);
                 selectBox.disabled = Boolean(k.is_active);
                 selectBox.checked = selectedKeys.has(k.id);
                 selectBox.addEventListener('change', () => {
-                    if (selectBox.checked && !k.is_active) selectedKeys.set(k.id, { id: k.id, name: k.name || 'بدون اسم', prefix: k.prefix || '' });
+                    if (selectBox.checked && !k.is_active) selectedKeys.set(k.id, { id: k.id, name: k.name || window.AVi18n.t('بدون اسم'), prefix: k.prefix || '' });
                     else selectedKeys.delete(k.id);
                     updateBulkToolbar();
                 });
                 selectTd.appendChild(selectBox);
                 tr.append(
                     selectTd,
-                    el('td', k.name || 'بدون اسم'),
+                    el('td', k.name || window.AVi18n.t('بدون اسم')),
                     prefixTd,
                     el('td', (k.scopes || []).join(', ') || '—'),
                     statusTd,
                     el('td', fmtDate(k.created_at)),
-                    el('td', k.last_used_at ? fmtDate(k.last_used_at) : 'لم يُستخدم'),
+                    el('td', k.last_used_at ? fmtDate(k.last_used_at) : window.AVi18n.t('لم يُستخدم')),
                     actionsTd
                 );
                 return tr;
@@ -172,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBulkToolbar();
         } catch (err) {
             console.warn('Failed to load API keys', err?.message || 'request failed');
-            tbody.innerHTML = '<tr><td colspan="8" class="table-empty-cell">تعذر تحميل قائمة المفاتيح.</td></tr>';
+            tbody.innerHTML = window.AVi18n.t('<tr><td colspan="8" class="table-empty-cell">تعذر تحميل قائمة المفاتيح.</td></tr>');
         }
     }
 
@@ -255,12 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const name = document.getElementById('key-name').value.trim();
             if (!name) {
-                message('يرجى إدخال اسم للمفتاح.', true);
+                message(window.AVi18n.t('يرجى إدخال اسم للمفتاح.'), true);
                 return;
             }
             const scopes = [...document.querySelectorAll('.key-scope:checked')].map(cb => cb.value);
             if (!scopes.length) {
-                message('اختر صلاحية واحدة على الأقل للمفتاح.', true);
+                message(window.AVi18n.t('اختر صلاحية واحدة على الأقل للمفتاح.'), true);
                 return;
             }
             const expiry = document.getElementById('key-expiry').value;
@@ -277,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify(payload),
                 });
                 const data = await res.json().catch(() => ({}));
-                if (!res.ok) throw new Error(data.detail || 'خطأ غير معروف');
+                if (!res.ok) throw new Error(window.AVi18n.t(data.detail) || window.AVi18n.t('خطأ غير معروف'));
 
                 document.getElementById('key-raw').value = data.raw_key;
                 document.getElementById('key-result').classList.remove('hidden');
@@ -285,11 +286,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('key-result').setAttribute('aria-hidden','false');
                 document.getElementById('createApiKeyModal')?.classList.remove('is-open');
                 document.getElementById('createApiKeyModal')?.setAttribute('aria-hidden','true');
-                message('تم إنشاء المفتاح بنجاح — انسخ الرمز السري الآن.');
+                message(window.AVi18n.t('تم إنشاء المفتاح بنجاح — انسخ الرمز السري الآن.'));
                 currentPage = 1;
                 fetchKeys();
             } catch (err) {
-                message('تعذر إنشاء المفتاح: ' + err.message, true);
+                message(window.AVi18n.t('تعذر إنشاء المفتاح: ') + window.AVi18n.t(err.message), true);
             } finally {
                 btn.disabled = false;
             }
@@ -303,8 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = document.getElementById('key-raw').value;
             if (key) {
                 navigator.clipboard.writeText(key).then(
-                    () => message('تم نسخ المفتاح إلى الحافظة بنجاح.'),
-                    () => message('تعذر النسخ إلى الحافظة.', true)
+                    () => message(window.AVi18n.t('تم نسخ المفتاح إلى الحافظة بنجاح.')),
+                    () => message(window.AVi18n.t('تعذر النسخ إلى الحافظة.'), true)
                 );
             }
         });
@@ -333,13 +334,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'X-CSRF-Token': getCsrf() },
                 });
                 if (res.ok) {
-                    message('تم إلغاء صلاحية المفتاح بنجاح.');
+                    message(window.AVi18n.t('تم إلغاء صلاحية المفتاح بنجاح.'));
                     fetchKeys();
                 } else {
-                    message('تعذر إلغاء المفتاح.', true);
+                    message(window.AVi18n.t('تعذر إلغاء المفتاح.'), true);
                 }
             } catch (_) {
-                message('تعذر الاتصال بالخادم أثناء إلغاء المفتاح.', true);
+                message(window.AVi18n.t('تعذر الاتصال بالخادم أثناء إلغاء المفتاح.'), true);
             }
         });
     }
@@ -355,23 +356,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'DELETE', credentials: 'include', headers: { 'X-CSRF-Token': getCsrf() }
             });
             if (!res.ok) {
-                if (res.status === 409) message('يجب إلغاء المفتاح أولاً قبل حذفه.', true);
-                else message('تعذر حذف المفتاح', true);
+                if (res.status === 409) message(window.AVi18n.t('يجب إلغاء المفتاح أولاً قبل حذفه.'), true);
+                else message(window.AVi18n.t('تعذر حذف المفتاح'), true);
                 return;
             }
             selectedKeys.delete(item.id);
             pendingDelete = null;
             setModalOpen('keys-delete-confirm', false);
-            message('تم حذف مفتاح API');
+            message(window.AVi18n.t('تم حذف مفتاح API'));
             await fetchKeys();
-        } catch (_) { message('تعذر حذف المفتاح', true); }
+        } catch (_) { message(window.AVi18n.t('تعذر حذف المفتاح'), true); }
         finally { button.disabled = false; }
     });
 
     document.getElementById('keys-bulk-delete')?.addEventListener('click', () => {
         if (!selectedKeys.size) return;
         const n = selectedKeys.size;
-        document.getElementById('bulkDeleteQuestion').textContent = `حذف ${n} مفاتيح API الملغاة؟`;
+        document.getElementById('bulkDeleteQuestion').textContent = window.AVi18n.tpl`حذف ${n} مفاتيح API الملغاة؟`;
         setModalOpen('keys-bulk-confirm', true);
     });
     document.getElementById('keys-bulk-no')?.addEventListener('click', () => setModalOpen('keys-bulk-confirm', false));
@@ -388,15 +389,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                if (res.status === 409) message('يجب إلغاء المفاتيح النشطة أولاً قبل حذفها.', true);
-                else message('تعذر حذف المفتاح', true);
+                if (res.status === 409) message(window.AVi18n.t('يجب إلغاء المفاتيح النشطة أولاً قبل حذفها.'), true);
+                else message(window.AVi18n.t('تعذر حذف المفتاح'), true);
                 return;
             }
             ids.forEach(id => selectedKeys.delete(id));
             setModalOpen('keys-bulk-confirm', false);
-            message(`تم حذف ${data.deleted_count || ids.length} مفاتيح API`);
+            message(window.AVi18n.tpl`تم حذف ${data.deleted_count || ids.length} مفاتيح API`);
             await fetchKeys();
-        } catch (_) { message('تعذر حذف المفتاح', true); }
+        } catch (_) { message(window.AVi18n.t('تعذر حذف المفتاح'), true); }
         finally { button.disabled = false; }
     });
 

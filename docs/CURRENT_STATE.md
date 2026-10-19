@@ -4,13 +4,15 @@ Updated 2026-10-19.
 
 | Product | Version |
 | --- | --- |
-| ABOODVIDEO Platform | 1.0.0 |
-| ABOODVIDEO Studio | 1.0.0 |
-| Windows file/product numeric version | 1.0.0.0 |
+| ABOODVIDEO Platform | 1.1.0 |
+| ABOODVIDEO Studio | 1.1.0 |
+| Windows file/product numeric version | 1.1.0.0 |
 
 This is the version of the current source and its build configuration. Changing source metadata does not update an installed executable or deployed server. Build and deploy the intended artifact separately.
 
 ## Included behavior
+
+- Arabic/English UI with saved preferences and RTL/LTR sidebar placement across Platform and Studio.
 
 - Empty HTTP 404 for the root and closed public catalog routes, with protected administration and valid playback links.
 - Authenticated administration, upload and encoder configuration.

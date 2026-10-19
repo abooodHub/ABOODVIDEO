@@ -1,0 +1,59 @@
+[
+  {
+    "image": "platform-dashboard-en.png",
+    "language": "en",
+    "actual_template": "admin_dashboard.html",
+    "synthetic_offline_data": true,
+    "page_errors": [],
+    "missing_messages": [],
+    "layout": {
+      "width": 1600,
+      "document_width": 1600,
+      "direction": "ltr",
+      "language": "en",
+      "sidebar": {
+        "left": 0,
+        "right": 248,
+        "width": 248
+      }
+    }
+  },
+  {
+    "image": "platform-upload-en.png",
+    "language": "en",
+    "actual_template": "admin_upload.html",
+    "synthetic_offline_data": true,
+    "page_errors": [],
+    "missing_messages": [],
+    "layout": {
+      "width": 1600,
+      "document_width": 1600,
+      "direction": "ltr",
+      "language": "en",
+      "sidebar": {
+        "left": 0,
+        "right": 248,
+        "width": 248
+      }
+    }
+  },
+  {
+    "image": "studio-en.png",
+    "language": "en",
+    "actual_template": "index_v3.html",
+    "synthetic_offline_data": true,
+    "page_errors": [],
+    "missing_messages": [],
+    "layout": {
+      "width": 1600,
+      "document_width": 1600,
+      "direction": "ltr",
+      "language": "en",
+      "sidebar": {
+        "left": 0,
+        "right": 228,
+        "width": 228
+      }
+    }
+  }
+]

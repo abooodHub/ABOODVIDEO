@@ -1,4 +1,4 @@
-# Installation and upgrades — 1.0.0
+# Installation and upgrades — 1.1.0
 
 ## New Platform server
 
@@ -24,9 +24,9 @@ Older storage owned by root requires a deliberate ownership migration to UID/GID
 
 ## Windows Studio
 
-Run `ABOODVIDEO-Studio-Setup-v1.0.0.exe`. Setup installs per-user without administrator rights and offers a desktop shortcut. It checks WebView2 Runtime in both user and machine registry views. When missing, it runs the embedded signed Microsoft Evergreen bootstrapper before copying Studio. That prerequisite installation needs internet access.
+Run `ABOODVIDEO-Studio-Setup-v1.1.0.exe`. Setup installs per-user without administrator rights and offers a desktop shortcut. It checks WebView2 Runtime in both user and machine registry views. When missing, it runs the embedded signed Microsoft Evergreen bootstrapper before copying Studio. That prerequisite installation needs internet access.
 
-For the portable version, extract the complete `ABOODVIDEO-Studio-1.0.0-windows-x64-portable.zip` and run `ABOODVIDEO Studio.exe`. WebView2 is also required for this version. FFmpeg/FFprobe and the exact distribution's license/source notices are bundled. Compare downloaded artifacts against `SHA256SUMS.txt`.
+For the portable version, extract the complete `ABOODVIDEO-Studio-1.1.0-windows-x64-portable.zip` and run `ABOODVIDEO Studio.exe`. WebView2 is also required for this version. FFmpeg/FFprobe and the exact distribution's license/source notices are bundled. Compare downloaded artifacts against `SHA256SUMS.txt`.
 
 Settings, protected credentials and queue history remain in `%LOCALAPPDATA%\ABOODVIDEO Studio`. Close Studio normally before upgrading and keep a private profile backup. The installer preserves its application ID, never automatically closes Studio, and does not remove profile data or the shared WebView2 Runtime on uninstall. Portable builds use the same profile unless given a separate Windows user/profile for testing.
 
@@ -35,3 +35,7 @@ Settings, protected credentials and queue history remain in `%LOCALAPPDATA%\ABOO
 See [DEVELOPMENT.md](DEVELOPMENT.md). Installer builds require `--webview2-bootstrapper` with a valid Microsoft Authenticode signature. Unsigned or differently signed prerequisites are rejected. Project executables/installers remain unsigned unless a project signing certificate is configured separately.
 
 Use a disposable Windows VM to verify missing-WebView2 setup, fresh installation, upgrade and uninstall. Source checks and a portable upgrade test do not establish those clean-machine installer results.
+
+## Interface language
+
+Choose Arabic or English in the language selector. Arabic uses a right sidebar and RTL; English uses a left sidebar and LTR. Studio persists the preference locally. The installer also offers Arabic and English. See [language behavior](LOCALIZATION.md).

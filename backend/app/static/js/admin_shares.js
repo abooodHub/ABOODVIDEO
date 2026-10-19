@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /**
  * admin_shares.js – ABOODVIDEO Admin V2
  * Manages the shares listing page: fetch, render, filter, copy & revoke.
@@ -76,7 +77,7 @@
   function formatDate(isoStr) {
     if (!isoStr) return '—';
     try {
-      return new Date(isoStr).toLocaleDateString('ar-SA', {
+      return new Date(isoStr).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-US' : 'ar-SA'), {
         year: 'numeric', month: 'short', day: 'numeric',
       });
     } catch {
@@ -93,7 +94,7 @@
   }
 
   /** Arabic label for a status key */
-  const STATUS_LABELS = { active: 'نشط', expired: 'منتهي', revoked: 'ملغى' };
+  const STATUS_LABELS = { active: window.AVi18n.t('نشط'), expired: window.AVi18n.t('منتهي'), revoked: window.AVi18n.t('ملغى') };
 
   /** CSS class for type badge */
   function typeBadgeClass(type) {
@@ -109,11 +110,11 @@
   /** Arabic label for content type */
   function typeLabel(type) {
     const t = (type || '').toLowerCase();
-    if (t.includes('series')) return 'مسلسل';
-    if (t.includes('season')) return 'موسم';
-    if (t.includes('video'))  return 'فيديو';
-    if (t.includes('folder')) return 'مجلد';
-    if (t.includes('file'))   return 'ملف';
+    if (t.includes('series')) return window.AVi18n.t('مسلسل');
+    if (t.includes('season')) return window.AVi18n.t('موسم');
+    if (t.includes('video'))  return window.AVi18n.t('فيديو');
+    if (t.includes('folder')) return window.AVi18n.t('مجلد');
+    if (t.includes('file'))   return window.AVi18n.t('ملف');
     return type || '—';
   }
 
@@ -125,7 +126,7 @@
 
     if (!shares || shares.length === 0) {
       emptyRow.hidden = false;
-      emptyRow.querySelector('.empty-state-text').textContent = 'لا توجد مشاركات في هذه الفئة';
+      emptyRow.querySelector('.empty-state-text').textContent = window.AVi18n.t('لا توجد مشاركات في هذه الفئة');
       return;
     }
 
@@ -133,7 +134,7 @@
 
     shares.forEach(share => {
       const status   = resolveStatus(share);
-      const name     = share.target_name || share.name || share.title || share.file_name || 'غير محدد';
+      const name     = share.target_name || share.name || share.title || share.file_name || window.AVi18n.t('غير محدد');
       const type     = share.target_type || share.type || share.content_type || '';
       const url      = share.share_url || share.url || share.link || '';
       const created  = formatDate(share.created_at);
@@ -144,7 +145,7 @@
       tr.dataset.status = status;
       tr.dataset.id     = share.token || share.id || '';
 
-      tr.innerHTML = `
+      tr.innerHTML = window.AVi18n.tpl`
         <td>
           <div class="share-content-cell">
             <span class="share-content-name" title="${escHtml(name)}">${escHtml(name)}</span>
@@ -233,7 +234,7 @@
     };
     tabsBar.querySelectorAll('[data-share-count]').forEach(badge => {
       const count = values[badge.dataset.shareCount];
-      if (count !== undefined) badge.textContent = count.toLocaleString('ar-SA');
+      if (count !== undefined) badge.textContent = count.toLocaleString((document.documentElement.lang === 'en' ? 'en-US' : 'ar-SA'));
     });
   }
 
@@ -291,12 +292,12 @@
       btn.addEventListener('click', () => {
         const url = btn.dataset.url;
         if (!url) {
-          showToast('لا يوجد رابط متاح', 'error');
+          showToast(window.AVi18n.t('لا يوجد رابط متاح'), 'error');
           return;
         }
         navigator.clipboard.writeText(url)
-          .then(() => showToast('تم نسخ الرابط', 'success'))
-          .catch(() => showToast('فشل نسخ الرابط', 'error'));
+          .then(() => showToast(window.AVi18n.t('تم نسخ الرابط'), 'success'))
+          .catch(() => showToast(window.AVi18n.t('فشل نسخ الرابط'), 'error'));
       });
     });
 
@@ -315,7 +316,7 @@
     modalReturnFocus = document.activeElement;
     revokeModal.removeAttribute('hidden');
     revokeConfirm.disabled = false;
-    revokeConfirm.textContent = 'تأكيد الإلغاء';
+    revokeConfirm.textContent = window.AVi18n.t('تأكيد الإلغاء');
     document.addEventListener('keydown', onEscClose);
     revokeClose.focus();
   }
@@ -364,7 +365,7 @@
     if (!pendingId) return;
 
     revokeConfirm.disabled = true;
-    revokeConfirm.textContent = 'جاري الإلغاء…';
+    revokeConfirm.textContent = window.AVi18n.t('جاري الإلغاء…');
 
     try {
       const res = await fetch(`/api/v1/drive/shares/${pendingId}/revoke`, {
@@ -376,13 +377,13 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       await fetchShares();
-      showToast('تم إلغاء الرابط بنجاح', 'success');
+      showToast(window.AVi18n.t('تم إلغاء الرابط بنجاح'), 'success');
       closeRevokeModal();
     } catch (err) {
       console.error('[admin_shares] revoke error:', err);
-      showToast('فشل إلغاء الرابط، حاول مجدداً', 'error');
+      showToast(window.AVi18n.t('فشل إلغاء الرابط، حاول مجدداً'), 'error');
       revokeConfirm.disabled = false;
-      revokeConfirm.textContent = 'تأكيد الإلغاء';
+      revokeConfirm.textContent = window.AVi18n.t('تأكيد الإلغاء');
     }
   });
 
@@ -417,7 +418,7 @@
       pageStatus.textContent = '—';
       prevButton.disabled = true;
       nextButton.disabled = true;
-      showToast('تعذّر تحميل المشاركات', 'error');
+      showToast(window.AVi18n.t('تعذّر تحميل المشاركات'), 'error');
     }
   }
 

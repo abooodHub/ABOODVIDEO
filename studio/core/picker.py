@@ -8,6 +8,7 @@ import sys
 import threading
 from pathlib import Path
 from typing import Optional, List, Tuple
+from shared.i18n import gettext
 
 VIDEO_EXTENSIONS = [".mkv", ".mp4", ".mov", ".ts", ".webm", ".flv", ".avi"]
 SUBTITLE_EXTENSIONS = [".ass", ".srt", ".vtt"]
@@ -240,6 +241,9 @@ def select_video_file(initial_dir: Optional[str] = None, title: str = "اختر 
         ("كل الملفات (*.*)", "*.*"),
     ]
 
+    title = gettext(title)
+    filters = [(gettext(label), pattern) for label, pattern in filters]
+
     def _worker():
         try:
             return _pick_com_dialog(title=title, is_folder=False, file_types=filters, initial_dir=initial_dir)
@@ -264,6 +268,9 @@ def select_subtitle_file(initial_dir: Optional[str] = None, title: str = "اخت
         ("كل الملفات (*.*)", "*.*"),
     ]
 
+    title = gettext(title)
+    filters = [(gettext(label), pattern) for label, pattern in filters]
+
     def _worker():
         try:
             return _pick_com_dialog(title=title, is_folder=False, file_types=filters, initial_dir=initial_dir)
@@ -280,6 +287,8 @@ def select_folder(initial_dir: Optional[str] = None, title: str = "اختر مج
     """Prompts native Windows folder picker for selecting a folder.
     Returns absolute path or None if cancelled.
     """
+    title = gettext(title)
+
     def _worker():
         try:
             return _pick_com_dialog(title=title, is_folder=True, initial_dir=initial_dir)

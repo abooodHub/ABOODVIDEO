@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 import jinja2
+from shared.i18n import configure_environment, gettext
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -23,6 +24,7 @@ jinja_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(str(TEMPLATES_DIR)),
     autoescape=True,
 )
+configure_environment(jinja_env)
 
 
 async def get_optional_admin_user(request: Request, db: AsyncSession):
@@ -60,6 +62,9 @@ def render_admin_template(template_name: str, **ctx) -> HTMLResponse:
     ctx.setdefault("embed_mode", False)
     ctx.setdefault("server_transcoding_enabled", settings.ENABLE_TRANSCODING)
     ctx.setdefault("csrf_cookie_name", settings.CSRF_COOKIE_NAME)
+    for label in ('page_title', 'admin_role'):
+        if label in ctx:
+            ctx[label] = gettext(ctx[label])
     try:
         tmpl = jinja_env.get_template(template_name)
         content = tmpl.render(**ctx)

@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /**
  * admin_login.js — ABOODVIDEO Admin V2
  * Handles login form submission, API call, redirect and inline error display.
@@ -55,7 +56,7 @@
   const setLoading = (btn, loading) => {
     btn.disabled = loading;
     btn.dataset.originalText = btn.dataset.originalText ?? btn.textContent;
-    btn.textContent = loading ? 'جارٍ تسجيل الدخول…' : btn.dataset.originalText;
+    btn.textContent = loading ? window.AVi18n.t('جارٍ تسجيل الدخول…') : btn.dataset.originalText;
     btn.classList.toggle('btn--loading', loading);
   };
 
@@ -80,12 +81,12 @@
 
       // Basic client-side validation
       if (!username) {
-        setError('الرجاء إدخال اسم المستخدم.');
+        setError(window.AVi18n.t('الرجاء إدخال اسم المستخدم.'));
         usernameInput?.focus();
         return;
       }
       if (!password) {
-        setError('الرجاء إدخال كلمة المرور.');
+        setError(window.AVi18n.t('الرجاء إدخال كلمة المرور.'));
         passwordInput?.focus();
         return;
       }
@@ -127,13 +128,13 @@
           null;
 
         if (res.status === 401 || res.status === 403) {
-          setError('اسم المستخدم أو كلمة المرور غير صحيحة.');
+          setError(window.AVi18n.t('اسم المستخدم أو كلمة المرور غير صحيحة.'));
         } else if (res.status === 429) {
-          setError('تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة لاحقاً.');
+          setError(window.AVi18n.t('تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة لاحقاً.'));
         } else if (errorDetail?.code === 'SYSTEM_UNAVAILABLE') {
-          setError('خدمة تسجيل الدخول غير متاحة مؤقتاً.');
+          setError(window.AVi18n.t('خدمة تسجيل الدخول غير متاحة مؤقتاً.'));
         } else {
-          setError(serverMsg ?? `حدث خطأ غير متوقع (${res.status}). حاول مجدداً.`);
+          setError(serverMsg ?? window.AVi18n.tpl`حدث خطأ غير متوقع (${res.status}). حاول مجدداً.`);
         }
 
         // Clear password field on failure for security
@@ -144,7 +145,7 @@
       } catch (err) {
         // Network / server unreachable
         console.error('[admin_login] Fetch error:', err);
-        setError('تعذّر الاتصال بالخادم. يرجى التحقق من الاتصال بالإنترنت والمحاولة مجدداً.');
+        setError(window.AVi18n.t('تعذّر الاتصال بالخادم. يرجى التحقق من الاتصال بالإنترنت والمحاولة مجدداً.'));
       } finally {
         if (submitBtn) setLoading(submitBtn, false);
       }

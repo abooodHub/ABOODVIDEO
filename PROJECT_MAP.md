@@ -1,4 +1,4 @@
-# Project map — 1.0.0
+# Project map — 1.1.0
 
 ## Source directories
 
@@ -29,7 +29,7 @@ Studio processing flows from `studio/web/routes/` through `batch_runner.py`, `pr
 - Build and installer: `studio.spec`, `installer.iss`, `scripts/build_studio_release.py`.
 - Source publication: `scripts/export_github_source.py`.
 
-Both product versions are 1.0.0; Windows numeric metadata is 1.0.0.0. Internal protocol/schema versions and migration identifiers are independent and must remain compatible.
+Both product versions are 1.1.0; Windows numeric metadata is 1.1.0.0. Internal protocol/schema versions and migration identifiers are independent and must remain compatible.
 
 ## Local data and generated output
 
@@ -38,3 +38,7 @@ The installed Studio profile is `%LOCALAPPDATA%\ABOODVIDEO Studio\` and contains
 Historical phase reports, mockups and superseded one-off scripts have been moved to an ignored local archive under `backups/v1_cleanup_<timestamp>/archived/`, with a hash manifest. They are not part of the version 1 source distribution.
 
 See [development](docs/DEVELOPMENT.md), [script catalog](docs/SCRIPT_CATALOG.md) and [test catalog](docs/TEST_CATALOG.md). Use disposable test services and profiles; never use production services or real media for routine tests.
+
+## Shared interface languages
+
+`shared/i18n/` contains the Arabic/English UI catalog, request locale, template loader and browser direction assets used by both Platform and Studio. See [localization](docs/LOCALIZATION.md).

@@ -9,6 +9,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from shared.i18n import configure_environment, gettext
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -197,6 +198,7 @@ def render_watch_template(
         loader=jinja2.FileSystemLoader(str(TEMPLATES_DIR)),
         autoescape=True,
     )
+    configure_environment(env)
     template = env.get_template("watch.html")
     rendered_content = template.render(
         VIDEO_TITLE=title,
@@ -253,13 +255,13 @@ def render_unauthorized_domain_page(domain: str) -> HTMLResponse:
     if err_template.exists():
         try:
             import jinja2
-            tpl = jinja2.Environment(
+            tpl = configure_environment(jinja2.Environment(
                 loader=jinja2.FileSystemLoader(str(TEMPLATES_DIR)),
                 autoescape=True
-            ).get_template("viewer_error.html")
+            )).get_template("viewer_error.html")
             html = tpl.render(
-                error_title=title,
-                error_message=message,
+                error_title=gettext(title),
+                error_message=gettext(message),
                 error_code="403_FORBIDDEN",
                 EMBED_MODE=True,
             )
@@ -333,9 +335,9 @@ async def get_watch_subtitles(db: AsyncSession, video_id: uuid.UUID) -> list[dic
 def get_library_meta(video: Video) -> str:
     parts = [part for part in (video.category, video.series_name) if part]
     if video.season_number is not None:
-        parts.append(f"الموسم {video.season_number}")
+        parts.append(gettext(f"الموسم {video.season_number}"))
     if video.episode_number is not None:
-        parts.append(f"الحلقة {video.episode_number}")
+        parts.append(gettext(f"الحلقة {video.episode_number}"))
     return " • ".join(parts)
 
 

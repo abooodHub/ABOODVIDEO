@@ -8,10 +8,10 @@
 
 #define MyAppName "ABOODVIDEO Studio"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.0.0"
+  #define MyAppVersion "1.1.0"
 #endif
 #ifndef MyAppNumericVersion
-  #define MyAppNumericVersion "1.0.0.0"
+  #define MyAppNumericVersion "1.1.0.0"
 #endif
 #define MyAppPublisher "ABOODVIDEO"
 #define MyAppExeName "ABOODVIDEO Studio.exe"
@@ -43,6 +43,15 @@ UninstallDisplayName={#MyAppName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "arabic"; MessagesFile: "compiler:Languages\Arabic.isl"
+
+[CustomMessages]
+english.WebViewInstalling=Installing Microsoft WebView2 Runtime...
+arabic.WebViewInstalling=جارٍ تثبيت Microsoft WebView2 Runtime...
+english.WebViewStartFailed=Unable to start Microsoft WebView2 setup. Check your connection and retry.
+arabic.WebViewStartFailed=تعذر بدء تثبيت Microsoft WebView2. تحقق من الاتصال وحاول مجددًا.
+english.WebViewRequired=Microsoft WebView2 Runtime is required. Connect to the internet and retry setup.
+arabic.WebViewRequired=يلزم Microsoft WebView2 Runtime. اتصل بالإنترنت وأعد محاولة التثبيت.
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
@@ -85,16 +94,16 @@ begin
   Result := '';
   if HasWebView2() then
     exit;
-  WizardForm.StatusLabel.Caption := 'Installing Microsoft WebView2 Runtime...';
+  WizardForm.StatusLabel.Caption := CustomMessage('WebViewInstalling');
   ExtractTemporaryFile('MicrosoftEdgeWebview2Setup.exe');
   if not Exec(ExpandConstant('{tmp}\MicrosoftEdgeWebview2Setup.exe'),
       '/silent /install', '', SW_HIDE, ewWaitUntilTerminated, ExitCode) then
   begin
-    Result := 'Unable to start Microsoft WebView2 setup. Check your connection and retry.';
+    Result := CustomMessage('WebViewStartFailed');
     exit;
   end;
   if ExitCode = 3010 then
     NeedsRestart := True;
   if not HasWebView2() then
-    Result := 'Microsoft WebView2 Runtime is required. Connect to the internet and retry setup.';
+    Result := CustomMessage('WebViewRequired');
 end;

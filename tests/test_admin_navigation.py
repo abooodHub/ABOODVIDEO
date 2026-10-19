@@ -67,8 +67,8 @@ def test_share_revoke_sends_csrf_and_uses_only_registered_api_routes():
 
 def test_share_ui_handles_all_supported_target_types_and_safe_status_classes():
     source = Path("backend/app/static/js/admin_shares.js").read_text(encoding="utf-8")
-    assert "if (t.includes('series')) return 'مسلسل'" in source
-    assert "if (t.includes('season')) return 'موسم'" in source
+    assert "if (t.includes('series')) return window.AVi18n.t('مسلسل')" in source
+    assert "if (t.includes('season')) return window.AVi18n.t('موسم')" in source
     assert "if (share.status === 'expired') return 'expired'" in source
     assert "if (share.status) return share.status" not in source
 

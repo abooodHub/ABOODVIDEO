@@ -45,14 +45,18 @@ Automated tests must never point at production services, real Studio profiles, `
 
 ## Build Windows Studio
 
-The source release is 1.0.0 for both Platform and Studio. Install `requirements-build.txt`, Inno Setup and WebView2. Supply FFmpeg and FFprobe from a distribution you are permitted to redistribute. From the repository root:
+The source release is 1.1.0 for both Platform and Studio. Install `requirements-build.txt`, Inno Setup and WebView2. Supply FFmpeg and FFprobe from a distribution you are permitted to redistribute. From the repository root:
 
 ```powershell
-python scripts/build_studio_release.py --output release/Studio-1.0.0-build --ffmpeg-bin '<FFmpeg-distribution>\bin' --iscc '<InnoSetup>\ISCC.exe' --webview2-bootstrapper '<Microsoft-download>\MicrosoftEdgeWebview2Setup.exe'
+python scripts/build_studio_release.py --output release/Studio-1.1.0-build --ffmpeg-bin '<FFmpeg-distribution>\bin' --iscc '<InnoSetup>\ISCC.exe' --webview2-bootstrapper '<Microsoft-download>\MicrosoftEdgeWebview2Setup.exe'
 ```
 
-Use a new output directory for every build. Omit `--iscc` to produce only the portable application and ZIP. The builder validates Windows version 1.0.0.0, runtime dependencies, source consistency and payload hashes. Output includes `ABOODVIDEO-Studio-1.0.0-windows-x64-portable.zip`, an optional `ABOODVIDEO-Studio-Setup-v1.0.0.exe` installer and manifests/checksums.
+Use a new output directory for every build. Omit `--iscc` to produce only the portable application and ZIP. The builder validates Windows version 1.1.0.0, runtime dependencies, source consistency and payload hashes. Output includes `ABOODVIDEO-Studio-1.1.0-windows-x64-portable.zip`, an optional `ABOODVIDEO-Studio-Setup-v1.1.0.exe` installer and manifests/checksums.
 
 The icons come from `app.ico` and editable `design/brand/` sources. The installer retains its existing application ID and installation/profile locations for upgrade continuity. Building does not install the program or replace user data. Font files with unknown redistribution rights remain outside the bundle. Internal UI filenames such as `index_v3.html` and protocol/schema versions are implementation identifiers, independent of the product version.
 
 Use an intact FFmpeg distribution with `LICENSE` and `README.txt` above its `bin` directory. The supplied WebView2 bootstrapper must have a valid Microsoft Authenticode signature. See [INSTALLATION.md](INSTALLATION.md) for deployment and Windows prerequisites.
+
+## UI translations
+
+Platform and Studio share `shared/i18n`. Include this package when deploying source or building containers. Run `python scripts/check_localization.py` after UI edits. See [translation guidelines and browser checks](LOCALIZATION.md).

@@ -50,6 +50,7 @@ jobs:
           python scripts/check_repository_secrets.py --index --history
           python -m pip_audit -r requirements-dev.txt
           python -m pip check
+          python scripts/check_localization.py
       - name: Migrations and tests
         run: python scripts/run_tests.py -q --junitxml=test-results/unit.xml
       - name: Browser regressions
@@ -61,6 +62,7 @@ jobs:
           tests/test_admin_upload_browser_regression.py
           tests/test_share_security_browser.py
           tests/test_drive_bulk_browser.py
+          tests/test_localization_browser.py
           --junitxml=test-results/browser.xml
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()

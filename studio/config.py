@@ -53,6 +53,7 @@ LOGS_DIR.mkdir(parents=True, exist_ok=True)
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 DEFAULT_CONFIG = {
+    "language": "ar",
     "server_url": "",
     "api_key": "",
     "studio_port": 8555,

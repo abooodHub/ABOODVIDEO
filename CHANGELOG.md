@@ -1,5 +1,14 @@
 # Release notes
 
+## 1.1.0 — 2026-10-19
+
+- Arabic/English selection in Platform administration, login, player controls and Windows Studio.
+- Saved language preference; Arabic RTL sidebar on the right and English LTR sidebar on the left, including responsive layouts.
+- Shared UI message catalog, localized forms, system messages, accessibility labels and native picker captions.
+- User titles, filenames, subtitle content, authentication and private-media access remain unchanged.
+- Bilingual Windows installer, English README, Arabic README and screenshots in both languages.
+- Localization validation and browser coverage. No database migration or media changes.
+
 ## 1.0.0 — 2026-10-19
 
 First unified source release of ABOODVIDEO Platform and ABOODVIDEO Studio.

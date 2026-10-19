@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /**
  * ABOODVIDEO Admin — Professional Multi-Video Uploader
  * Concurrency control (default 2), Resumable chunking, Folder destination,
@@ -40,12 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatEta(seconds) {
         if (!seconds || !Number.isFinite(seconds) || seconds <= 0) return '--:--';
         const s = Math.round(seconds);
-        if (s < 60) return `متبقي ${s} ثانية`;
+        if (s < 60) return window.AVi18n.tpl`متبقي ${s} ثانية`;
         const m = Math.floor(s / 60);
         const remS = s % 60;
-        if (m < 60) return `متبقي ${m}د ${remS}ث`;
+        if (m < 60) return window.AVi18n.tpl`متبقي ${m}د ${remS}ث`;
         const h = Math.floor(m / 60);
-        return `متبقي ${h}س ${m % 60}د`;
+        return window.AVi18n.tpl`متبقي ${h}س ${m % 60}د`;
     }
 
     function cleanTitle(filename) {
@@ -157,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     // The selected destination supplies series/season metadata; no duplicate form.
-    const rootDestination = () => ({ id: 'root', type: 'root', name: 'مكتبتي', folderId: null, seriesId: null, seasonId: null, seriesName: null, seasonNumber: null, breadcrumbs: [{ id: 'root', type: 'root', name: 'مكتبتي' }] });
+    const rootDestination = () => ({ id: 'root', type: 'root', name: window.AVi18n.t('مكتبتي'), folderId: null, seriesId: null, seasonId: null, seriesName: null, seasonNumber: null, breadcrumbs: [{ id: 'root', type: 'root', name: window.AVi18n.t('مكتبتي') }] });
     let currentFolder = rootDestination();
     let selectedFolderInModal = rootDestination();
     let destinationReady = Promise.resolve();
@@ -188,8 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateProcessingChoice() {
         const choice = currentProcessingChoice();
-        if (choice) processingFeedback.textContent = `${choice.options.preset} · ${choice.options.video_bitrate_percent}% · ${choice.options.enabled_qualities.join(' / ')} — الرفع ثم التحويل تلقائيًا بهذا الإعداد`;
-        else if (uploadEncoderDefaults) processingFeedback.textContent = 'اختر دقة إخراج واحدة على الأقل.';
+        if (choice) processingFeedback.textContent = window.AVi18n.tpl`${choice.options.preset} · ${choice.options.video_bitrate_percent}% · ${choice.options.enabled_qualities.join(' / ')} — الرفع ثم التحويل تلقائيًا بهذا الإعداد`;
+        else if (uploadEncoderDefaults) processingFeedback.textContent = window.AVi18n.t('اختر دقة إخراج واحدة على الأقل.');
         updateQueueHeaderStats();
     }
 
@@ -197,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (uploadEncoderDefaults) return;
         if (uploadEncoderLoad) return uploadEncoderLoad;
         encoderRetry.classList.add('hidden');
-        processingFeedback.textContent = 'جارٍ تحميل إعداد الإنكودر…';
+        processingFeedback.textContent = window.AVi18n.t('جارٍ تحميل إعداد الإنكودر…');
         uploadEncoderLoad = (async () => {
             try {
                 const response = await fetch('/api/v1/admin/quality-settings/encoder', { credentials: 'include', cache: 'no-store' });
@@ -213,10 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     label.append(input, text); outputOptions.appendChild(label);
                 }
                 uploadEncoderDefaults = data; encoderProfile.disabled = false;
-                encoderProfile.querySelector('[value="saved"]').textContent = `المحفوظ — ${data.preset} · ${data.video_bitrate_percent}%`;
+                encoderProfile.querySelector('[value="saved"]').textContent = window.AVi18n.tpl`المحفوظ — ${data.preset} · ${data.video_bitrate_percent}%`;
                 updateProcessingChoice();
             } catch (_) {
-                processingFeedback.textContent = 'تعذر تحميل إعداد الإنكودر. أعد المحاولة قبل بدء الرفع.';
+                processingFeedback.textContent = window.AVi18n.t('تعذر تحميل إعداد الإنكودر. أعد المحاولة قبل بدء الرفع.');
                 encoderRetry.classList.remove('hidden');
                 updateQueueHeaderStats();
             } finally { uploadEncoderLoad = null; }
@@ -231,11 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function destinationFromData(data, id, type) {
         const scope = data.current_scope;
         if (!scope || !['root', 'folder', 'series', 'season'].includes(scope.type) || (type !== 'root' && (scope.id !== id || scope.type !== type)) || (type !== 'root' && !scope.name)) {
-            throw new Error('وجهة الرفع غير متاحة. اختر وجهة أخرى.');
+            throw new Error(window.AVi18n.t('وجهة الرفع غير متاحة. اختر وجهة أخرى.'));
         }
         const breadcrumbs = data.breadcrumbs || [];
         const folder = [...breadcrumbs].reverse().find(crumb => crumb.type === 'folder');
-        if (scope.type === 'season' && (!scope.series_id || !Number.isInteger(Number(scope.season_number)))) throw new Error('تعذر قراءة بيانات الموسم.');
+        if (scope.type === 'season' && (!scope.series_id || !Number.isInteger(Number(scope.season_number)))) throw new Error(window.AVi18n.t('تعذر قراءة بيانات الموسم.'));
         return {
             id: scope.id, type: scope.type, name: scope.name,
             folderId: scope.type === 'folder' ? scope.id : (folder?.id || null),
@@ -251,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams({ type });
         if (type !== 'root') params.set('id', id);
         const response = await fetch(`/api/v1/drive/scope?${params}`, { credentials: 'include', cache: 'no-store' });
-        if (!response.ok) throw new Error('تعذر تحميل وجهة الرفع. اختر الوجهة مجددًا.');
+        if (!response.ok) throw new Error(window.AVi18n.t('تعذر تحميل وجهة الرفع. اختر الوجهة مجددًا.'));
         const data = await response.json();
         return { data, destination: destinationFromData(data, id, type) };
     }
@@ -262,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (destinationPath) destinationPath.textContent = destination.breadcrumbs.map(crumb => crumb.name).join(' / ') || destination.name;
         if (seasonUploadHint) {
             seasonUploadHint.textContent = destination.seasonNumber
-                ? 'سيُربط كل ملف بهذا الموسم تلقائيًا، مع استخراج رقم الحلقة من اسمه.'
+                ? window.AVi18n.t('سيُربط كل ملف بهذا الموسم تلقائيًا، مع استخراج رقم الحلقة من اسمه.')
                 : '';
             seasonUploadHint.classList.toggle('hidden', !destination.seasonNumber);
         }
@@ -280,13 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadFolderTree(destination);
                     modalDest?.classList.add('is-open');
                     modalDest?.setAttribute('aria-hidden', 'false');
-                    throw new Error('اختر موسمًا داخل المسلسل لرفع الحلقات.');
+                    throw new Error(window.AVi18n.t('اختر موسمًا داخل المسلسل لرفع الحلقات.'));
                 }
                 applyDestination(destination);
             }).catch(error => {
                 if (request !== destinationRequest) return;
                 destinationError = true;
-                if (destinationPath) destinationPath.textContent = error.message;
+                if (destinationPath) destinationPath.textContent = window.AVi18n.t(error.message);
                 seasonUploadHint?.classList.add('hidden');
             }).finally(() => {
                 if (request === destinationRequest) btnStartBatch.disabled = destinationError;
@@ -304,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const destination = rootDestination();
             destination.seriesName = params.get('series').trim();
             destination.seasonNumber = legacySeason;
-            destination.breadcrumbs.push({ name: destination.seriesName }, { name: `الموسم ${legacySeason}` });
+            destination.breadcrumbs.push({ name: destination.seriesName }, { name: window.AVi18n.tpl`الموسم ${legacySeason}` });
             applyDestination(destination);
             return Promise.resolve();
         }
@@ -331,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadFolderTree(target) {
         const request = ++pickerRequest;
         btnConfirmDestModal.disabled = true;
-        folderTreeList.textContent = 'جارٍ تحميل الوجهات…';
+        folderTreeList.textContent = window.AVi18n.t('جارٍ تحميل الوجهات…');
         try {
             const { data, destination } = await fetchDestination(target.id, target.type);
             if (request !== pickerRequest) return;
@@ -359,15 +360,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 folderTreeList.appendChild(button);
             }
-            if (!children.length) folderTreeList.textContent = destination.type === 'season' ? 'ستُرفع الملفات إلى هذا الموسم تلقائيًا.' : 'لا توجد وجهات فرعية.';
+            if (!children.length) folderTreeList.textContent = destination.type === 'season' ? window.AVi18n.t('ستُرفع الملفات إلى هذا الموسم تلقائيًا.') : window.AVi18n.t('لا توجد وجهات فرعية.');
             if (destination.type === 'series') {
-                btnConfirmDestModal.textContent = 'اختر موسمًا';
+                btnConfirmDestModal.textContent = window.AVi18n.t('اختر موسمًا');
             } else {
-                btnConfirmDestModal.textContent = destination.type === 'season' ? 'اختيار الموسم' : 'اختيار المجلد';
+                btnConfirmDestModal.textContent = destination.type === 'season' ? window.AVi18n.t('اختيار الموسم') : window.AVi18n.t('اختيار المجلد');
                 btnConfirmDestModal.disabled = false;
             }
         } catch (error) {
-            if (request === pickerRequest) folderTreeList.textContent = error.message;
+            if (request === pickerRequest) folderTreeList.textContent = window.AVi18n.t(error.message);
         }
     }
 
@@ -456,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const validVideos = incomingFiles.filter(isVideoFile);
 
         if (validVideos.length === 0) {
-            alert('لم يتم العثور على ملفات فيديو مدعومة (MKV, MP4, MOV, TS, WEBM).');
+            alert(window.AVi18n.t('لم يتم العثور على ملفات فيديو مدعومة (MKV, MP4, MOV, TS, WEBM).'));
             return;
         }
 
@@ -528,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
         processingControls.classList.toggle('hidden', totalFiles === 0);
         const totalBytes = queue.reduce((sum, item) => sum + item.size, 0);
 
-        queueCountBadge.textContent = `${totalFiles} ${totalFiles === 1 ? 'ملف' : (totalFiles <= 10 ? 'ملفات' : 'ملفاً')}`;
+        queueCountBadge.textContent = `${totalFiles} ${totalFiles === 1 ? window.AVi18n.t('ملف') : (totalFiles <= 10 ? window.AVi18n.t('ملفات') : window.AVi18n.t('ملفاً'))}`;
         queueSizeBadge.textContent = formatBytes(totalBytes);
 
         const completedCount = queue.filter(q => q.status === 'COMPLETED').length;
@@ -572,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const choice = currentProcessingChoice();
         btnStartBatch.disabled = destinationError || !choice || queuedCount === 0;
-        btnStartBatchLabel.textContent = !uploadEncoderDefaults ? 'تحميل إعدادات الإنكودر…' : !choice ? 'اختر دقة إخراج' : `بدء رفع وتحويل ${queuedCount} ملفات`;
+        btnStartBatchLabel.textContent = !uploadEncoderDefaults ? window.AVi18n.t('تحميل إعدادات الإنكودر…') : !choice ? window.AVi18n.t('اختر دقة إخراج') : window.AVi18n.tpl`بدء رفع وتحويل ${queuedCount} ملفات`;
     }
 
     function createItemElement(item) {
@@ -593,55 +594,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Status badge label and class
         let badgeCls = 'badge-ready';
-        let badgeText = 'جاهز للرفع';
+        let badgeText = window.AVi18n.t('جاهز للرفع');
 
         switch (item.status) {
             case 'QUEUED':
                 badgeCls = 'badge-queued';
-                badgeText = 'في الانتظار';
+                badgeText = window.AVi18n.t('في الانتظار');
                 break;
             case 'UPLOADING':
                 badgeCls = 'badge-uploading';
-                badgeText = 'جارٍ الرفع';
+                badgeText = window.AVi18n.t('جارٍ الرفع');
                 break;
             case 'FINALIZING':
                 badgeCls = 'badge-uploading';
-                badgeText = 'التحقق الأمني...';
+                badgeText = window.AVi18n.t('التحقق الأمني...');
                 break;
             case 'PAUSED':
                 badgeCls = 'badge-paused';
-                badgeText = 'متوقف';
+                badgeText = window.AVi18n.t('متوقف');
                 break;
             case 'COMPLETED':
                 badgeCls = 'badge-completed';
-                badgeText = 'مكتمل';
+                badgeText = window.AVi18n.t('مكتمل');
                 break;
             case 'FAILED':
                 badgeCls = 'badge-failed';
-                badgeText = 'فشل';
+                badgeText = window.AVi18n.t('فشل');
                 break;
             case 'CANCELLED':
                 badgeCls = 'badge-cancelled';
-                badgeText = 'ملغي';
+                badgeText = window.AVi18n.t('ملغي');
                 break;
         }
 
         // Action controls
         let actionsHtml = '';
         if (item.status === 'READY') {
-            actionsHtml = `<button type="button" class="item-btn-remove" data-action="remove" title="إزالة من القائمة" aria-label="إزالة">✕</button>`;
+            actionsHtml = window.AVi18n.tpl`<button type="button" class="item-btn-remove" data-action="remove" title="إزالة من القائمة" aria-label="إزالة">✕</button>`;
         } else if (item.status === 'UPLOADING') {
-            actionsHtml = `
+            actionsHtml = window.AVi18n.tpl`
                 <button type="button" class="btn btn-secondary btn-sm" data-action="pause">إيقاف مؤقت</button>
                 <button type="button" class="btn btn-danger btn-sm" data-action="cancel">إلغاء</button>
             `;
         } else if (item.status === 'PAUSED') {
-            actionsHtml = `
+            actionsHtml = window.AVi18n.tpl`
                 <button type="button" class="btn btn-primary btn-sm" data-action="resume">استئناف</button>
                 <button type="button" class="btn btn-danger btn-sm" data-action="cancel">إلغاء</button>
             `;
         } else if (item.status === 'FAILED') {
-            actionsHtml = `<button type="button" class="btn btn-secondary btn-sm" data-action="retry">إعادة المحاولة</button>`;
+            actionsHtml = window.AVi18n.tpl`<button type="button" class="btn btn-secondary btn-sm" data-action="retry">إعادة المحاولة</button>`;
         }
 
         // Progress section (shown for UPLOADING, PAUSED, FINALIZING, COMPLETED, FAILED)
@@ -654,14 +655,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 telemetryHtml = `
                     <div class="${item.processingWarning ? 'item-msg-error' : 'item-msg-success'}">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>${item.processingWarning ? 'اكتمل الرفع · تعذر تأكيد بدء التحويل' : 'اكتمل الرفع · أُضيف إلى طابور التحويل'}</span>
+                        <span>${item.processingWarning ? window.AVi18n.t('اكتمل الرفع · تعذر تأكيد بدء التحويل') : window.AVi18n.t('اكتمل الرفع · أُضيف إلى طابور التحويل')}</span>
                     </div>
                 `;
             } else if (item.status === 'FAILED') {
-                telemetryHtml = `
+                telemetryHtml = window.AVi18n.tpl`
                     <div class="item-msg-error">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        <span>فشل الرفع: ${escapeHtml(item.errorMessage || 'حدث خطأ في الشبكة')}</span>
+                        <span>فشل الرفع: ${escapeHtml(item.errorMessage || window.AVi18n.t('حدث خطأ في الشبكة'))}</span>
                     </div>
                 `;
             } else {
@@ -699,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="item-names-box">
                         <span class="item-filename" title="${escapeHtml(item.filename)}">${escapeHtml(item.filename)}</span>
                         <span class="item-filesize dir-ltr">${formatBytes(item.size)}</span>
-                        ${(item.destination || currentFolder).seasonNumber ? `<div class="season-item-fields"><label>الحلقة <input type="number" min="1" max="99999" data-season-field="episode" value="${item.episodeNumber || ''}" ${item.status !== 'READY' ? 'disabled' : ''} aria-label="رقم الحلقة"></label></div>` : ''}
+                        ${(item.destination || currentFolder).seasonNumber ? window.AVi18n.tpl`<div class="season-item-fields"><label>الحلقة <input type="number" min="1" max="99999" data-season-field="episode" value="${item.episodeNumber || ''}" ${item.status !== 'READY' ? 'disabled' : ''} aria-label="رقم الحلقة"></label></div>` : ''}
                     </div>
                 </div>
                 <div class="item-trailing-box">
@@ -865,13 +866,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!target.seasonNumber) continue;
             const episode = Number(item.episodeNumber);
             if (!Number.isInteger(episode) || episode < 1 || episode > 99999) {
-                alert(`تعذر تحديد رقم الحلقة من اسم الملف. أدخل رقمه:\n${item.filename}`);
+                alert(window.AVi18n.tpl`تعذر تحديد رقم الحلقة من اسم الملف. أدخل رقمه:\n${item.filename}`);
                 item.domEl?.querySelector('[data-season-field="episode"]')?.focus();
                 return;
             }
             const key = `${target.seasonId || target.seriesName}:${target.seasonNumber}:${episode}`;
             if (episodeKeys.has(key)) {
-                alert('يوجد رقم حلقة مكرر في القائمة. صحح الأرقام قبل بدء الرفع.');
+                alert(window.AVi18n.t('يوجد رقم حلقة مكرر في القائمة. صحح الأرقام قبل بدء الرفع.'));
                 return;
             }
             episodeKeys.add(key);
@@ -955,7 +956,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (!initRes.ok) {
                     const errData = await initRes.json().catch(() => ({}));
-                    throw new Error(errData.detail || errData.error?.message || `فشل بدء الجلسة (HTTP ${initRes.status})`);
+                    throw new Error(window.AVi18n.t(errData.detail) || errData.error?.message || window.AVi18n.tpl`فشل بدء الجلسة (HTTP ${initRes.status})`);
                 }
 
                 const initData = await initRes.json();
@@ -1028,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             break;
                         } else {
                             const errBody = await chunkRes.json().catch(() => ({}));
-                            chunkError = new Error(errBody.detail || `خطأ جزء ${i + 1} (HTTP ${chunkRes.status})`);
+                            chunkError = new Error(window.AVi18n.t(errBody.detail) || window.AVi18n.tpl`خطأ جزء ${i + 1} (HTTP ${chunkRes.status})`);
                         }
                     } catch (netErr) {
                         chunkError = netErr;
@@ -1040,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (!chunkUploaded) {
-                    throw chunkError || new Error(`تعذر رفع الجزء ${i + 1} بعد 3 محاولات`);
+                    throw chunkError || new Error(window.AVi18n.tpl`تعذر رفع الجزء ${i + 1} بعد 3 محاولات`);
                 }
 
                 // Chunk successful, update telemetry
@@ -1077,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!finRes.ok) {
                 const finErr = await finRes.json().catch(() => ({}));
-                throw new Error(finErr.detail || finErr.error?.message || `فشل التحقق الأمني من الفيديو (HTTP ${finRes.status})`);
+                throw new Error(window.AVi18n.t(finErr.detail) || finErr.error?.message || window.AVi18n.tpl`فشل التحقق الأمني من الفيديو (HTTP ${finRes.status})`);
             }
 
             const finData = await finRes.json();
@@ -1092,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (!transcodeResponse.ok) item.processingWarning = `HTTP ${transcodeResponse.status}`;
                 else item.transcodeQueued = true;
-            } catch (_) { item.processingWarning = 'تعذر الاتصال بالخادم'; }
+            } catch (_) { item.processingWarning = window.AVi18n.t('تعذر الاتصال بالخادم'); }
 
             // Completed!
             item.status = 'COMPLETED';
@@ -1105,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.status = 'CANCELLED';
             } else {
                 item.status = 'FAILED';
-                item.errorMessage = err.message || 'حدث خطأ أثناء الرفع';
+                item.errorMessage = window.AVi18n.t(err.message) || window.AVi18n.t('حدث خطأ أثناء الرفع');
             }
             updateItemContent(item, item.domEl);
         }
@@ -1113,6 +1114,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Batch Telemetry & Progress Display ---
     function updateBatchProgress() {
+        // A reload would discard selected File objects and interrupt browser uploads.
+        const languageLocked = queue.some(item => !['COMPLETED', 'CANCELLED'].includes(item.status));
+        const documents = [document];
+        try { if (window.parent !== window) documents.push(window.parent.document); } catch (_) {}
+        documents.forEach(doc => doc.querySelectorAll('[data-language-select]').forEach(select => {
+            select.disabled = languageLocked;
+            select.title = languageLocked ? window.AVi18n.t('أكمل الرفع أو امسح القائمة قبل تغيير اللغة.') : '';
+        }));
         const totalFiles = queue.length;
         if (totalFiles === 0) {
             batchProgressCard.classList.add('hidden');

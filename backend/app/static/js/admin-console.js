@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 (() => {
   'use strict';
 
@@ -66,11 +67,11 @@
       const response = await fetch('/api/v1/health', { credentials: 'include', cache: 'no-store' });
       status.dataset.state = response.ok ? 'online' : 'offline';
       const label = status.querySelector('span');
-      if (label) label.textContent = response.ok ? 'الخادم متصل' : 'الخادم غير متاح';
+      if (label) label.textContent = response.ok ? window.AVi18n.t('الخادم متصل') : window.AVi18n.t('الخادم غير متاح');
     } catch (_) {
       status.dataset.state = 'offline';
       const label = status.querySelector('span');
-      if (label) label.textContent = 'الخادم غير متاح';
+      if (label) label.textContent = window.AVi18n.t('الخادم غير متاح');
     }
   };
 

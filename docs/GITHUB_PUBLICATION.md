@@ -4,7 +4,7 @@ Publish source from a clean export so local runtime files and development histor
 
 ```sh
 python scripts/check_repository_secrets.py
-python scripts/export_github_source.py --output release/ABOODVIDEO-1.0.0-source
+python scripts/export_github_source.py --output release/ABOODVIDEO-1.1.0-source
 ```
 
 The destination must not exist. The exporter follows ignore rules, refuses symlinks, scans credentials and copies current source without media, databases, private settings, backups or Git history. It initializes an empty repository without creating a commit or remote. The original working tree and index are preserved.

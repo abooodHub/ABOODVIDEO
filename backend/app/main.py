@@ -77,6 +77,8 @@ def create_application() -> FastAPI:
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(PublicHTTPSRedirectMiddleware)
     app.add_middleware(RequestIDMiddleware)
+    from shared.i18n.middleware import LocaleMiddleware
+    app.add_middleware(LocaleMiddleware, secure_cookie=settings.SESSION_COOKIE_SECURE)
 
     # 3. CORS Middleware
     app.add_middleware(
@@ -114,6 +116,8 @@ def create_application() -> FastAPI:
 
     # 9. Static Files Mount (Self-hosted assets and strict CSP scripts)
     from fastapi.staticfiles import StaticFiles
+    from shared.i18n import WEB_DIR
+    app.mount('/static/i18n', StaticFiles(directory=str(WEB_DIR)), name='i18n')
     static_dir = Path(__file__).resolve().parent / "static"
     static_dir.mkdir(parents=True, exist_ok=True)
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")

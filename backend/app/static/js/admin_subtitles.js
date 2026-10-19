@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* ============================================================
    ABOODVIDEO Admin UI V3 — Subtitle Management Logic (Phase H)
    Full subtitle CRUD, format verification, playability status,
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fmtDate = (iso) => {
         if (!iso) return '—';
         try {
-            return new Date(iso).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+            return new Date(iso).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-US' : 'ar-EG'), { year: 'numeric', month: 'short', day: 'numeric' });
         } catch (_) {
             return iso.slice(0, 10);
         }
@@ -66,13 +67,13 @@ document.addEventListener('DOMContentLoaded', () => {
             applyPlayableFilterAndRender();
 
             const pageInfo = document.getElementById('subs-page-info');
-            if (pageInfo) pageInfo.textContent = `صفحة ${page} من ${Math.max(1, Math.ceil(total / PAGE_SIZE))} · ${total} مسار`;
+            if (pageInfo) pageInfo.textContent = window.AVi18n.tpl`صفحة ${page} من ${Math.max(1, Math.ceil(total / PAGE_SIZE))} · ${total} مسار`;
             const prevBtn = document.getElementById('subs-prev');
             const nextBtn = document.getElementById('subs-next');
             if (prevBtn) prevBtn.disabled = page <= 1;
             if (nextBtn) nextBtn.disabled = page * PAGE_SIZE >= total;
         } catch (_) {
-            if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="table-empty-cell text-danger">تعذر تحميل مسارات الترجمة — تحقق من الاتصال.</td></tr>';
+            if (tbody) tbody.innerHTML = window.AVi18n.t('<tr><td colspan="8" class="table-empty-cell text-danger">تعذر تحميل مسارات الترجمة — تحقق من الاتصال.</td></tr>');
         }
     }
 
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function render(items) {
         if (!tbody) return;
         if (!items.length) {
-            tbody.innerHTML = '<tr><td colspan="8" class="table-empty-cell">لا توجد مسارات ترجمة مطابقة للفلاتر الحالية.</td></tr>';
+            tbody.innerHTML = window.AVi18n.t('<tr><td colspan="8" class="table-empty-cell">لا توجد مسارات ترجمة مطابقة للفلاتر الحالية.</td></tr>');
             return;
         }
 
@@ -127,18 +128,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Playable Status
             const playableTd = el('td');
             if (s.is_playable) {
-                const badge = el('span', 'قابلة للتشغيل', ['badge', 'badge-success', 'text-xs']);
+                const badge = el('span', window.AVi18n.t('قابلة للتشغيل'), ['badge', 'badge-success', 'text-xs']);
                 playableTd.appendChild(badge);
             } else {
-                const badge = el('span', 'أرشيف فقط', ['badge', 'badge-muted', 'text-xs']);
+                const badge = el('span', window.AVi18n.t('أرشيف فقط'), ['badge', 'badge-muted', 'text-xs']);
                 playableTd.appendChild(badge);
             }
 
             // Options (Default / Forced)
             const optsTd = el('td');
             const pills = [];
-            if (s.is_default) pills.push(el('span', 'افتراضية', ['badge', 'badge-primary', 'text-xs']));
-            if (s.is_forced) pills.push(el('span', 'إجبارية', ['badge', 'badge-warning', 'text-xs']));
+            if (s.is_default) pills.push(el('span', window.AVi18n.t('افتراضية'), ['badge', 'badge-primary', 'text-xs']));
+            if (s.is_forced) pills.push(el('span', window.AVi18n.t('إجبارية'), ['badge', 'badge-warning', 'text-xs']));
             if (!pills.length) pills.push(el('span', '—', ['text-muted', 'text-xs']));
             optsTd.append(...pills);
 
@@ -148,12 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Actions
             const actionsTd = el('td');
             actionsTd.style.textAlign = 'center';
-            const delBtn = el('button', 'حذف', ['btn', 'btn-sm', 'btn-ghost', 'text-danger']);
+            const delBtn = el('button', window.AVi18n.t('حذف'), ['btn', 'btn-sm', 'btn-ghost', 'text-danger']);
             delBtn.type = 'button';
             delBtn.dataset.id = String(s.id);
             delBtn.dataset.videoId = String(s.video_id);
             delBtn.dataset.label = s.label;
-            delBtn.title = 'حذف هذا المسار';
+            delBtn.title = window.AVi18n.t('حذف هذا المسار');
             delBtn.addEventListener('click', () => askDelete(s));
             actionsTd.appendChild(delBtn);
 
@@ -169,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pendingDelete = sub;
         const text = document.getElementById('subs-confirm-text');
         if (text) {
-            text.textContent = `هل أنت متأكد من حذف مسار الترجمة «${sub.label}» (${sub.language_name}) للفيديو «${sub.video_title}»؟`;
+            text.textContent = window.AVi18n.tpl`هل أنت متأكد من حذف مسار الترجمة «${sub.label}» (${sub.language_name}) للفيديو «${sub.video_title}»؟`;
         }
         const modal = document.getElementById('subs-confirm');
         if (modal) modal.classList.add('is-open');
@@ -194,15 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'X-CSRF-Token': getCsrf() }
             });
             if (res.ok) {
-                showFeedback('تم حذف مسار الترجمة بنجاح.');
+                showFeedback(window.AVi18n.t('تم حذف مسار الترجمة بنجاح.'));
                 closeDeleteModal();
                 load();
             } else {
                 const err = await res.json().catch(() => ({}));
-                showFeedback('تعذر حذف الترجمة: ' + (err.detail || 'خطأ غير معروف'), true);
+                showFeedback(window.AVi18n.t('تعذر حذف الترجمة: ') + (window.AVi18n.t(err.detail) || window.AVi18n.t('خطأ غير معروف')), true);
             }
         } catch (_) {
-            showFeedback('تعذر الاتصال بالخادم لحذف الترجمة.', true);
+            showFeedback(window.AVi18n.t('تعذر الاتصال بالخادم لحذف الترجمة.'), true);
         } finally {
             if (yesBtn) yesBtn.disabled = false;
         }
@@ -233,28 +234,28 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadVideosDropdown() {
         const select = document.getElementById('add-sub-video');
         if (!select) return;
-        select.innerHTML = '<option value="">جاري جلب الفيديوهات...</option>';
+        select.innerHTML = window.AVi18n.t('<option value="">جاري جلب الفيديوهات...</option>');
         try {
             const res = await fetch('/api/v1/admin/videos?limit=100', { credentials: 'include', cache: 'no-store' });
             if (!res.ok) throw new Error();
             const data = await res.json();
             const items = data.items || [];
             if (!items.length) {
-                select.innerHTML = '<option value="">لا توجد فيديوهات مسجلة في المكتبة</option>';
+                select.innerHTML = window.AVi18n.t('<option value="">لا توجد فيديوهات مسجلة في المكتبة</option>');
                 return;
             }
-            select.innerHTML = '<option value="">-- اختر الفيديو المستهدف --</option>' +
+            select.innerHTML = window.AVi18n.t('<option value="">-- اختر الفيديو المستهدف --</option>') +
                 items.map(v => `<option value="${esc(v.id)}">${esc(v.title)} (${esc(v.status)})</option>`).join('');
         } catch (_) {
-            select.innerHTML = '<option value="">تعذر جلب الفيديوهات</option>';
+            select.innerHTML = window.AVi18n.t('<option value="">تعذر جلب الفيديوهات</option>');
         }
     }
 
     // Auto prefill language name
     const langNames = {
-        'ar': 'العربية', 'en': 'الإنجليزية', 'fr': 'الفرنسية', 'es': 'الإسبانية',
-        'de': 'الألمانية', 'tr': 'التركية', 'ja': 'اليابانية', 'ko': 'الكورية',
-        'it': 'الإيطالية', 'ru': 'الروسية', 'pt': 'البرتغالية', 'zh': 'الصينية'
+        'ar': window.AVi18n.t('العربية'), 'en': window.AVi18n.t('الإنجليزية'), 'fr': window.AVi18n.t('الفرنسية'), 'es': window.AVi18n.t('الإسبانية'),
+        'de': window.AVi18n.t('الألمانية'), 'tr': window.AVi18n.t('التركية'), 'ja': window.AVi18n.t('اليابانية'), 'ko': window.AVi18n.t('الكورية'),
+        'it': window.AVi18n.t('الإيطالية'), 'ru': window.AVi18n.t('الروسية'), 'pt': window.AVi18n.t('البرتغالية'), 'zh': window.AVi18n.t('الصينية')
     };
     const codeInput = document.getElementById('add-sub-lang-code');
     const nameInput = document.getElementById('add-sub-lang-name');
@@ -279,11 +280,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const isForced = document.getElementById('add-sub-forced')?.checked;
 
             if (!videoId) {
-                alert('الرجاء اختيار الفيديو المستهدف.');
+                alert(window.AVi18n.t('الرجاء اختيار الفيديو المستهدف.'));
                 return;
             }
             if (!fileInput || !fileInput.files.length) {
-                alert('الرجاء اختيار ملف ترجمة.');
+                alert(window.AVi18n.t('الرجاء اختيار ملف ترجمة.'));
                 return;
             }
 
@@ -306,20 +307,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: fd
                 });
                 if (res.ok) {
-                    showFeedback('تم رفع وحفظ مسار الترجمة بنجاح.');
+                    showFeedback(window.AVi18n.t('تم رفع وحفظ مسار الترجمة بنجاح.'));
                     closeAddModal();
                     load();
                 } else {
                     const err = await res.json().catch(() => ({}));
                     if (addSubAlert) {
-                        addSubAlert.textContent = 'فشل الرفع: ' + (err.detail || 'خطأ غير معروف');
+                        addSubAlert.textContent = window.AVi18n.t('فشل الرفع: ') + (window.AVi18n.t(err.detail) || window.AVi18n.t('خطأ غير معروف'));
                         addSubAlert.className = 'alert alert-danger';
                         addSubAlert.classList.remove('hidden');
                     }
                 }
             } catch (_) {
                 if (addSubAlert) {
-                    addSubAlert.textContent = 'تعذر الاتصال بالخادم أثناء رفع ملف الترجمة.';
+                    addSubAlert.textContent = window.AVi18n.t('تعذر الاتصال بالخادم أثناء رفع ملف الترجمة.');
                     addSubAlert.className = 'alert alert-danger';
                     addSubAlert.classList.remove('hidden');
                 }

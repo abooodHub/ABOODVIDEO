@@ -17,6 +17,7 @@ from sqlalchemy import select, and_, or_, desc, asc, func, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 import jinja2
+from shared.i18n import configure_environment, gettext
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -42,6 +43,7 @@ jinja_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(str(TEMPLATES_DIR)),
     autoescape=True,
 )
+configure_environment(jinja_env)
 
 
 def format_duration(seconds: Optional[float]) -> str:

@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* Admin dashboard: compact, read-only view of the existing aggregate API. */
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
@@ -29,20 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const shortDate = (value) => {
     const date = new Date(value || '');
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('ar', {day:'numeric',month:'short'});
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(document.documentElement.lang || 'ar', {day:'numeric',month:'short'});
   };
   const relTime = (value) => {
     const date = new Date(value || '');
     if (Number.isNaN(date.getTime())) return '—';
     const minutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
-    if (minutes < 1) return 'الآن';
-    if (minutes < 60) return `منذ ${minutes} د`;
+    if (minutes < 1) return window.AVi18n.t('الآن');
+    if (minutes < 60) return window.AVi18n.tpl`منذ ${minutes} د`;
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `منذ ${hours} س`;
+    if (hours < 24) return window.AVi18n.tpl`منذ ${hours} س`;
     return shortDate(value);
   };
   const setText = (id, value) => { if ($(id)) $(id).textContent = value; };
-  const statusLabel = (status) => ({READY:'جاهز',PROCESSING:'قيد المعالجة',PROBING:'فحص الملف',VERIFYING:'التحقق',QUEUED:'في الانتظار',UPLOADING:'جارٍ الرفع',UPLOADED:'في الانتظار',FAILED:'فشل',CANCELLED:'ملغي'}[status] || status || '—');
+  const statusLabel = (status) => ({READY:window.AVi18n.t('جاهز'),PROCESSING:window.AVi18n.t('قيد المعالجة'),PROBING:window.AVi18n.t('فحص الملف'),VERIFYING:window.AVi18n.t('التحقق'),QUEUED:window.AVi18n.t('في الانتظار'),UPLOADING:window.AVi18n.t('جارٍ الرفع'),UPLOADED:window.AVi18n.t('في الانتظار'),FAILED:window.AVi18n.t('فشل'),CANCELLED:window.AVi18n.t('ملغي')}[status] || status || '—');
 
   function animateMetric(id, value, formatter) {
     const el = $(id); if (!el) return;
@@ -68,15 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSummary(data) {
     const videos = data.videos || {}, jobs = data.jobs || {}, storage = data.storage || {};
     animateMetric('kpiVideosVal', videos.total, fmtNum);
-    setText('kpiVideosSub', `${fmtNum(videos.ready)} جاهز · ${fmtNum(videos.processing)} قيد العمل`);
+    setText('kpiVideosSub', window.AVi18n.tpl`${fmtNum(videos.ready)} جاهز · ${fmtNum(videos.processing)} قيد العمل`);
     animateMetric('kpiStorageVal', storage.used_bytes, fmtBytes);
     const free = storage.free_bytes;
     const total = storage.total_bytes;
-    setText('kpiStorageSub', free == null ? 'المساحة المتاحة غير متوفرة' : `${fmtBytes(free)} متاح${total == null ? '' : ` من ${fmtBytes(total)}`}`);
+    setText('kpiStorageSub', free == null ? window.AVi18n.t('المساحة المتاحة غير متوفرة') : window.AVi18n.tpl`${fmtBytes(free)} متاح${total == null ? '' : window.AVi18n.tpl` من ${fmtBytes(total)}`}`);
     animateMetric('kpiProcessingVal', jobs.active_count, fmtNum);
-    setText('kpiProcessingSub', `${fmtNum(jobs.queued_count)} في الانتظار`);
+    setText('kpiProcessingSub', window.AVi18n.tpl`${fmtNum(jobs.queued_count)} في الانتظار`);
     if ($('kpiFailedVal')) setText('kpiFailedVal', fmtNum(videos.failed));
-    if ($('kpiFailedSub')) setText('kpiFailedSub', `${fmtNum(videos.failed)} فيديو بحالة فشل`);
+    if ($('kpiFailedSub')) setText('kpiFailedSub', window.AVi18n.tpl`${fmtNum(videos.failed)} فيديو بحالة فشل`);
     ['kpiVideosVal','kpiStorageVal','kpiProcessingVal','kpiFailedVal'].forEach(id => $(id)?.classList.remove('is-loading'));
     document.querySelectorAll('[data-processing-badge]').forEach(badge => {
       const count = Number(jobs.active_count || 0);
@@ -89,18 +90,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const box = $('dashServices'); if (!box) return;
     const services = data.services || {};
     const entries = [
-      ['الواجهة', services.api],
-      ['قاعدة البيانات', services.database],
+      [window.AVi18n.t('الواجهة'), services.api],
+      [window.AVi18n.t('قاعدة البيانات'), services.database],
       ['Redis', services.redis],
-      ['التخزين', services.storage || data.storage?.status],
-      ...(transcodingEnabled ? [['عامل المعالجة', services.worker]] : []),
+      [window.AVi18n.t('التخزين'), services.storage || data.storage?.status],
+      ...(transcodingEnabled ? [[window.AVi18n.t('عامل المعالجة'), services.worker]] : []),
     ];
     const statusInfo = (value) => {
       const raw = value && typeof value === 'object' ? value.status : value;
       const key = String(raw ?? '').toLowerCase();
-      if (value === true || ['healthy','online','active','ready','up'].includes(key)) return ['سليم','ok'];
-      if (value === false || ['offline','down','error','unhealthy','failed','stale'].includes(key)) return ['متعطل','fail'];
-      if (['degraded','warning','unknown',''].includes(key)) return ['غير مؤكد','warn'];
+      if (value === true || ['healthy','online','active','ready','up'].includes(key)) return [window.AVi18n.t('سليم'),'ok'];
+      if (value === false || ['offline','down','error','unhealthy','failed','stale'].includes(key)) return [window.AVi18n.t('متعطل'),'fail'];
+      if (['degraded','warning','unknown',''].includes(key)) return [window.AVi18n.t('غير مؤكد'),'warn'];
       return [String(raw), 'warn'];
     };
     box.innerHTML = entries.map(([label, value]) => {
@@ -108,20 +109,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return `<span class="dash-service-chip status-${tone}"><i aria-hidden="true"></i><span>${esc(label)}</span><strong>${esc(status)}</strong></span>`;
     }).join('');
 
-    setText('dashServicesUpdated', data.generated_at ? `آخر تحديث ${relTime(data.generated_at)}` : 'قراءة مباشرة من الخادم');
+    setText('dashServicesUpdated', data.generated_at ? window.AVi18n.tpl`آخر تحديث ${relTime(data.generated_at)}` : window.AVi18n.t('قراءة مباشرة من الخادم'));
   }
 
   const diagnostics = $('system-diagnostics');
   let diagnosticsLoading = false;
-  const healthLabel = (value) => ({ healthy:'سليم', unhealthy:'متعطل', degraded:'يحتاج مراجعة', ONLINE:'يعمل', online:'يعمل', stopped:'متوقف', OFFLINE:'متوقف', STALE:'النبض متأخر', error:'تعذر الفحص' }[value] || value || 'غير متاح');
-  const secondsLabel = (value) => value == null ? 'غير متاح' : `${fmtNum(value)} ثانية`;
+  const healthLabel = (value) => ({ healthy:window.AVi18n.t('سليم'), unhealthy:window.AVi18n.t('متعطل'), degraded:window.AVi18n.t('يحتاج مراجعة'), ONLINE:window.AVi18n.t('يعمل'), online:window.AVi18n.t('يعمل'), stopped:window.AVi18n.t('متوقف'), OFFLINE:window.AVi18n.t('متوقف'), STALE:window.AVi18n.t('النبض متأخر'), error:window.AVi18n.t('تعذر الفحص') }[value] || value || window.AVi18n.t('غير متاح'));
+  const secondsLabel = (value) => value == null ? window.AVi18n.t('غير متاح') : window.AVi18n.tpl`${fmtNum(value)} ثانية`;
   async function loadDiagnostics() {
     if (!diagnostics?.open || document.hidden || diagnosticsLoading) return;
     diagnosticsLoading = true;
     const refresh = $('dashDiagnosticsRefresh'), message = $('dashDiagnosticsStatus');
     refresh.disabled = true;
     diagnostics.setAttribute('aria-busy', 'true');
-    message.textContent = 'جارٍ فحص تفاصيل التشغيل…';
+    message.textContent = window.AVi18n.t('جارٍ فحص تفاصيل التشغيل…');
     message.classList.remove('is-error');
     try {
       const responses = await Promise.allSettled((transcodingEnabled ? ['readiness','worker','reconciler'] : ['readiness']).map(async name => {
@@ -133,20 +134,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = responses.map(result => result.status === 'fulfilled' ? result.value.data : {});
       const [overall, worker = {}, reconciler = {}] = data;
       const facts = [
-        ['صحة التطبيق', healthLabel(overall.status)], ['إصدار التطبيق', overall.version || 'غير متاح'],
-        ['قاعدة البيانات', healthLabel(overall.services?.database)], ['Redis', healthLabel(overall.services?.redis)],
-        ['التخزين', healthLabel(overall.services?.storage)], ['عامل المعالجة', healthLabel(worker.worker_status || worker.status)],
-        ['مهام في الطابور', fmtNum(worker.queue_depth)], ['آخر نبض للعامل', secondsLabel(worker.last_seen_seconds_ago)],
-        ['خدمة الصيانة', healthLabel(reconciler.status)], ['آخر نبض للصيانة', secondsLabel(reconciler.last_seen_seconds_ago)],
+        [window.AVi18n.t('صحة التطبيق'), healthLabel(overall.status)], [window.AVi18n.t('إصدار التطبيق'), overall.version || window.AVi18n.t('غير متاح')],
+        [window.AVi18n.t('قاعدة البيانات'), healthLabel(overall.services?.database)], ['Redis', healthLabel(overall.services?.redis)],
+        [window.AVi18n.t('التخزين'), healthLabel(overall.services?.storage)], [window.AVi18n.t('عامل المعالجة'), healthLabel(worker.worker_status || worker.status)],
+        [window.AVi18n.t('مهام في الطابور'), fmtNum(worker.queue_depth)], [window.AVi18n.t('آخر نبض للعامل'), secondsLabel(worker.last_seen_seconds_ago)],
+        [window.AVi18n.t('خدمة الصيانة'), healthLabel(reconciler.status)], [window.AVi18n.t('آخر نبض للصيانة'), secondsLabel(reconciler.last_seen_seconds_ago)],
       ];
-      if (!transcodingEnabled) facts.splice(5, facts.length - 5, ['نمط الرفع', 'ملفات جاهزة — التحويل معطّل']);
+      if (!transcodingEnabled) facts.splice(5, facts.length - 5, [window.AVi18n.t('نمط الرفع'), window.AVi18n.t('ملفات جاهزة — التحويل معطّل')]);
       $('dashDiagnosticsFacts').innerHTML = facts.map(([name,value]) => `<div class="dash-diagnostics-fact"><dt>${esc(name)}</dt><dd>${esc(value)}</dd></div>`).join('');
       const okay = responses.every(result => result.status === 'fulfilled' && result.value.okay)
         && overall.status === 'healthy' && (!transcodingEnabled || (worker.worker_status === 'ONLINE' && reconciler.status === 'online'));
-      message.textContent = okay ? 'الخدمات تعمل — تم تحديث الفحص الآن.' : 'توجد خدمة متوقفة أو تعذر فحصها. راجع التفاصيل أدناه.';
+      message.textContent = okay ? window.AVi18n.t('الخدمات تعمل — تم تحديث الفحص الآن.') : window.AVi18n.t('توجد خدمة متوقفة أو تعذر فحصها. راجع التفاصيل أدناه.');
       message.classList.toggle('is-error', !okay);
     } catch (_) {
-      message.textContent = 'تعذر تحميل التشخيص. أعد تحديث الفحص.';
+      message.textContent = window.AVi18n.t('تعذر تحميل التشخيص. أعد تحديث الفحص.');
       message.classList.add('is-error');
     } finally {
       diagnosticsLoading = false;
@@ -171,30 +172,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const box = $('dashAttention'); if (!box) return;
     const entries = [];
     const failed = Number(data.videos?.failed || 0);
-    if (failed) entries.push(`<a href="/admin/videos"><span>محتوى تعذرت معالجته</span><strong>${esc(fmtNum(failed))}</strong></a>`);
+    if (failed) entries.push(window.AVi18n.tpl`<a href="/admin/videos"><span>محتوى تعذرت معالجته</span><strong>${esc(fmtNum(failed))}</strong></a>`);
     const queued = Number(data.jobs?.queued_count || 0);
-    if (queued) entries.push(`<a href="/admin/processing"><span>مهام في الانتظار</span><strong>${esc(fmtNum(queued))}</strong></a>`);
-    if (Number(data.storage?.used_percentage || 0) >= 85) entries.push('<a href="/admin/storage"><span>راجع المساحة المتاحة</span><span>التخزين ←</span></a>');
+    if (queued) entries.push(window.AVi18n.tpl`<a href="/admin/processing"><span>مهام في الانتظار</span><strong>${esc(fmtNum(queued))}</strong></a>`);
+    if (Number(data.storage?.used_percentage || 0) >= 85) entries.push(window.AVi18n.t('<a href="/admin/storage"><span>راجع المساحة المتاحة</span><span>التخزين ←</span></a>'));
     const degraded = Object.values(data.services || {}).some(value => {
       const status = String(value && typeof value === 'object' ? value.status : value).toLowerCase();
       return value === false || ['down','error','unhealthy','degraded','offline','stale'].includes(status);
     });
-    if (degraded) entries.push('<p>إحدى الخدمات تحتاج مراجعة؛ حالتها ظاهرة في ملخص الخدمات أعلاه.</p>');
-    box.innerHTML = entries.length ? entries.join('') : '<p>لا توجد تنبيهات في ملخص المكتبة الحالي.</p>';
+    if (degraded) entries.push(window.AVi18n.t('<p>إحدى الخدمات تحتاج مراجعة؛ حالتها ظاهرة في ملخص الخدمات أعلاه.</p>'));
+    box.innerHTML = entries.length ? entries.join('') : window.AVi18n.t('<p>لا توجد تنبيهات في ملخص المكتبة الحالي.</p>');
   }
 
   function renderVideos(data) {
     const box = $('dashLatestVideos'); if (!box) return;
     const items = Array.isArray(data.latest_videos) ? data.latest_videos : [];
     if (!items.length) {
-      box.innerHTML = `<div class="dash-empty">${icon('video')}<span class="dash-empty-title">لا توجد فيديوهات</span><span class="dash-empty-desc">ارفع فيديو ليظهر هنا.</span></div>`;
+      box.innerHTML = window.AVi18n.tpl`<div class="dash-empty">${icon('video')}<span class="dash-empty-title">لا توجد فيديوهات</span><span class="dash-empty-desc">ارفع فيديو ليظهر هنا.</span></div>`;
       return;
     }
     box.innerHTML = items.slice(0, 6).map(video => {
       const id = encodeURIComponent(String(video.id || ''));
       const href = `/admin/videos/detail?v=${id}`;
       const details = [video.quality_summary || video.quality, fmtDuration(video.duration_seconds), video.size_bytes != null ? fmtBytes(video.size_bytes) : '', shortDate(video.created_at)].filter(Boolean);
-      return `<article class="dash-video-row">
+      return window.AVi18n.tpl`<article class="dash-video-row">
         <a class="dash-video-thumb" href="${esc(href)}" data-poster="${esc(id)}" aria-label="فتح ${esc(video.title)}">${icon('video')}</a>
         <div class="dash-video-info"><a class="dash-video-title" dir="auto" href="${esc(href)}" title="${esc(video.title)}"><bdi>${esc(video.title)}</bdi></a><div class="dash-video-meta">${details.map((item,index)=>`${index?'<span aria-hidden="true">·</span>':''}<span>${esc(item)}</span>`).join('')}</div></div>
         <span class="dash-video-state">${esc(statusLabel(video.status))}</span>
@@ -212,13 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const box = $('dashQueue'); if (!box) return;
     const jobs = Array.isArray(data.jobs?.items) ? data.jobs.items : [];
     if (!jobs.length) {
-      box.innerHTML = `<div class="dash-empty">${icon('clock')}<span class="dash-empty-title">لا توجد مهام معالجة</span></div>`;
+      box.innerHTML = window.AVi18n.tpl`<div class="dash-empty">${icon('clock')}<span class="dash-empty-title">لا توجد مهام معالجة</span></div>`;
       return;
     }
     box.innerHTML = jobs.slice(0, 4).map(job => {
       const percent = Math.max(0, Math.min(100, Math.round(Number(job.progress_percent || 0))));
-      const meta = [job.current_rendition, job.ffmpeg_fps ? `${Math.round(job.ffmpeg_fps)} FPS` : '', job.ffmpeg_speed ? `${Number(job.ffmpeg_speed).toFixed(2)}x` : '', job.eta_seconds ? `متبقي ${fmtDuration(job.eta_seconds)}` : ''].filter(Boolean);
-      return `<article class="dash-queue-item"><div class="dash-queue-top"><span class="dash-queue-icon">${icon('processing')}</span><div class="dash-queue-info"><div class="dash-queue-title" dir="auto"><bdi>${esc(job.video_title || 'مهمة معالجة')}</bdi></div><div class="dash-queue-stage"><span>${esc(statusLabel(job.status))}</span><span class="queue-pct" dir="ltr">${percent}%</span></div></div></div><div class="dash-queue-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}" aria-label="تقدم ${esc(job.video_title || 'المهمة')}"><span style="--progress:${percent}%"></span></div>${meta.length ? `<div class="dash-queue-meta">${meta.map(v=>`<span dir="auto">${esc(v)}</span>`).join(' · ')}</div>` : ''}</article>`;
+      const meta = [job.current_rendition, job.ffmpeg_fps ? `${Math.round(job.ffmpeg_fps)} FPS` : '', job.ffmpeg_speed ? `${Number(job.ffmpeg_speed).toFixed(2)}x` : '', job.eta_seconds ? window.AVi18n.tpl`متبقي ${fmtDuration(job.eta_seconds)}` : ''].filter(Boolean);
+      return window.AVi18n.tpl`<article class="dash-queue-item"><div class="dash-queue-top"><span class="dash-queue-icon">${icon('processing')}</span><div class="dash-queue-info"><div class="dash-queue-title" dir="auto"><bdi>${esc(job.video_title || window.AVi18n.t('مهمة معالجة'))}</bdi></div><div class="dash-queue-stage"><span>${esc(statusLabel(job.status))}</span><span class="queue-pct" dir="ltr">${percent}%</span></div></div></div><div class="dash-queue-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}" aria-label="تقدم ${esc(job.video_title || window.AVi18n.t('المهمة'))}"><span style="--progress:${percent}%"></span></div>${meta.length ? `<div class="dash-queue-meta">${meta.map(v=>`<span dir="auto">${esc(v)}</span>`).join(' · ')}</div>` : ''}</article>`;
     }).join('');
   }
 
@@ -226,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const box = $('dashActivity'); if (!box) return;
     const items = Array.isArray(data.activity) ? data.activity : [];
     if (!items.length) {
-      box.innerHTML = `<li class="dash-empty">${icon('clock')}<span class="dash-empty-title">لا يوجد نشاط حديث</span></li>`;
+      box.innerHTML = window.AVi18n.tpl`<li class="dash-empty">${icon('clock')}<span class="dash-empty-title">لا يوجد نشاط حديث</span></li>`;
       return;
     }
     const icons = {upload:'upload',processing:'check',failed:'alert',share:'shares',delete:'trash',edit:'settings',key:'key',subtitle:'video'};
@@ -239,15 +240,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const cutoff = Date.now() - 86400000;
     const fresh = (data.activity || []).filter(item => item.at && new Date(item.at).getTime() >= cutoff).length;
     if (badge) { badge.textContent = fresh > 9 ? '9+' : String(fresh); badge.classList.toggle('hidden', !fresh); }
-    list.innerHTML = items.length ? items.map(item => `<div class="dash-notif-item" role="menuitem">${icon('processing')}<div class="dash-feed-texts"><span class="dash-feed-text">${esc(item.text)}</span><time class="dash-feed-time">${esc(relTime(item.at))}</time></div></div>`).join('') : '<div class="dash-notif-empty">لا إشعارات جديدة</div>';
+    list.innerHTML = items.length ? items.map(item => `<div class="dash-notif-item" role="menuitem">${icon('processing')}<div class="dash-feed-texts"><span class="dash-feed-text">${esc(item.text)}</span><time class="dash-feed-time">${esc(relTime(item.at))}</time></div></div>`).join('') : window.AVi18n.t('<div class="dash-notif-empty">لا إشعارات جديدة</div>');
   }
 
   function renderError() {
-    const message = `<div class="dash-error" role="alert">${icon('alert')}<span>تعذر تحميل البيانات. ستتم المحاولة مجدداً تلقائياً.</span></div>`;
+    const message = window.AVi18n.tpl`<div class="dash-error" role="alert">${icon('alert')}<span>تعذر تحميل البيانات. ستتم المحاولة مجدداً تلقائياً.</span></div>`;
     ['dashLatestVideos','dashQueue','dashActivity','dashAttention'].forEach(id => { if ($(id)) $(id).innerHTML = message; });
     ['kpiVideosVal','kpiStorageVal','kpiProcessingVal','kpiFailedVal'].forEach(id => { setText(id,'—'); $(id)?.classList.remove('is-loading'); });
-    ['kpiVideosSub','kpiStorageSub','kpiProcessingSub','kpiFailedSub'].forEach(id => setText(id,'غير متاح مؤقتاً'));
-    if ($('dashServices')) $('dashServices').innerHTML = '<span class="dash-service-error">تعذر قراءة حالة الخدمات</span>';
+    ['kpiVideosSub','kpiStorageSub','kpiProcessingSub','kpiFailedSub'].forEach(id => setText(id,window.AVi18n.t('غير متاح مؤقتاً')));
+    if ($('dashServices')) $('dashServices').innerHTML = window.AVi18n.t('<span class="dash-service-error">تعذر قراءة حالة الخدمات</span>');
   }
 
   const notifButton = $('dashNotifBtn'), notifMenu = $('dashNotifMenu');
@@ -302,12 +303,12 @@ document.addEventListener('DOMContentLoaded', () => {
           el.classList.remove('metric-updated');
           requestAnimationFrame(() => el.classList.add('metric-updated'));
         });
-        setText('kpiNetworkNote', 'مباشر · شبكة خادم المنصة');
+        setText('kpiNetworkNote', window.AVi18n.t('مباشر · شبكة خادم المنصة'));
         $('kpiNetworkNote')?.classList.remove('is-error');
       }
       previousNetworkSample = { received: Number(sample.received_bytes), sent: Number(sample.sent_bytes), at: now };
     } catch (_) {
-      setText('kpiNetworkNote', 'قياس السرعة غير متاح');
+      setText('kpiNetworkNote', window.AVi18n.t('قياس السرعة غير متاح'));
       $('kpiNetworkNote')?.classList.add('is-error');
     }
   }

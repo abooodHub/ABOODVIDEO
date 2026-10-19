@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 /* Diagnostics for the video already authorized and loaded by the detail page. */
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
@@ -13,12 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRun.addEventListener('click', runInspection);
     root.addEventListener('toggle', () => {if (root.open && !inspected) runInspection();});
     document.addEventListener('abv-video-loaded', event => {
-        videoId = String(event.detail.id); btnRun.disabled = false;
+        videoId = String(window.AVi18n.t(event.detail).id); btnRun.disabled = false;
         if (root.open) runInspection();
     });
     document.addEventListener('abv-video-subtitles-changed', () => {
         revision++; inspected = false; resultsContainer.classList.add('hidden');
-        showError('تغيرت مسارات الترجمة. أعد الفحص لتحديث النتائج.');
+        showError(window.AVi18n.t('تغيرت مسارات الترجمة. أعد الفحص لتحديث النتائج.'));
     });
     probeNetworkCheck.addEventListener('change', () => {revision++; inspected = false; resultsContainer.classList.add('hidden');});
     const viewportBtns = root.querySelectorAll('.viewport-btn');
@@ -53,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await res.json();
             if (!res.ok) {
-                throw new Error(data.detail || data.error || 'حدث خطأ أثناء إجراء الفحص');
+                throw new Error(window.AVi18n.t(data.detail) || data.error || window.AVi18n.t('حدث خطأ أثناء إجراء الفحص'));
             }
 
-            if (currentRevision !== revision) {showError('تغيرت الترجمات أثناء الفحص. أعد الفحص لعرض النتيجة الحالية.'); return;}
-            renderResults(data); inspected = true; btnRun.textContent = 'إعادة الفحص';
+            if (currentRevision !== revision) {showError(window.AVi18n.t('تغيرت الترجمات أثناء الفحص. أعد الفحص لعرض النتيجة الحالية.')); return;}
+            renderResults(data); inspected = true; btnRun.textContent = window.AVi18n.t('إعادة الفحص');
         } catch (err) {
-            showError(err.message || 'فشل الاتصال بخدمة الفحص.');
+            showError(window.AVi18n.t(err.message) || window.AVi18n.t('فشل الاتصال بخدمة الفحص.'));
         } finally {
             if (loadingEl) loadingEl.classList.add('hidden');
             running = false;
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Status banner
         const statusVal = find('stat-overall-status');
         if (statusVal) {
-            statusVal.textContent = data.status === 'READY' ? 'جاهز للبث (READY)' : (data.status === 'WARN' ? 'تحذير (WARNING)' : 'غير جاهز (FAILED)');
+            statusVal.textContent = data.status === 'READY' ? window.AVi18n.t('جاهز للبث (READY)') : (data.status === 'WARN' ? window.AVi18n.t('تحذير (WARNING)') : window.AVi18n.t('غير جاهز (FAILED)'));
             statusVal.className = 'summary-stat-value ' + (data.status === 'READY' ? 'status-pass' : (data.status === 'WARN' ? 'status-warn' : 'status-fail'));
         }
 
@@ -90,13 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const inspectedAtVal = find('stat-inspected-at');
         if (inspectedAtVal && data.inspected_at) {
             const dt = new Date(data.inspected_at);
-            inspectedAtVal.textContent = dt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            inspectedAtVal.textContent = dt.toLocaleTimeString((document.documentElement.lang === 'en' ? 'en-US' : 'ar-SA'), { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
         // Video info
         if (data.video) {
             find('video-info-title').textContent = data.video.title || '—';
-            find('video-info-meta').textContent = `${data.video.resolution} · ${data.video.codec} · ${(Number(data.video.duration_seconds) || 0).toFixed(1)} ثانية`;
+            find('video-info-meta').textContent = window.AVi18n.tpl`${data.video.resolution} · ${data.video.codec} · ${(Number(data.video.duration_seconds) || 0).toFixed(1)} ثانية`;
             const watchLink = find('video-info-watch');
             if (watchLink && data.video.watch_url) {
                 watchLink.href = data.video.watch_url;
@@ -118,14 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
             data.checks.forEach(c => {
                 const tr = document.createElement('tr');
                 const pillClass = c.status === 'PASS' ? 'pill-pass' : (c.status === 'WARN' ? 'pill-warn' : 'pill-fail');
-                const pillLabel = c.status === 'PASS' ? 'ناجح' : (c.status === 'WARN' ? 'تنبيه' : 'فشل');
+                const pillLabel = c.status === 'PASS' ? window.AVi18n.t('ناجح') : (c.status === 'WARN' ? window.AVi18n.t('تنبيه') : window.AVi18n.t('فشل'));
                 const latencyText = c.latency_ms ? `<span class="latency-meter">${c.latency_ms} ms</span>` : '—';
 
                 tr.innerHTML = `
                     <td><strong>${escapeHtml(c.title)}</strong></td>
                     <td><span class="status-pill ${pillClass}">${pillLabel}</span></td>
-                    <td>${escapeHtml(c.message || '')}</td>
-                    <td><small class="text-muted">${escapeHtml(c.detail || '')}</small></td>
+                    <td>${escapeHtml(window.AVi18n.t(c.message) || '')}</td>
+                    <td><small class="text-muted">${escapeHtml(window.AVi18n.t(c.detail) || '')}</small></td>
                     <td>${latencyText}</td>
                 `;
                 tbody.appendChild(tr);
@@ -137,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hlsTbody && data.hls && data.hls.renditions) {
             hlsTbody.innerHTML = '';
             if (data.hls.renditions.length === 0) {
-                hlsTbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center">لا توجد جودات مولّدة.</td></tr>';
+                hlsTbody.innerHTML = window.AVi18n.t('<tr><td colspan="5" class="text-muted text-center">لا توجد جودات مولّدة.</td></tr>');
             } else {
                 data.hls.renditions.forEach(r => {
                     const tr = document.createElement('tr');
@@ -146,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>${escapeHtml(r.resolution)}</td>
                         <td>${r.bandwidth ? Math.round(r.bandwidth / 1000) + ' kbps' : '—'}</td>
                         <td><code>${escapeHtml(r.codec)}</code></td>
-                        <td><span class="status-pill ${r.exists_on_disk ? 'pill-pass' : 'pill-fail'}">${r.exists_on_disk ? 'متوفر' : 'مفقود'}</span></td>
+                        <td><span class="status-pill ${r.exists_on_disk ? 'pill-pass' : 'pill-fail'}">${r.exists_on_disk ? window.AVi18n.t('متوفر') : window.AVi18n.t('مفقود')}</span></td>
                     `;
                     hlsTbody.appendChild(tr);
                 });
@@ -158,16 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (subsTbody && data.subtitles) {
             subsTbody.innerHTML = '';
             if (data.subtitles.length === 0) {
-                subsTbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center">لا توجد مسارات ترجمة.</td></tr>';
+                subsTbody.innerHTML = window.AVi18n.t('<tr><td colspan="5" class="text-muted text-center">لا توجد مسارات ترجمة.</td></tr>');
             } else {
                 data.subtitles.forEach(s => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${escapeHtml(s.label)}</strong> ${s.is_default ? '<span class="badge badge-primary">افتراضي</span>' : ''}</td>
+                        <td><strong>${escapeHtml(s.label)}</strong> ${s.is_default ? window.AVi18n.t('<span class="badge badge-primary">افتراضي</span>') : ''}</td>
                         <td>${escapeHtml(s.language_name || s.language_code)}</td>
                         <td><code>${escapeHtml(s.format.toUpperCase())}</code></td>
                         <td>${s.file_size ? (s.file_size / 1024).toFixed(1) + ' KB' : '—'}</td>
-                        <td><span class="status-pill ${s.exists_on_disk ? 'pill-pass' : 'pill-fail'}">${s.exists_on_disk ? 'جاهز' : 'غير متوفر'}</span></td>
+                        <td><span class="status-pill ${s.exists_on_disk ? 'pill-pass' : 'pill-fail'}">${s.exists_on_disk ? window.AVi18n.t('جاهز') : window.AVi18n.t('غير متوفر')}</span></td>
                     `;
                     subsTbody.appendChild(tr);
                 });

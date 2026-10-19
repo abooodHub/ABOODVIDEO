@@ -33,6 +33,7 @@
         <header class="console-topbar" aria-label="شريط الأدوات">
             <button type="button" id="sidebarToggleBtn" class="console-icon-button console-menu-toggle" aria-label="فتح القائمة" aria-controls="adminSidebar" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
             <div class="console-page-context"><span class="console-eyebrow">ABOODVIDEO / ADMIN</span><strong>{{ page_title|default('إدارة المنصة') }}</strong></div>
+            <label class="language-control"><span>اللغة</span><select data-language-select aria-label="اللغة"><option value="ar">العربية</option><option value="en">English</option></select></label>
             <label class="console-search" for="global-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg><input type="search" id="global-search" placeholder="ابحث في المحتوى…" autocomplete="off" aria-label="البحث في المحتوى"><kbd>Ctrl K</kbd></label>
             <div class="console-status" id="consoleConnectionStatus" data-state="loading"><i aria-hidden="true"></i><span>جارٍ الاتصال</span></div>
             <div class="console-activity" aria-label="نشاط المنصة"><span class="console-activity-chip" id="consoleProcessingIndicator"><span>معالجة</span><b data-processing-badge>0</b></span><span class="console-activity-chip is-hidden" id="consoleUploadIndicator"><span>رفع</span><b>0</b></span></div>
@@ -56,10 +57,10 @@
     {% endif %}
 
     <!-- Shell script -->
-    <script src="/static/js/admin_shell.js?v=nav-sizing-20261018"></script>
-    <script src="/static/js/admin-console.js?v=auto-season-20261018" defer></script>
+    <script src="/static/js/admin_shell.js?v=nav-sizing-20261018-i18n-110"></script>
+    <script src="/static/js/admin-console.js?v=auto-season-20261018-i18n-110" defer></script>
     {% block extra_js %}{% endblock %}
-<script src="/static/js/atelier-motion.js?v=m6-admin-platform-20261016-fix2" defer></script>
+<script src="/static/js/atelier-motion.js?v=m6-admin-platform-20261016-fix2-i18n-110" defer></script>
 </body>
 </html>
 

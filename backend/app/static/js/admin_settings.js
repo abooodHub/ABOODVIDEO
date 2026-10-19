@@ -1,3 +1,4 @@
+window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((out, part, i) => out + part + (i < values.length ? values[i] : ''), '')};
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.hash === '#quality') history.replaceState(null, '', '#encoder');
     // --- CSRF Helper ---
@@ -34,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
         default_skip_intro: 85,
         pause_banner: {
             enabled: false,
-            title: 'تابعنا على قنواتنا الرسمية',
-            text: 'انضم إلينا لمتابعة جميع الحلقات والإصدارات الجديدة بجودة 4K',
+            title: window.AVi18n.t('تابعنا على قنواتنا الرسمية'),
+            text: window.AVi18n.t('انضم إلينا لمتابعة جميع الحلقات والإصدارات الجديدة بجودة 4K'),
             link: ''
         }
     };
@@ -187,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (embedBannerTextInput) embedBannerTextInput.value = initialEmbedState.pause_banner.text;
 
             checkDirty();
-            showFeedback('تم التراجع عن جميع التغييرات غير المحفوظة.', 'info');
+            showFeedback(window.AVi18n.t('تم التراجع عن جميع التغييرات غير المحفوظة.'), 'info');
         });
     }
 
@@ -225,10 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 checkDirty();
-                showFeedback('تم حفظ جميع الإعدادات وإعدادات التضمين بنجاح.', 'success');
+                showFeedback(window.AVi18n.t('تم حفظ جميع الإعدادات وإعدادات التضمين بنجاح.'), 'success');
             } catch (err) {
                 console.error('Failed to save settings:', err);
-                showFeedback('تعذر حفظ الإعدادات. يرجى التحقق من الاتصال بالخادم.', 'danger');
+                showFeedback(window.AVi18n.t('تعذر حفظ الإعدادات. يرجى التحقق من الاتصال بالخادم.'), 'danger');
             } finally {
                 btnSave.disabled = false;
             }
@@ -247,10 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const setStorageUnavailable = () => {
         const status = document.getElementById('storage-status');
         const values = ['storage-used', 'storage-free', 'storage-total'];
-        if (status) status.textContent = 'تعذر جلب الحالة';
+        if (status) status.textContent = window.AVi18n.t('تعذر جلب الحالة');
         values.forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.textContent = 'غير متاح';
+            if (el) el.textContent = window.AVi18n.t('غير متاح');
         });
     };
 
@@ -262,15 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             const d = data.details || data;
             const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-            set('storage-status', data.status === 'healthy' ? 'سليم' : (data.status || 'غير معروف'));
-            set('storage-used', d.used_bytes == null ? 'غير متاح' : fmtBytes(d.used_bytes) + (d.used_percentage == null ? '' : ` (${d.used_percentage}٪)`));
+            set('storage-status', data.status === 'healthy' ? window.AVi18n.t('سليم') : (data.status || window.AVi18n.t('غير معروف')));
+            set('storage-used', d.used_bytes == null ? window.AVi18n.t('غير متاح') : fmtBytes(d.used_bytes) + (d.used_percentage == null ? '' : ` (${d.used_percentage}٪)`));
             set('storage-free', fmtBytes(d.free_bytes));
             set('storage-total', fmtBytes(d.total_bytes));
             const usageProgress = document.getElementById('storage-usage-progress');
             const usagePercent = document.getElementById('storage-usage-percent');
             const pct = d.used_percentage == null ? null : Math.max(0, Math.min(100, Number(d.used_percentage)));
             if (usageProgress && pct != null) usageProgress.value = pct;
-            if (usagePercent) usagePercent.textContent = pct == null ? 'غير متاح' : `${new Intl.NumberFormat('ar').format(pct)}٪`;
+            if (usagePercent) usagePercent.textContent = pct == null ? window.AVi18n.t('غير متاح') : `${new Intl.NumberFormat('ar').format(pct)}٪`;
         })
         .catch(() => setStorageUnavailable());
 
@@ -291,9 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const pb = data.pause_banner || {};
             if (embedBannerEnabledCb) embedBannerEnabledCb.checked = Boolean(pb.enabled);
-            if (embedBannerTitleInput) embedBannerTitleInput.value = pb.title || 'تابعنا على قنواتنا الرسمية';
+            if (embedBannerTitleInput) embedBannerTitleInput.value = pb.title || window.AVi18n.t('تابعنا على قنواتنا الرسمية');
             if (embedBannerLinkInput) embedBannerLinkInput.value = pb.link || '';
-            if (embedBannerTextInput) embedBannerTextInput.value = pb.text || 'انضم إلينا لمتابعة جميع الحلقات والإصدارات الجديدة بجودة 4K';
+            if (embedBannerTextInput) embedBannerTextInput.value = pb.text || window.AVi18n.t('انضم إلينا لمتابعة جميع الحلقات والإصدارات الجديدة بجودة 4K');
 
             initialEmbedState = {
                 allowed_domains_raw: data.allowed_domains_raw || '',
@@ -304,9 +305,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 default_skip_intro: data.default_skip_intro !== undefined ? data.default_skip_intro : 85,
                 pause_banner: {
                     enabled: Boolean(pb.enabled),
-                    title: pb.title || 'تابعنا على قنواتنا الرسمية',
+                    title: pb.title || window.AVi18n.t('تابعنا على قنواتنا الرسمية'),
                     link: pb.link || '',
-                    text: pb.text || 'انضم إلينا لمتابعة جميع الحلقات والإصدارات الجديدة بجودة 4K'
+                    text: pb.text || window.AVi18n.t('انضم إلينا لمتابعة جميع الحلقات والإصدارات الجديدة بجودة 4K')
                 }
             };
             settingsBaselineReady = true;
@@ -330,8 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
             enabled.checked = !!policy.enabled;
             enabled.disabled = !policy.source_ready;
             countries.value = (policy.blocked_countries || []).join(', ');
-            if (!policy.source_ready && status) status.textContent = 'الحجب غير متاح حتى يمرّر Cloudflare رمز الدولة الموثوق عبر Nginx.';
-        } catch (_) { if (status) status.textContent = 'تعذر تحميل سياسة الدول.'; }
+            if (!policy.source_ready && status) status.textContent = window.AVi18n.t('الحجب غير متاح حتى يمرّر Cloudflare رمز الدولة الموثوق عبر Nginx.');
+        } catch (_) { if (status) status.textContent = window.AVi18n.t('تعذر تحميل سياسة الدول.'); }
     }
     async function loadTransferPolicy() {
         try {
@@ -341,14 +342,14 @@ document.addEventListener('DOMContentLoaded', () => {
             setTransferRate('playback', policy.playback_kbps);
             setTransferRate('upload', policy.upload_kbps);
             document.getElementById('transfer-concurrency').value = policy.concurrent_uploads;
-        } catch (_) { document.getElementById('transfer-policy-status').textContent = 'تعذر تحميل حدود النقل.'; }
+        } catch (_) { document.getElementById('transfer-policy-status').textContent = window.AVi18n.t('تعذر تحميل حدود النقل.'); }
     }
     function setTransferRate(kind, rate) {
         const select = document.getElementById(`transfer-${kind}-rate`);
         const input = document.getElementById(`transfer-${kind}-kbps`);
         const known = [...select.options].some(option => option.value !== 'custom' && Number(option.value) === Number(rate));
         if (!known && Number(rate) > 0 && ![...select.options].some(option => option.value === 'custom-value')) {
-            const customOption = document.createElement('option'); customOption.value = 'custom-value'; customOption.textContent = `مخصص (${rate} Kbps)`; select.insertBefore(customOption, select.lastElementChild);
+            const customOption = document.createElement('option'); customOption.value = 'custom-value'; customOption.textContent = window.AVi18n.tpl`مخصص (${rate} Kbps)`; select.insertBefore(customOption, select.lastElementChild);
         }
         select.value = known ? String(rate) : (Number(rate) > 0 ? 'custom-value' : '0');
         input.value = Number(rate) || 0;
@@ -367,13 +368,13 @@ document.addEventListener('DOMContentLoaded', () => {
             upload_kbps: transferRateValue('upload'),
             concurrent_uploads: Number(document.getElementById('transfer-concurrency').value)
         };
-        if (!Number.isInteger(payload.playback_kbps) || !Number.isInteger(payload.upload_kbps) || !Number.isInteger(payload.concurrent_uploads) || payload.playback_kbps < 0 || payload.upload_kbps < 0 || payload.concurrent_uploads < 1 || payload.concurrent_uploads > 8) { status.textContent = 'تحقق من القيم: السرعات صفر أو أكثر والتزامن من 1 إلى 8.'; return; }
+        if (!Number.isInteger(payload.playback_kbps) || !Number.isInteger(payload.upload_kbps) || !Number.isInteger(payload.concurrent_uploads) || payload.playback_kbps < 0 || payload.upload_kbps < 0 || payload.concurrent_uploads < 1 || payload.concurrent_uploads > 8) { status.textContent = window.AVi18n.t('تحقق من القيم: السرعات صفر أو أكثر والتزامن من 1 إلى 8.'); return; }
         button.disabled = true;
         try {
             const response = await fetch('/api/v1/admin/transfer-settings', { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() }, body: JSON.stringify(payload) });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            status.textContent = 'حُفظت الإعدادات؛ حد المشاهدة لكل استجابة، وحد الرفع لواجهة الإدارة الرسمية.';
-        } catch (_) { status.textContent = 'تعذر حفظ حدود النقل.'; }
+            status.textContent = window.AVi18n.t('حُفظت الإعدادات؛ حد المشاهدة لكل استجابة، وحد الرفع لواجهة الإدارة الرسمية.');
+        } catch (_) { status.textContent = window.AVi18n.t('تعذر حفظ حدود النقل.'); }
         finally { button.disabled = false; }
     });
     function transferRateValue(kind) {
@@ -384,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const status = document.getElementById('geo-policy-status');
         const button = document.getElementById('geo-block-save');
         const codes = document.getElementById('geo-block-countries').value.split(',').map(code => code.trim().toUpperCase()).filter(Boolean);
-        if (codes.some(code => !/^[A-Z]{2}$/.test(code) || ['XX', 'T1'].includes(code))) { status.textContent = 'اكتب رموز دول من حرفين مثل US, CA.'; return; }
+        if (codes.some(code => !/^[A-Z]{2}$/.test(code) || ['XX', 'T1'].includes(code))) { status.textContent = window.AVi18n.t('اكتب رموز دول من حرفين مثل US, CA.'); return; }
         button.disabled = true;
         try {
             const response = await fetch('/api/v1/admin/analytics/geo-policy', { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() }, body: JSON.stringify({ enabled: document.getElementById('geo-block-enabled').checked, blocked_countries: [...new Set(codes)] }) });
@@ -392,8 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const policy = await response.json();
             document.getElementById('geo-block-enabled').checked = policy.enabled;
             document.getElementById('geo-block-countries').value = policy.blocked_countries.join(', ');
-            status.textContent = 'حُفظت السياسة وتُطبّق على طلبات المشاهدة.';
-        } catch (_) { status.textContent = 'تعذر حفظ السياسة. تحقق من جلسة الإدارة ورمز الحماية.'; }
+            status.textContent = window.AVi18n.t('حُفظت السياسة وتُطبّق على طلبات المشاهدة.');
+        } catch (_) { status.textContent = window.AVi18n.t('تعذر حفظ السياسة. تحقق من جلسة الإدارة ورمز الحماية.'); }
         finally { button.disabled = false; }
     });
 
@@ -406,19 +407,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const policy = await response.json();
             qualityContainer.innerHTML = policy.available_qualities.map(q => `<label class="quality-option"><input type="checkbox" value="${q}" ${policy.enabled_qualities.includes(q) ? 'checked' : ''} ${q === '2160p' && !policy.available_qualities.includes(q) ? 'disabled' : ''}> ${q}</label>`).join('');
-            if (qualityStatus) qualityStatus.textContent = 'السياسة الحالية مطبقة على قوائم HLS والطلبات المباشرة.';
-        } catch (_) { qualityContainer.textContent = 'تعذر تحميل سياسة المشاهدة.'; }
+            if (qualityStatus) qualityStatus.textContent = window.AVi18n.t('السياسة الحالية مطبقة على قوائم HLS والطلبات المباشرة.');
+        } catch (_) { qualityContainer.textContent = window.AVi18n.t('تعذر تحميل سياسة المشاهدة.'); }
     }
     document.getElementById('playback-quality-save')?.addEventListener('click', async () => {
         const button = document.getElementById('playback-quality-save');
         const selected = [...qualityContainer.querySelectorAll('input:checked')].map(input => input.value);
-        if (!selected.length) { qualityStatus.textContent = 'اختر جودة واحدة على الأقل.'; return; }
+        if (!selected.length) { qualityStatus.textContent = window.AVi18n.t('اختر جودة واحدة على الأقل.'); return; }
         button.disabled = true;
         try {
             const response = await fetch('/api/v1/admin/quality-settings/playback', { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() }, body: JSON.stringify({ enabled_qualities: selected }) });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            qualityStatus.textContent = 'حُفظت السياسة؛ تسري فوراً على طلبات التشغيل الجديدة.';
-        } catch (_) { qualityStatus.textContent = 'تعذر حفظ سياسة الجودة.'; }
+            qualityStatus.textContent = window.AVi18n.t('حُفظت السياسة؛ تسري فوراً على طلبات التشغيل الجديدة.');
+        } catch (_) { qualityStatus.textContent = window.AVi18n.t('تعذر حفظ سياسة الجودة.'); }
         finally { button.disabled = false; }
     });
     loadGeoPolicy();

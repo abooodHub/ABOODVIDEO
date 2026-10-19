@@ -1,24 +1,36 @@
 """Capture real templates with synthetic offline fixtures; never contact a deployment."""
 import json
+import argparse
 import mimetypes
 from pathlib import Path
 import subprocess
 import time
+import sys
 from urllib.parse import urlsplit, unquote
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from playwright.sync_api import sync_playwright
+from shared.i18n import configure_environment, use_language, gettext, WEB_DIR
 
-ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'docs/assets'
 
 
 def main():
+    global OUT
+    args=argparse.ArgumentParser(description=__doc__)
+    args.add_argument('--language',choices=['ar','en'],default='ar')
+    args.add_argument('--output',type=Path,default=OUT)
+    args.add_argument('--width',type=int,default=1600)
+    options=args.parse_args()
+    OUT=options.output
     OUT.mkdir(parents=True, exist_ok=True)
     admin = ROOT / 'backend/app'
     studio = ROOT / 'studio/web'
-    templates = Environment(loader=FileSystemLoader(admin / 'templates'), autoescape=select_autoescape())
-    studio_templates = Environment(loader=FileSystemLoader(studio / 'templates'), autoescape=select_autoescape())
+    templates = configure_environment(Environment(loader=FileSystemLoader(admin / 'templates'), autoescape=select_autoescape()))
+    studio_templates = configure_environment(Environment(loader=FileSystemLoader(studio / 'templates'), autoescape=select_autoescape()))
     now = '2026-10-19T09:00:00Z'
     videos = [dict(id=f'demo-{i}', title=t, status='READY', quality_summary='1080p', duration_seconds=1240+i*55,
                    size_bytes=524288000, created_at=now) for i,t in enumerate(['رحلة الضوء — الحلقة 01', 'آفاق جديدة — الحلقة 02', 'مذكّرات الطبيعة — الحلقة 03', 'المسار الأخير — الحلقة 04'])]
@@ -47,19 +59,26 @@ def main():
             ('platform-upload', 'admin_upload.html', '/admin/upload', 'upload', admin),
             ('studio', 'index_v3.html', '/', 'studio', studio),
         ]:
-            context = browser.new_context(viewport={'width': 1600, 'height': 1000}, device_scale_factor=1)
+            context = browser.new_context(viewport={'width': options.width, 'height': 1000}, device_scale_factor=1)
+            context.add_cookies([{'name':'av_language','value':options.language,'url':'http://127.0.0.1:18899/'}])
             context.route_web_socket('**/*', lambda ws: None)
             page = context.new_page()
             errors = []
             page.on('pageerror', lambda error: errors.append(str(error)))
-            html = (studio_templates if page_id == 'studio' else templates).get_template(template).render(
-                page_id=page_id, page_title='نظرة عامة' if page_id=='dashboard' else 'الرفع والاستيراد',
-                server_transcoding_enabled=True, version='v1.0.0')
+            with use_language(options.language):
+                html = (studio_templates if page_id == 'studio' else templates).get_template(template).render(
+                    page_id=page_id, page_title=gettext('نظرة عامة' if page_id=='dashboard' else 'الرفع والاستيراد'),
+                    server_transcoding_enabled=True, version='v1.1.0')
 
             def route(request_route):
                 path = unquote(urlsplit(request_route.request.url).path)
                 if path == route_path:
                     request_route.fulfill(status=200, content_type='text/html', body=html)
+                elif path.startswith('/static/i18n/'):
+                    target=(WEB_DIR/path.rsplit('/',1)[-1]).resolve()
+                    if target.is_relative_to(WEB_DIR) and target.is_file():
+                        request_route.fulfill(status=200,content_type='application/javascript' if target.suffix=='.js' else 'text/css',body=target.read_bytes())
+                    else:request_route.fulfill(status=404,body='')
                 elif path.startswith('/static/'):
                     target = (base / path.lstrip('/')).resolve()
                     if target.is_relative_to(base) and target.is_file():
@@ -82,17 +101,34 @@ def main():
             if page_id=='upload':
                 page.locator('#file-input-files').set_input_files({'name':'Sample Episode 01.mp4','mimeType':'video/mp4','buffer':b'\0'*(1024*1024)})
                 page.wait_for_selector('#upload-processing-controls:not(.hidden)')
+                assert page.locator('[data-language-select]').is_disabled(), 'Queued files must survive language selection'
             if page_id=='dashboard':page.wait_for_function("document.getElementById('kpiVideosVal').textContent==='24'")
             if page_id=='studio':
                 page.locator('#add-season').click()
                 page.wait_for_selector('.review-row')
             page.wait_for_timeout(900)
-            page.screenshot(path=str(OUT / (name+'.png')))
+            suffix='-en' if options.language=='en' else ''
+            page.screenshot(path=str(OUT / (name+suffix+'.png')))
             assert not errors, (name,errors)
-            evidence.append({'image':name+'.png','actual_template':template,'synthetic_offline_data':True,'page_errors':errors})
+            layout=page.evaluate('''() => {
+              const sidebar=document.querySelector('.sidebar,.console-sidebar');
+              const rect=sidebar?.getBoundingClientRect();
+              return {width:innerWidth, document_width:document.documentElement.scrollWidth,
+                direction:document.documentElement.dir, language:document.documentElement.lang,
+                sidebar:rect?{left:rect.left,right:rect.right,width:rect.width}:null};
+            }''')
+            assert layout['language']==options.language, layout
+            assert layout['direction']==('ltr' if options.language=='en' else 'rtl'),layout
+            assert layout['document_width']<=options.width+1,(name,layout)
+            if options.width>900:
+                edge=layout['sidebar']['left'] if options.language=='en' else options.width-layout['sidebar']['right']
+                assert abs(edge)<2,(name,layout)
+            missing=page.evaluate('Array.from(window.AVi18n.missing)')
+            assert not missing,(name,missing)
+            evidence.append({'image':name+suffix+'.png','language':options.language,'actual_template':template,'synthetic_offline_data':True,'page_errors':errors,'missing_messages':missing,'layout':layout})
             context.close()
         browser.close()
-    (OUT/'screenshots.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
+    (OUT/('screenshots-en.json' if options.language=='en' else 'screenshots.json')).write_text(json.dumps(evidence,indent=2),encoding='utf-8')
     print('Captured three actual interfaces with offline synthetic data.')
 
 
