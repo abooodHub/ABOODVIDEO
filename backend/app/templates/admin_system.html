@@ -1,0 +1,13 @@
+{% extends "admin_base.html" %}
+{% block title %}حالة الخدمات{% endblock %}
+{% block topbar_title %}حالة الخدمات{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_platform.css?v=m6-admin-platform-20261016-fix2">{% endblock %}
+{% block content %}
+<section class="platform-page" aria-labelledby="system-heading">
+  <header class="platform-heading"><div><p class="platform-eyebrow">حالة مباشرة من الاعتمادات</p><h1 id="system-heading">حالة الخدمات</h1><p>الصحة العامة تفحص PostgreSQL وRedis والتخزين. مراقبة العامل والمصالح تتطلب صلاحية النظام.</p></div><button id="system-refresh" class="btn btn-secondary" type="button">تحديث</button></header>
+  <p id="system-status" class="platform-status" role="status" aria-live="polite">جارٍ فحص الخدمات…</p>
+  <div class="platform-cards" id="system-services"></div>
+  <section class="platform-panel"><h2>المعالجة والمصالحة</h2><dl id="system-workers" class="platform-facts"></dl></section>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="/static/js/admin_platform.js?v=github-readiness-20261019" defer></script>{% endblock %}

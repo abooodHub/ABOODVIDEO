@@ -1,0 +1,258 @@
+/* ============================================================
+   ABOODVIDEO Admin UI V3 — Canonical Forms System
+   Inputs, Selects, Checkboxes, Switches, Dropzones.
+   Unified control heights, crisp focus rings, RTL-friendly.
+   ============================================================ */
+
+.form-group {
+    margin-bottom: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.form-label .form-required {
+    color: var(--danger);
+}
+
+.form-hint {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.form-error {
+    font-size: var(--text-xs);
+    color: var(--danger);
+    line-height: 1.4;
+}
+
+/* --- Core Inputs & Selects --- */
+
+.form-control,
+.input-text,
+.input-select,
+.input-textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: var(--text-sm);
+    color: var(--text);
+    background-color: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0 var(--space-3);
+    height: var(--input-h-md);
+    line-height: var(--input-h-md);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:hover,
+.input-text:hover,
+.input-select:hover {
+    border-color: var(--border-strong);
+}
+
+.form-control:focus,
+.input-text:focus,
+.input-select:focus,
+.input-textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+    outline: none;
+}
+
+.form-control:disabled,
+.input-text:disabled,
+.input-select:disabled {
+    opacity: 0.5;
+    background-color: var(--surface-2);
+    cursor: not-allowed;
+}
+
+.input-textarea {
+    height: auto;
+    min-height: 80px;
+    padding: var(--space-3);
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.input-select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+    padding-inline-end: var(--space-3);
+    padding-inline-start: 32px;
+}
+
+/* LTR Inputs for English values / keys / URLs */
+.input-ltr {
+    direction: ltr;
+    text-align: left;
+}
+
+/* --- Custom Checkbox --- */
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.checkbox-box {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.checkbox-box svg {
+    display: none;
+    width: 12px;
+    height: 12px;
+    stroke: #ffffff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ .checkbox-box {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ .checkbox-box svg {
+    display: block;
+}
+
+.checkbox-label input[type="checkbox"]:focus-visible ~ .checkbox-box {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+/* --- Custom Toggle Switch --- */
+
+.switch-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+    user-select: none;
+}
+
+.switch-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-track {
+    width: 40px;
+    height: 22px;
+    background-color: var(--surface-3);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-full);
+    position: relative;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.switch-track::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    inset-inline-start: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.switch-label input[type="checkbox"]:checked ~ .switch-track {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.switch-label input[type="checkbox"]:checked ~ .switch-track::after {
+    transform: translateX(-18px);
+}
+
+.switch-label input[type="checkbox"]:focus-visible ~ .switch-track {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+/* --- Custom File Dropzone --- */
+
+.file-dropzone {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-1);
+    padding: var(--space-8) var(--space-4);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-dropzone:hover,
+.file-dropzone.is-dragover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.file-dropzone-icon {
+    width: 44px;
+    height: 44px;
+    color: var(--primary);
+    margin-bottom: var(--space-3);
+    opacity: 0.85;
+}
+
+.file-dropzone-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: var(--space-1);
+}
+
+.file-dropzone-hint {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+}

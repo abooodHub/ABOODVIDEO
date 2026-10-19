@@ -1,0 +1,180 @@
+{% extends "viewer_base.html" %}
+
+{% block title %}ABOODVIDEO — المكتبة الخاصة{% endblock %}
+
+{% block content %}
+<div class="viewer-container">
+
+    {% if featured %}
+    <!-- Compact Featured Showcase -->
+    <section class="series-hero">
+        <div class="series-hero-content">
+            <div class="series-hero-info">
+                <div class="series-hero-badges">
+                    <span class="viewer-badge viewer-badge-neutral">محتوى مميز</span>
+                    {% if featured.is_4k %}
+                    <span class="viewer-badge viewer-badge-4k">4K UHD</span>
+                    {% elif featured.max_quality %}
+                    <span class="viewer-badge viewer-badge-hd">{{ featured.max_quality }}</span>
+                    {% endif %}
+                    {% if featured.has_ass %}
+                    <span class="viewer-badge viewer-badge-ass">ASS متقدم</span>
+                    {% endif %}
+                </div>
+
+                <h1 class="series-hero-title"><bdi dir="auto">{{ featured.title }}</bdi></h1>
+
+                <div class="series-hero-meta">
+                    {% if featured.series_name %}
+                    <span class="series-hero-meta-item">{{ featured.series_name }}</span>
+                    {% endif %}
+                    {% if featured.season_number %}
+                    <span class="series-hero-meta-item">الموسم {{ featured.season_number }}</span>
+                    {% endif %}
+                    {% if featured.episode_number %}
+                    <span class="series-hero-meta-item">الحلقة {{ featured.episode_number }}</span>
+                    {% endif %}
+                    {% if featured.duration_formatted %}
+                    <span class="series-hero-meta-item ltr-text">{{ featured.duration_formatted }}</span>
+                    {% endif %}
+                </div>
+
+                <p class="series-hero-desc">
+                    {{ featured.description or 'بث محمي فائق الجودة بتقنية HLS المتكيفة مع دعم الترجمة الاحترافية المتقدمة.' }}
+                </p>
+
+                <div class="series-hero-actions">
+                    <a href="{{ prefix or '' }}/watch/{{ featured.share_id }}" class="viewer-btn viewer-btn-primary viewer-btn-lg">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                            <path d="M8 5v14l11-7z"></path>
+                        </svg>
+                        مشاهدة الآن
+                    </a>
+                    <a href="{{ prefix or '' }}/title/{{ featured.id }}" class="viewer-btn viewer-btn-secondary viewer-btn-lg">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        التفاصيل
+                    </a>
+                </div>
+            </div>
+
+            <!-- Compact Native 2:3 Poster Frame -->
+            <div class="series-hero-poster">
+                {% if featured.poster_url %}<img src="{{ featured.poster_url }}" alt="{{ featured.title }}" loading="eager" decoding="async">{% else %}<div class="viewer-card-placeholder" aria-hidden="true"><svg class="viewer-card-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 5 10 7-10 7z"/></svg></div>{% endif %}
+            </div>
+        </div>
+    </section>
+    {% else %}
+    <!-- Platform Summary Card -->
+    <div class="platform-summary-card">
+        <div>
+            <h1 class="platform-summary-title">المكتبة الخاصة — ABOODVIDEO</h1>
+            <p class="platform-summary-desc">استعرض المحتوى المتاح وشاهد الحلقات من مكان واحد.</p>
+        </div>
+        <div class="platform-summary-stats">
+            <span class="viewer-badge viewer-badge-neutral">{{ total_count or '0' }} وسائط متوفرة</span>
+            <a href="{{ prefix or '' }}/browse" class="viewer-btn viewer-btn-primary">
+                تصفح المكتبة
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Macro: Media Row -->
+    {% macro render_media_row(row_title, items, row_id, view_all_url=None) %}
+    {% if items and items|length > 0 %}
+    <section class="viewer-row-section">
+        <div class="viewer-row-header">
+            <div class="viewer-row-title-wrap">
+                <h2 class="viewer-row-title">{{ row_title }}</h2>
+                <span class="viewer-row-count">{{ items|length }}</span>
+            </div>
+            {% if view_all_url %}
+            <a href="{{ view_all_url }}" class="viewer-row-link">
+                عرض الكل
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="viewer-row-container" data-row-id="{{ row_id }}">
+            <button type="button" class="viewer-row-arrow viewer-row-arrow-prev" aria-label="السابق" data-dir="prev">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+
+            <div class="viewer-row-track" id="row-track-{{ row_id }}">
+                {% for item in items %}
+                <div class="viewer-row-item">
+                    <article class="viewer-card">
+                        <div class="viewer-card-media">
+                            {% if item.has_poster and item.poster_url %}
+                            <img src="{{ item.poster_url }}" alt="{{ item.title }}" class="viewer-card-img" loading="lazy" decoding="async">
+                            {% else %}
+                            <div class="viewer-card-placeholder">
+                                <svg class="viewer-card-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                                <span class="viewer-card-placeholder-title"><bdi dir="auto">{{ item.title }}</bdi></span>
+                            </div>
+                            {% endif %}
+                            <div class="viewer-card-overlay"></div>
+
+                            <div class="viewer-card-actions">
+                                <a href="{{ prefix or '' }}/watch/{{ item.share_id }}" class="viewer-card-action-btn viewer-card-action-play">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                                    تشغيل
+                                </a>
+                                <a href="{{ prefix or '' }}/title/{{ item.id }}" class="viewer-card-action-btn viewer-card-action-details">
+                                    تفاصيل
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="viewer-card-info">
+                            <h3 class="viewer-card-title" title="{{ item.title }}"><bdi dir="auto">{{ item.title }}</bdi></h3>
+                            <div class="viewer-card-meta">
+                                {% if item.is_4k %}
+                                <span class="viewer-badge-mini viewer-badge-mini-4k">4K</span>
+                                {% elif item.max_quality %}
+                                <span class="viewer-badge-mini viewer-badge-mini-hd">{{ item.max_quality }}</span>
+                                {% endif %}
+                                {% if item.has_ass %}
+                                <span class="viewer-badge-mini viewer-badge-mini-ass">ASS</span>
+                                {% endif %}
+                                {% if item.duration_formatted %}
+                                <span class="viewer-card-meta-dot">•</span>
+                                <span class="ltr-text">{{ item.duration_formatted }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" class="viewer-row-arrow viewer-row-arrow-next" aria-label="التالي" data-dir="next">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+        </div>
+    </section>
+    {% endif %}
+    {% endmacro %}
+
+    <!-- 1. أحدث الإضافات -->
+    {{ render_media_row("أحدث الإضافات", latest_videos, "latest", (prefix or '') + "/browse?sort=latest") }}
+
+    <!-- 2. المحتوى الفائق 4K -->
+    {{ render_media_row("محتوى 4K Ultra HD", uhd_videos, "uhd", (prefix or '') + "/browse?quality=4K") }}
+
+    <!-- 3. المسلسلات (إذا وجدت) -->
+    {% if series_videos and series_videos|length > 0 %}
+    {{ render_media_row("المسلسلات المتاحة", series_videos, "series", (prefix or '') + "/browse?type=series") }}
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,508 @@
+{% extends 'admin_base.html' %}
+{% block title %}مكتبة المحتوى | ABOODVIDEO{% endblock %}
+{% block topbar_title %}مكتبة المحتوى{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/admin_videos.css?v=m6-admin-platform-20261016-fix2">
+<link rel="stylesheet" href="/static/css/admin_series.css?v=m6-admin-platform-20261016-fix2">
+{% endblock %}
+
+{% block content %}
+        <div class="content-hub-header">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">مكتبة المحتوى</h1>
+                    <p class="page-desc">مركز موحد وشامل لإدارة الفيديوهات، المسلسلات، والمجلدات</p>
+                </div>
+                <div class="page-actions">
+                    <button type="button" id="btn-toggle-folders" class="btn btn-ghost" aria-expanded="false">شجرة التنظيم</button>
+                </div>
+            </div>
+
+            <!-- Hub Segmented Tab Switcher -->
+            <div class="content-hub-tabs" role="tablist" aria-label="أقسام مكتبة المحتوى">
+                <button type="button" class="hub-tab-btn is-active" data-hub-tab="videos" role="tab" aria-selected="true" aria-controls="pane-videos">
+                    <svg class="hub-tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect width="14" height="14" x="1" y="5" rx="2"/></svg>
+                    <span>الفيديوهات والحلقات</span>
+                    <span class="hub-tab-badge" id="hubVideosCount">0</span>
+                </button>
+
+                <button type="button" class="hub-tab-btn" data-hub-tab="series" role="tab" aria-selected="false" aria-controls="pane-series">
+                    <svg class="hub-tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    <span>المسلسلات والمواسم</span>
+                    <span class="hub-tab-badge" id="hubSeriesCount">0</span>
+                </button>
+
+                <button type="button" class="hub-tab-btn" data-hub-tab="drive" role="tab" aria-selected="false" aria-controls="pane-drive">
+                    <svg class="hub-tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    <span>مستكشف المجلدات (Drive)</span>
+                </button>
+
+                <button type="button" class="hub-tab-btn" data-hub-tab="trash" role="tab" aria-selected="false" aria-controls="pane-trash">
+                    <svg class="hub-tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    <span>سلة المحذوفات</span>
+                    <span class="hub-tab-badge hub-tab-badge-danger hidden" id="hubTrashCount">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. Videos & Episodes Pane -->
+        <div id="pane-videos" class="hub-pane is-active" role="tabpanel" aria-labelledby="tab-videos">
+            <div class="library-layout">
+            <aside id="folders-panel" class="folders-panel" aria-label="شجرة التنظيم">
+                <div class="folders-header">
+                    <h2 class="folders-title">التنظيم</h2>
+                    <button type="button" id="btn-close-folders" class="icon-btn icon-btn-sm" aria-label="إغلاق اللوحة">✕</button>
+                </div>
+                <div class="folders-search">
+                    <input type="search" id="tree-search" class="search-input" placeholder="تصفية التنظيم..." aria-label="تصفية شجرة التنظيم">
+                </div>
+                <div id="folders-tree" class="folders-tree">
+                    <div class="empty-hint-sm">جاري التحميل...</div>
+                </div>
+            </aside>
+
+            <section class="library-main">
+                <div class="library-toolbar-container">
+                    <!-- Tier 1: Primary Toolbar -->
+                    <div class="filter-bar" role="search">
+                        <div class="search-input-wrap">
+                            <span class="search-icon" aria-hidden="true">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            </span>
+                            <input type="search" id="search-input" class="search-input" placeholder="ابحث في مكتبة الفيديوهات بالعنوان أو الكود…" aria-label="بحث بالعنوان">
+                        </div>
+
+                        <!-- Quick status pills -->
+                        <div class="status-quick-pills" role="radiogroup" aria-label="تصفية سريعة بالحالة">
+                            <button type="button" class="quick-pill is-active" data-status="">الكل</button>
+                            <button type="button" class="quick-pill" data-status="READY">جاهز</button>
+                            <button type="button" class="quick-pill" data-status="PROCESSING">قيد المعالجة</button>
+                            <button type="button" class="quick-pill" data-status="FAILED">فشل</button>
+                        </div>
+
+                        <!-- Toggle Advanced Drawer -->
+                        <button type="button" id="btn-toggle-advanced" class="btn btn-secondary btn-advanced-toggle" aria-expanded="false">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            <span>الفلاتر المتقدمة</span>
+                            <span class="filter-count-badge hidden" id="activeFiltersBadge">0</span>
+                        </button>
+
+                        <div class="view-switch" role="group" aria-label="طريقة العرض">
+                            <button id="view-table" type="button" class="btn is-selected" aria-pressed="true" title="عرض جدول">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                <span>جدول</span>
+                            </button>
+                            <button id="view-cards" type="button" class="btn" aria-pressed="false" title="عرض بطاقات">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                                <span>بطاقات</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tier 2: Collapsible Advanced Filter Drawer -->
+                    <div id="advanced-filters-drawer" class="advanced-filters-drawer hidden" aria-label="خيارات التصفية المتقدمة">
+                        <div class="advanced-grid">
+                            <div class="filter-field">
+                                <label for="status-filter">حالة المعالجة</label>
+                                <select id="status-filter" class="search-input" aria-label="فلترة الحالة">
+                                    <option value="">كل الحالات</option>
+                                    <option>READY</option><option>PROCESSING</option><option>FAILED</option>
+                                    <option>CANCELLED</option><option>UPLOADING</option><option>UPLOADED</option>
+                                    <option>QUEUED</option><option>VERIFYING</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label for="visibility-filter">سياسة الظهور</label>
+                                <select id="visibility-filter" class="search-input" aria-label="فلترة الظهور">
+                                    <option value="">كل سياسات الظهور</option>
+                                    <option value="PRIVATE">خاص</option>
+                                    <option value="UNLISTED">غير مدرج</option>
+                                    <option value="PUBLIC">عام</option>
+                                    <option value="PASSWORD_PROTECTED">محمي بكلمة سر</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label for="quality-filter">الجودة</label>
+                                <select id="quality-filter" class="search-input" aria-label="فلترة الجودة">
+                                    <option value="">كل الجودات</option>
+                                    <option>2160p</option><option>1440p</option><option>1080p</option>
+                                    <option>720p</option><option>480p</option><option>360p</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label for="subtitle-filter">الترجمة</label>
+                                <select id="subtitle-filter" class="search-input" aria-label="فلترة الترجمة">
+                                    <option value="">الترجمة: الكل</option>
+                                    <option value="with">له ترجمة</option>
+                                    <option value="without">بدون ترجمة</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label for="category-filter">المجلد / القسم</label>
+                                <input id="category-filter" class="search-input" placeholder="اسم المجلد..." aria-label="فلترة المجلد">
+                            </div>
+                            <div class="filter-field">
+                                <label for="series-filter">المسلسل</label>
+                                <input id="series-filter" class="search-input" placeholder="اسم المسلسل..." aria-label="فلترة المسلسل">
+                            </div>
+                            <div class="filter-field">
+                                <label for="season-filter">الموسم</label>
+                                <input id="season-filter" type="number" min="1" class="search-input" placeholder="رقم الموسم..." aria-label="فلترة الموسم">
+                            </div>
+                            <div class="filter-field">
+                                <label for="sort-select">الفرز والترتيب</label>
+                                <select id="sort-select" class="search-input" aria-label="الفرز">
+                                    <option value="date:desc">الأحدث أولاً</option>
+                                    <option value="date:asc">الأقدم أولاً</option>
+                                    <option value="title:asc">الاسم أ–ي</option>
+                                    <option value="title:desc">الاسم ي–أ</option>
+                                    <option value="status:asc">الحالة</option>
+                                    <option value="size:desc">الحجم الأكبر</option>
+                                    <option value="views:desc">الأكثر مشاهدة</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label for="group-select">التجميع</label>
+                                <select id="group-select" class="search-input" aria-label="التجميع">
+                                    <option value="">بدون تجميع</option>
+                                    <option value="category">حسب المجلد</option>
+                                    <option value="series_name">حسب المسلسل</option>
+                                </select>
+                            </div>
+                            <div class="filter-field filter-reset-wrap">
+                                <button type="button" id="btn-clear-filters" class="btn btn-ghost" style="width: 100%;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                                    <span>إعادة ضبط</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="library-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+
+                <div id="bulk-bar" class="bulk-bar hidden">
+                    <strong id="selected-count">0 فيديو محدد</strong>
+                    <select id="bulk-action" class="search-input" aria-label="إجراء جماعي">
+                        <option value="">اختر إجراء</option>
+                        <option value="visibility">تغيير الظهور</option>
+                        <option value="category">تعيين مجلد</option>
+                        <option value="series">تعيين مسلسل/موسم</option>
+                        <option value="reprocess">إعادة معالجة</option>
+                        <option value="delete">حذف</option>
+                    </select>
+                    <input id="bulk-value" class="search-input hidden" placeholder="القيمة">
+                    <input id="bulk-season" type="number" min="1" class="search-input hidden" placeholder="الموسم">
+                    <select id="bulk-visibility" class="search-input hidden">
+                        <option value="PRIVATE">خاص</option>
+                        <option value="UNLISTED">غير مدرج</option>
+                        <option value="PUBLIC">عام</option>
+                    </select>
+                    <button id="bulk-apply" type="button" class="btn btn-primary">تطبيق على المحدد</button>
+                </div>
+
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><input id="select-all-videos" type="checkbox" aria-label="تحديد كل الفيديوهات المعروضة"></th>
+                                <th>الفيديو</th>
+                                <th>الحالة</th>
+                                <th>الموقع داخل المكتبة</th>
+                                <th>الجودة</th>
+                                <th>الترجمة</th>
+                                <th>الحجم</th>
+                                <th>المشاهدات</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="videos-tbody">
+                            <tr><td colspan="10" class="table-empty-cell">جاري تحميل الفيديوهات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="videos-cards" class="videos-cards hidden"></div>
+                <div class="pagination">
+                    <button id="prev-page" type="button" class="btn">السابق</button>
+                    <span id="page-info">1</span>
+                    <button id="next-page" type="button" class="btn">التالي</button>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- 2. Series & Seasons Pane -->
+        <div id="pane-series" class="hub-pane hidden" role="tabpanel" aria-labelledby="tab-series">
+            <div class="series-hub-toolbar">
+                <div class="search-input-wrap">
+                    <span class="search-icon" aria-hidden="true">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
+                    <input type="search" id="series-search-input" class="search-input" placeholder="ابحث في المسلسلات بالعنوان…" aria-label="بحث في المسلسلات">
+                </div>
+                <div class="series-toolbar-actions">
+                    <span class="series-count-indicator" id="seriesCountIndicator">0 مسلسل</span>
+                </div>
+            </div>
+
+            <div id="series-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+            <div id="series-loading" class="empty-state">جاري تحميل المسلسلات...</div>
+            <div id="series-grid" class="series-grid hidden"></div>
+        </div>
+
+        <!-- 3. Folders / Drive Explorer Pane -->
+        <div id="pane-drive" class="hub-pane hidden" role="tabpanel" aria-labelledby="tab-drive">
+            <div class="drive-hub-toolbar">
+                <div class="search-input-wrap">
+                    <span class="search-icon" aria-hidden="true">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
+                    <input type="search" id="folders-search-input" class="search-input" placeholder="ابحث في المجلدات…" aria-label="بحث في المجلدات">
+                </div>
+                <div class="drive-toolbar-actions">
+                    <span class="drive-count-indicator" id="foldersCountIndicator">0 مجلد</span>
+                    <button type="button" id="btn-create-folder" class="btn btn-secondary">+ مجلد جديد</button>
+                    <a href="/preview" class="btn btn-ghost" title="عرض مستكشف الملفات بنظام الشجرة الكامل">مستكشف الملفات الكامل ↗</a>
+                </div>
+            </div>
+
+            <div id="folders-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+            <div id="folders-loading" class="empty-state">جاري تحميل المجلدات...</div>
+            <div id="folders-grid" class="folders-grid hidden"></div>
+        </div>
+
+        <!-- 4. Trash & Recovery Pane -->
+        <div id="pane-trash" class="hub-pane hidden" role="tabpanel" aria-labelledby="tab-trash">
+            <div class="trash-hub-toolbar">
+                <div class="trash-toolbar-info">
+                    <span class="trash-count-indicator" id="trashCountIndicator">0 عنصر في سلة المحذوفات</span>
+                </div>
+                <div class="trash-toolbar-actions">
+                    <button type="button" id="btn-empty-trash" class="btn btn-danger btn-sm hidden">إفراغ السلة نهائياً</button>
+                </div>
+            </div>
+
+            <div id="trash-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+            <div id="trash-loading" class="empty-state">جاري فحص سلة المحذوفات...</div>
+            <div id="trash-content" class="trash-content-wrap hidden">
+                <div class="glass-table-wrapper">
+                    <table class="videos-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 45%;">العنصر المحذوف</th>
+                                <th style="width: 15%;">النوع</th>
+                                <th style="width: 12%;">الحجم</th>
+                                <th style="width: 13%;">تاريخ الحذف</th>
+                                <th style="width: 15%; text-align: left;">إجراءات الاستعادة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trash-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="trash-empty" class="empty-state hidden">
+                <div class="empty-state-title">سلة المحذوفات نظيفة تماماً ✓</div>
+                <p class="empty-state-desc">لا توجد أي فيديوهات أو مجلدات محذوفة حالياً.</p>
+            </div>
+        </div>
+
+    <!-- Delete Modal -->
+    <div id="delete-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title" aria-describedby="delete-modal-message">
+        <div class="modal-card">
+            <h3 id="delete-modal-title" class="modal-title">حذف الفيديو</h3>
+            <p id="delete-modal-message" class="modal-message"></p>
+            <div class="modal-actions">
+                <button type="button" id="btn-cancel-delete" class="btn">احتفظ بالرفع</button>
+                <button type="button" id="btn-confirm-delete" class="btn btn-danger">حذف الفيديو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <h3 class="modal-title">تعديل إعدادات الفيديو</h3>
+            <div class="field-row">
+                <label class="form-label" for="modal-title">عنوان الفيديو</label>
+                <input type="text" id="modal-title" class="search-input input-full">
+            </div>
+            <div class="field-row"><label class="form-label" for="modal-category">المجلد (تصنيف)</label><input id="modal-category" class="search-input input-full" maxlength="100"></div>
+            <div class="field-row"><label class="form-label" for="modal-series">المسلسل</label><input id="modal-series" class="search-input input-full" maxlength="150"></div>
+            <div class="edit-number-row">
+                <div class="field-row"><label class="form-label" for="modal-season">الموسم</label><input id="modal-season" type="number" min="1" max="9999" class="search-input input-full"></div>
+                <div class="field-row"><label class="form-label" for="modal-episode">الحلقة</label><input id="modal-episode" type="number" min="1" max="99999" class="search-input input-full"></div>
+            </div>
+            <div class="field-row">
+                <label class="form-label" for="modal-visibility">سياسة الظهور</label>
+                <select id="modal-visibility" class="search-input input-full">
+                    <option value="PRIVATE">خاص — المالك والإدارة فقط</option>
+                    <option value="UNLISTED">غير مدرج — متاح لمن يملك الرابط</option>
+                    <option value="PUBLIC">عام — متاح للجميع</option>
+                    <option value="PASSWORD_PROTECTED">محمي بكلمة سر</option>
+                </select>
+            </div>
+            <div id="modal-password-box" class="field-row hidden">
+                <label class="form-label" for="modal-password">رمز مرور المشاهدين</label>
+                <input type="password" id="modal-password" class="search-input input-full" placeholder="اتركه فارغاً للإبقاء على الرمز الحالي">
+            </div>
+            <div id="modal-unlisted-box" class="field-row hidden">
+                <label class="form-label" for="modal-share-link">رابط المشاهدة المباشر</label>
+                <div class="share-row">
+                    <input type="text" id="modal-share-link" readonly class="search-input input-full">
+                    <button type="button" id="btn-copy-share" class="btn">نسخ</button>
+                    <button type="button" id="btn-rotate-share" class="btn">تجديد</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="btn-cancel-edit" class="btn">إلغاء</button>
+                <button type="button" id="btn-save-edit" class="btn btn-primary">حفظ التغييرات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick details modal -->
+    <div id="details-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="details-title">
+        <div class="modal-card modal-wide">
+            <h3 id="details-title" class="modal-title">تفاصيل الفيديو</h3>
+            <div id="details-content" class="details-content"></div>
+            <div class="modal-actions">
+                <button id="close-details" type="button" class="btn">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm modal -->
+    <div id="confirm-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="modal-card">
+            <h3 id="confirm-title" class="modal-title">تأكيد الإجراء</h3>
+            <p id="confirm-message" class="modal-message"></p>
+            <div class="modal-actions">
+                <button id="confirm-no" type="button" class="btn">إلغاء</button>
+                <button id="confirm-yes" type="button" class="btn btn-danger">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtitles Modal -->
+    <div id="subtitles-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="subs-modal-title">
+        <div class="modal-card modal-wide">
+            <h3 class="modal-title" id="subs-modal-title">إدارة ترجمات الفيديو</h3>
+            <div id="subs-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+
+            <div class="subs-section">
+                <h4 class="subs-heading">مسارات الترجمة الحالية</h4>
+                <div id="subs-list" class="subs-list">
+                    <div class="subs-loading">جاري التحميل...</div>
+                </div>
+            </div>
+
+            <hr class="modal-divider">
+
+            <form id="subs-upload-form">
+                <h4 class="subs-heading subs-heading-form">إضافة مسار ترجمة جديد</h4>
+                <p class="form-hint">SRT تُحوّل إلى WebVTT مع حفظ الأصل · VTT تُشغّل في المتصفح · ASS/SSA تُحفظ أصلية وتُشغّل عبر libass</p>
+                <div class="subtitle-grid">
+                    <div>
+                        <label class="form-label" for="sub-lang-code">رمز اللغة (مثال: ar)</label>
+                        <input type="text" id="sub-lang-code" class="search-input input-full" placeholder="ar" required>
+                    </div>
+                    <div>
+                        <label class="form-label" for="sub-lang-name">اسم اللغة (مثال: العربية)</label>
+                        <input type="text" id="sub-lang-name" class="search-input input-full" placeholder="العربية" required>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <label class="form-label" for="sub-label">تسمية المسار في المشغل</label>
+                    <input type="text" id="sub-label" class="search-input input-full" placeholder="العربية (كاملة)" required>
+                </div>
+                <div class="field-row">
+                    <label class="form-label" for="sub-file">ملف الترجمة (.srt, .vtt, .ass, .ssa)</label>
+                    <input type="file" id="sub-file" accept=".srt,.vtt,.ass,.ssa" class="search-input input-full" required>
+                </div>
+                <div class="checkbox-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="sub-is-default">
+                        <span>افتراضية (Default)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="sub-is-forced">
+                        <span>إجبارية (Forced)</span>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="btn-close-subtitles" class="btn">إغلاق</button>
+                    <button type="submit" id="btn-upload-sub" class="btn btn-primary">رفع وحفظ الترجمة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Embed Modal -->
+    <div id="embed-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="embed-modal-title">
+        <div class="modal-card modal-wide">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <h3 id="embed-modal-title" class="modal-title" style="margin: 0;">كود التضمين للمواقع الخارجية (Embed iframe)</h3>
+                    <p id="embed-modal-subtitle" class="form-hint" style="margin: 4px 0 0 0; color: #94a3b8;"></p>
+                </div>
+                <span class="badge badge-info" style="background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem;">Hotlink Protected 🛡️</span>
+            </div>
+
+            <!-- Customization Controls Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; padding: 14px; background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;">
+                <div>
+                    <label class="form-label" style="margin-bottom: 6px;">لون شريط المشغل (Theme Accent):</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="text" id="modal-embed-color" value="00d2be" class="search-input" style="width: 85px; padding: 5px 8px; font-size: 0.85rem; direction: ltr; font-family: monospace;">
+                        <button type="button" class="btn-color-dot" data-col="00d2be" style="width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.6); background: #00d2be; cursor: pointer;" title="تركواز"></button>
+                        <button type="button" class="btn-color-dot" data-col="2563eb" style="width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.6); background: #2563eb; cursor: pointer;" title="أزرق"></button>
+                        <button type="button" class="btn-color-dot" data-col="f59e0b" style="width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.6); background: #f59e0b; cursor: pointer;" title="ذهبي"></button>
+                        <button type="button" class="btn-color-dot" data-col="ef4444" style="width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.6); background: #ef4444; cursor: pointer;" title="أحمر"></button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label" style="margin-bottom: 6px;">العلامة المائية (Watermark):</label>
+                    <input type="text" id="modal-embed-watermark" value="ABOODVIDEO" class="search-input input-full" style="padding: 5px 8px; font-size: 0.85rem;" maxlength="40">
+                </div>
+
+                <div>
+                    <label class="form-label" style="margin-bottom: 6px;">تخطي المقدمة (ثوانٍ):</label>
+                    <input type="number" id="modal-embed-skip" value="85" min="0" max="300" class="search-input" style="width: 95px; padding: 5px 8px; font-size: 0.85rem;">
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; justify-content: center;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; color: #e2e8f0;">
+                        <input type="checkbox" id="modal-embed-autoplay">
+                        <span>تشغيل تلقائي (Autoplay)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; color: #e2e8f0;">
+                        <input type="checkbox" id="modal-embed-banner">
+                        <span>تفعيل بانر إعلاني عند الإيقاف</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Iframe Snippet Area -->
+            <div class="field-row">
+                <label class="form-label">كود الـ iframe الجاهز للنسخ في ووردبريس أو المواقع الخارجية:</label>
+                <textarea id="modal-embed-code" readonly class="search-input input-full dir-ltr" rows="3" style="font-family: monospace; font-size: 0.85rem; resize: none; background: #090e17; color: #38bdf8; border-color: #334155;"></textarea>
+            </div>
+
+            <div class="modal-actions" style="justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" id="btn-copy-modal-embed" class="btn btn-primary" style="padding: 8px 18px; font-weight: 600;">نسخ كود الـ iframe</button>
+                    <a id="btn-preview-modal-embed" href="#" target="_blank" rel="noopener" class="btn btn-ghost" style="padding: 8px 14px;">معاينة المشغل ↗</a>
+                    <span id="modal-embed-feedback" style="font-size: 0.85rem; color: #10b981; font-weight: 600;"></span>
+                </div>
+                <button type="button" id="btn-close-modal-embed" class="btn">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions menu template -->
+    <div id="actions-menu" class="actions-menu" role="menu" aria-hidden="true"></div>
+{% endblock %}
+
+{% block extra_js %}<script src="/static/js/admin_videos.js?v=github-readiness-20261019"></script>{% endblock %}

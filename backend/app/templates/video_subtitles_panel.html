@@ -1,0 +1,17 @@
+<div class="video-tool-heading"><p>أضف مسارات الترجمة لهذا الفيديو أو عدّل تسميتها وخيارات التشغيل.</p><div><button type="button" class="btn btn-secondary" id="vs-refresh" disabled>تحديث</button> <button type="button" class="btn btn-primary" id="vs-add" disabled>إضافة ترجمة</button></div></div>
+<p class="text-muted">الصيغ المدعومة: VTT وSRT وASS وSSA. تبقى ترجمة ASS/SSA بتنسيقها الأصلي.</p>
+<p id="vs-feedback" role="status" aria-live="polite"></p>
+<div id="detail-subs-list" class="subs-list" aria-busy="true"></div>
+<dialog id="vs-editor" class="video-tool-dialog" aria-labelledby="vs-editor-title">
+  <form id="vs-form">
+    <header><h2 id="vs-editor-title">إضافة ترجمة</h2><button type="button" class="btn btn-ghost" data-close-editor aria-label="إغلاق">×</button></header>
+    <p id="vs-editor-feedback" role="alert"></p>
+    <label for="vs-label">تسمية المسار</label><input id="vs-label" required maxlength="100">
+    <div class="video-tool-fields"><div><label for="vs-language-code">رمز اللغة</label><input id="vs-language-code" required maxlength="16" placeholder="ar" dir="ltr"></div><div><label for="vs-language-name">اسم اللغة</label><input id="vs-language-name" required maxlength="64" placeholder="العربية"></div></div>
+    <div id="vs-file-field"><label for="vs-file">ملف الترجمة</label><input id="vs-file" type="file" accept=".vtt,.srt,.ass,.ssa"></div>
+    <label class="video-tool-check"><input id="vs-default" type="checkbox"> ترجمة افتراضية</label>
+    <label class="video-tool-check"><input id="vs-forced" type="checkbox"> ترجمة إجبارية</label>
+    <footer><button id="vs-save" type="submit" class="btn btn-primary">حفظ</button><button type="button" class="btn btn-secondary" data-close-editor>إلغاء</button></footer>
+  </form>
+</dialog>
+<dialog id="vs-delete-dialog" class="video-tool-dialog" aria-labelledby="vs-delete-title"><h2 id="vs-delete-title">حذف مسار الترجمة؟</h2><p id="vs-delete-label"></p><p>سيُحذف هذا المسار من الفيديو الحالي. لا يمكن التراجع عن الحذف.</p><p id="vs-delete-feedback" role="alert"></p><footer><button type="button" id="vs-delete-confirm" class="btn btn-danger">حذف المسار</button><button type="button" id="vs-delete-cancel" class="btn btn-secondary">إلغاء</button></footer></dialog>

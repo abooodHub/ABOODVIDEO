@@ -1,0 +1,86 @@
+/* ============================================================
+   ABOODVIDEO Admin UI V3 — Canonical Tables System
+   Structured row density, sticky headers, subtle dividers,
+   RTL/LTR mixed cell alignments, horizontal scroll safety.
+   ============================================================ */
+
+.admin-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: start;
+    font-size: var(--text-sm);
+    line-height: 1.4;
+}
+
+/* --- Table Headers --- */
+.admin-table thead th {
+    background-color: var(--surface-2);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: var(--text-xs);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+    text-align: start;
+    user-select: none;
+}
+
+.admin-table thead th.cell-center { text-align: center; }
+.admin-table thead th.cell-end { text-align: end; }
+
+/* --- Table Rows & Cells --- */
+.admin-table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.admin-table tbody tr.is-selected {
+    background-color: var(--primary-light);
+}
+
+.admin-table tbody td {
+    padding: var(--space-3) var(--space-4);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Alignment and Typography Helpers */
+.admin-table .cell-center { text-align: center; }
+.admin-table .cell-end { text-align: end; }
+.admin-table .cell-mono { font-family: var(--font-mono); }
+.admin-table .cell-ltr { direction: ltr; unicode-bidi: isolate; text-align: left; }
+.admin-table .cell-muted { color: var(--text-muted); font-size: var(--text-xs); }
+.admin-table .cell-nowrap { white-space: nowrap; }
+
+/* Empty Table Cell */
+.table-empty-cell {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}

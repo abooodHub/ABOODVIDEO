@@ -1,0 +1,3 @@
+# Optional independent subtitle timing oracle; install into disposable evidence
+# test-dependencies/, not into the installed Studio user profile.
+pysubs2==1.9.0

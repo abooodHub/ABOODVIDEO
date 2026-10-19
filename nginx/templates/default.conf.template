@@ -1,0 +1,191 @@
+upstream backend_api {
+    server backend:8000;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name _;
+    server_tokens off;
+
+    client_max_body_size 10G;
+
+    # Security Headers
+    add_header X-Frame-Options $frame_options always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "no-referrer" always;
+    add_header X-Request-ID $req_id always;
+
+    proxy_hide_header X-Request-ID;
+    proxy_hide_header X-Content-Type-Options;
+    proxy_hide_header Referrer-Policy;
+    proxy_hide_header X-Frame-Options;
+
+    # ACME Challenge pass-through for Let's Encrypt / Certbot
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Static Assets Direct Delivery
+    location /static/ {
+        alias /var/www/static/;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800";
+        add_header X-Request-ID $req_id always;
+        try_files $uri =404;
+    }
+
+    # Root Health and Readiness Probes
+    location = /health {
+        proxy_pass http://backend_api/health;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $req_id;
+        proxy_set_header CF-IPCountry $http_cf_ipcountry;
+    }
+
+    location = /readiness {
+        proxy_pass http://backend_api/readiness;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $req_id;
+        proxy_set_header CF-IPCountry $http_cf_ipcountry;
+    }
+
+    # General API Endpoints
+    location /api/ {
+        limit_req zone=api_zone burst=20 nodelay;
+        limit_conn conn_zone 20;
+
+        proxy_pass http://backend_api;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $req_id;
+        proxy_set_header CF-IPCountry $http_cf_ipcountry;
+
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+    }
+
+    # Resumable Chunked Uploads (Admin UI)
+    location /api/v1/uploads/ {
+        proxy_pass http://backend_api;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $req_id;
+        proxy_set_header CF-IPCountry $http_cf_ipcountry;
+
+        client_body_buffer_size 10M;
+        proxy_request_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 600s;
+        proxy_read_timeout 600s;
+    }
+
+    # Studio Packages Upload (Phase 5)
+    location /api/v1/studio/packages/ {
+        limit_req zone=api_zone burst=30 nodelay;
+        proxy_pass http://backend_api;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $req_id;
+        proxy_set_header CF-IPCountry $http_cf_ipcountry;
+
+        client_body_buffer_size 10M;
+        proxy_request_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 600s;
+        proxy_read_timeout 600s;
+    }
+
+    # Secure Playback Endpoints
+    location /api/v1/playback/ {
+        access_log off;
+
+        limit_req zone=playback_session burst=30 nodelay;
+        limit_req zone=playback_ip burst=120 nodelay;
+        limit_conn playback_session_conn 12;
+        limit_conn playback_ip_conn 200;
+        limit_req_status 429;
+        limit_conn_status 429;
+
+        proxy_pass http://backend_api;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $req_id;
+        proxy_set_header CF-IPCountry $http_cf_ipcountry;
+
+        proxy_connect_timeout 30s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Protected Media Delivery via X-Accel-Redirect (Internal Only)
+    location /internal_media/ {
+        internal;
+        access_log off;
+        alias /var/www/storage/videos/;
+
+        sendfile on;
+        tcp_nopush on;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Request-ID $req_id always;
+
+        location ~* \.m3u8$ {
+            default_type application/vnd.apple.mpegurl;
+            expires -1;
+            add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+        }
+
+        location ~* \.ts$ {
+            default_type video/mp2t;
+            expires 1d;
+            add_header Cache-Control "private, no-transform, max-age=86400" always;
+        }
+
+        location ~* \.vtt$ {
+            default_type text/vtt;
+            expires 1d;
+            add_header Cache-Control "private, no-transform, max-age=86400" always;
+        }
+
+        location ~* \.webp$ {
+            default_type image/webp;
+            expires 1d;
+            add_header Cache-Control "private, no-transform, max-age=86400" always;
+        }
+    }
+
+    # Default fallback
+    location / {
+        proxy_pass http://backend_api;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $req_id;
+        proxy_set_header CF-IPCountry $http_cf_ipcountry;
+    }
+}

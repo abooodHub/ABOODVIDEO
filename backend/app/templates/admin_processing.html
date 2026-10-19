@@ -1,0 +1,121 @@
+{% extends 'admin_base.html' %}
+{% block title %}المعالجة{% endblock %}
+{% block topbar_title %}طابور المعالجة{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_processing.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/system/layout-admin-operations.css?v=m6-admin-platform-20261016-fix2">
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <!-- ═══════════════════════════════════════════
+       PAGE HEADER
+  ════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="page-header__info">
+      <h1 class="page-header__title">طابور المعالجة</h1>
+      <p class="page-header__desc">متابعة عمليات تحويل الفيديو</p>
+    </div>
+
+    <div class="page-header__actions">
+      <!-- Worker Status Badge -->
+      <div id="worker-status-box" class="worker-badge worker-badge--unknown" title="حالة العامل">
+        <span class="worker-badge__dot" id="worker-dot"></span>
+        <span class="worker-badge__label" id="worker-text">جارٍ التحقق…</span>
+        <span class="worker-badge__count badge badge--surface" id="stat-processing">0</span>
+      </div>
+
+      <!-- Clear History -->
+      <button id="btnClearHistory" class="btn btn-secondary btn-sm" type="button">
+        <svg class="btn-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 3H5.5A1.5 1.5 0 004 4.5v11A1.5 1.5 0 005.5 17h9a1.5 1.5 0 001.5-1.5v-7M13 3h4m0 0v4m0-4L9.5 10.5"/>
+        </svg>
+        سجلات خدم
+      </button>
+
+      <!-- Refresh All -->
+      <button id="btnRefreshAll" class="btn btn-primary btn-sm" type="button">
+        <svg class="btn-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 4v5h5M16 16v-5h-5M4.07 9A8 8 0 1116 15.93"/>
+        </svg>
+        تحديث
+      </button>
+    </div>
+  </div>
+  <!-- /PAGE HEADER -->
+
+  <section class="data-table-wrapper jobs-table-wrapper" aria-labelledby="local-studio-heading" style="margin-block:1rem">
+    <div class="page-header__info" style="padding:1rem 1.25rem 0">
+      <h2 id="local-studio-heading" class="page-header__title" style="font-size:1.1rem">تحويل Studio المحلي</h2>
+      <p id="local-studio-status" class="page-header__desc">يعرض التحويل على جهاز Studio المرتبط بالموقع</p>
+    </div>
+    <div class="data-table-wrapper jobs-table-wrapper" style="border:0;margin:0">
+      <table class="data-table jobs-table" aria-label="تحويلات Studio المحلية">
+        <thead><tr><th>الحلقة</th><th>الحالة</th><th>التقدم</th><th>الجودة</th><th>السرعة</th><th>الوقت المتبقي</th><th>آخر تحديث</th></tr></thead>
+        <tbody id="local-studio-tbody"><tr><td colspan="7" class="table-empty-cell">جارٍ جلب حالة Studio…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       TABS BAR
+  ════════════════════════════════════════════ -->
+  <div class="tabs-bar processing-workspace-tabs" role="tablist" aria-label="أقسام المعالجة">
+    <button id="tabActive" data-tab="active" data-panel="tabActivePanel" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tabActivePanel" type="button">نشط <span class="tab-btn__badge badge badge--primary" id="tab-badge-active">0</span></button>
+    <button id="tabWaiting" data-tab="waiting" data-panel="tabActivePanel" class="tab-btn" role="tab" aria-selected="false" aria-controls="tabActivePanel" type="button">في الانتظار <span class="tab-btn__badge badge" id="tab-badge-waiting">0</span></button>
+    <button id="tabReadyUpload" data-tab="ready" data-panel="tabActivePanel" class="tab-btn" role="tab" aria-selected="false" aria-controls="tabActivePanel" type="button">جاهز للرفع <span class="tab-btn__badge badge" id="tab-badge-ready">0</span></button>
+    <button id="tabCompleted" data-tab="completed" data-panel="tabHistoryPanel" class="tab-btn" role="tab" aria-selected="false" aria-controls="tabHistoryPanel" type="button">مكتمل <span class="tab-btn__badge badge" id="tab-badge-completed">0</span></button>
+    <button id="tabFailed" data-tab="failed" data-panel="tabHistoryPanel" class="tab-btn" role="tab" aria-selected="false" aria-controls="tabHistoryPanel" type="button">متعثر / فاشل <span class="tab-btn__badge badge" id="tab-badge-failed">0</span></button>
+  </div>
+  <!-- /TABS BAR -->
+
+  <!-- ═══════════════════════════════════════════
+       TAB PANEL — ACTIVE JOBS
+  ════════════════════════════════════════════ -->
+  <div
+    id="tabActivePanel"
+    class="tab-panel"
+    role="tabpanel"
+    aria-labelledby="tabActive"
+  >
+    <h2 class="processing-origin-heading">مهام الخادم</h2>
+    <div class="processing-filters" role="search">
+      <label class="sr-only" for="filter-job-title">بحث عن مهمة</label><input class="input" type="search" id="filter-job-title" placeholder="بحث بالعنوان…">
+      <label class="sr-only" for="filter-job-status">تصفية حسب الحالة</label><select class="input" id="filter-job-status"><option value="">كل الحالات</option><option value="PROCESSING">قيد المعالجة</option><option value="PROBING">قيد الفحص</option><option value="QUEUED">في الانتظار</option><option value="VERIFYING">قيد التحقق</option><option value="COMPLETED">مكتمل</option><option value="FAILED">فشل</option><option value="CANCELLED">ملغى</option></select>
+      <button type="button" id="btn-refresh-jobs" class="btn btn-secondary btn-sm">تحديث المهام</button>
+    </div>
+    <div class="data-table-wrapper jobs-table-wrapper">
+      <table class="data-table jobs-table" aria-label="مهام المعالجة النشطة">
+        <thead><tr><th>الفيديو</th><th>الحالة</th><th>التقدم</th><th>الجودة</th><th>السرعة</th><th>الوقت المتبقي</th><th>العامل</th><th>المحاولة</th><th>الإجراءات</th></tr></thead>
+        <tbody id="jobs-tbody-active"><tr><td colspan="9" class="table-empty-cell"><div class="state-empty state-empty-padded"><div class="empty-title">لا توجد مهام معالجة نشطة</div><div class="empty-desc">ستظهر المهام هنا عند بدء المعالجة.</div></div></td></tr></tbody>
+      </table>
+    </div>
+    <div class="processing-pagination"><button type="button" class="btn btn-secondary btn-sm" id="jobs-previous-active">السابق</button><span id="jobs-page-active">صفحة 1</span><button type="button" class="btn btn-secondary btn-sm" id="jobs-next-active">التالي</button></div>
+  </div>
+  <!-- /TAB PANEL ACTIVE -->
+
+  <!-- ═══════════════════════════════════════════
+       TAB PANEL — HISTORY
+  ════════════════════════════════════════════ -->
+  <div
+    id="tabHistoryPanel"
+    class="tab-panel hidden"
+    role="tabpanel"
+    aria-labelledby="tabHistory"
+  >
+    <h2 class="processing-origin-heading">سجل مهام الخادم</h2>
+    <div class="data-table-wrapper jobs-table-wrapper">
+      <table class="data-table jobs-table" aria-label="سجل عمليات التحويل">
+        <thead><tr><th>الفيديو</th><th>الحالة</th><th>النتيجة</th><th>الجودة</th><th>السرعة</th><th>الوقت</th><th>العامل</th><th>المحاولة</th><th>الإجراءات</th></tr></thead>
+        <tbody id="jobs-tbody-history"><tr><td colspan="9" class="table-empty-cell"><div class="state-empty state-empty-padded"><div class="empty-title">لا يوجد سجل بعد</div></div></td></tr></tbody>
+      </table>
+    </div>
+    <div class="processing-pagination"><button type="button" class="btn btn-secondary btn-sm" id="jobs-previous-history">السابق</button><span id="jobs-page-history">صفحة 1</span><button type="button" class="btn btn-secondary btn-sm" id="jobs-next-history">التالي</button></div>
+  </div>
+  <!-- /TAB PANEL HISTORY -->
+
+</div><!-- /page-wrapper -->
+{% endblock %}
+
+{% block extra_js %}<script src="/static/js/admin_processing.js?v=github-readiness-20261019"></script>{% endblock %}

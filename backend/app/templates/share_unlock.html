@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مشاركة محمية</title>
+  <link rel="stylesheet" href="/static/css/admin_tokens.css?v=m6-admin-platform-20261016-fix2">
+  <link rel="stylesheet" href="/static/css/admin_login.css?v=m6-admin-platform-20261016-fix2">
+</head>
+<body class="login-body">
+  <main class="login-page">
+    <h1 class="login-brand">مشاركة محمية</h1>
+    <p class="login-subtitle">أدخل كلمة المرور لعرض المحتوى المشارك.</p>
+    <div class="login-card">
+      <form method="post" action="/preview/share/{{ token }}/unlock" class="login-form">
+        <div class="form-group">
+          <label class="form-label" for="share-password">كلمة المرور</label>
+          <input class="input" id="share-password" name="password" type="password"
+                 autocomplete="current-password" maxlength="1024" required>
+        </div>
+        {% if error_message %}<p class="login-error" role="alert">{{ error_message }}</p>{% endif %}
+        <button class="btn btn-primary btn-lg btn-block" type="submit">عرض المشاركة</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

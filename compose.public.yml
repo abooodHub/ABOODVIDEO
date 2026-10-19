@@ -1,0 +1,28 @@
+# New public installations only. Caddy manages certificate issuance and renewal.
+services:
+  nginx:
+    ports: !reset []
+  https:
+    build:
+      context: ./deploy/https
+    image: aboodvideo-https:1.0.0
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN using scripts/install_platform.py}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - aboodvideo_caddy_data:/data
+      - aboodvideo_caddy_config:/config
+    networks:
+      - aboodvideo_net
+    depends_on:
+      nginx:
+        condition: service_healthy
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  aboodvideo_caddy_data:
+  aboodvideo_caddy_config:

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول | ABOODVIDEO</title>
+  <link rel="stylesheet" href="/static/css/admin_tokens.css?v=m6-admin-platform-20261016-fix2">
+  <link rel="stylesheet" href="/static/css/admin_login.css?v=m6-admin-platform-20261016-fix2">
+<link rel="stylesheet" href="/static/css/atelier-v2.css?v=m6-admin-platform-20261016-fix2">
+</head>
+<body class="login-body">
+  <div class="login-page">
+
+    <!-- Brand -->
+    <div class="login-brand">ABOOD<span class="brand-accent">VIDEO</span></div>
+    <p class="login-subtitle">لوحة الإدارة الخاصة</p>
+
+    <!-- Login card -->
+    <div class="login-card">
+      <form id="login-form" class="login-form" autocomplete="on">
+
+        <div class="form-group">
+          <label class="form-label" for="username">اسم المستخدم</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            class="input"
+            placeholder="أدخل اسم المستخدم"
+            autocomplete="username"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">كلمة المرور</label>
+          <div class="password-wrap">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              class="input"
+              placeholder="كلمة المرور"
+              autocomplete="current-password"
+              required>
+            <button
+              type="button"
+              class="password-toggle"
+              id="togglePassword"
+              aria-label="إظهار كلمة المرور">
+              <!-- Eye icon (show) -->
+              <svg id="icon-eye" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                   viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- Eye-off icon (hide) — toggled via JS -->
+              <svg id="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                   viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                   hidden>
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8
+                         a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8
+                         a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="login-error" class="login-error" role="alert" hidden></div>
+
+        <button type="submit" id="login-submit" class="btn btn-primary btn-lg btn-block">
+          دخول
+        </button>
+
+      </form>
+    </div>
+
+    <p class="login-footer">ABOODVIDEO Private Media Platform</p>
+  </div>
+
+  <script src="/static/js/admin_login.js?v=m6-admin-platform-20261016-fix2"></script>
+<script src="/static/js/atelier-motion.js?v=m6-admin-platform-20261016-fix2" defer></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+/* ABOODVIDEO Common Utility Styles */
+.hidden { display: none !important; }
+.relative { position: relative; }
+.w-full { width: 100%; max-width: 100%; }
+.flex-row { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 6px; }
+.gap-3 { gap: 10px; }
+.text-muted-sm { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+.text-muted-xs { font-size: 11px; color: var(--text-muted); }
+.text-muted-12 { color: var(--text-muted); font-size: 12px; }
+.text-center { text-align: center; }
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.text-white { color: #ffffff; }
+.font-mono { font-family: monospace; }
+.font-bold { font-weight: 700; }
+.font-semi { font-weight: 600; }
+.font-22 { font-size: 22px; }
+.section-title { font-size: 18px; margin-bottom: 16px; }
+.card-header-title { font-size: 16px; font-weight: 700; }
+.metric-active { color: var(--success); font-size: 22px; }
+.p-40 { padding: 40px; }
+.p-32 { padding: 32px; }
+.p-16 { padding: 8px 16px; }
+.p-12 { padding: 12px; }
+.p-8 { padding: 8px; }
+.mb-14 { margin-bottom: 14px; }
+.mb-20 { margin-bottom: 20px; }
+.mt-4 { margin-top: 4px; }
+.label-block { display: block; font-size: 13px; margin-bottom: 6px; }
+.table-empty-cell { text-align: center; color: var(--text-muted); padding: 32px; }
+.page-desc { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+.overflow-y-auto { max-height: 250px; overflow-y: auto; }

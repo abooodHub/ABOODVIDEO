@@ -1,0 +1,115 @@
+# ==============================================================================
+# ABOODVIDEO - Production .gitignore
+# ==============================================================================
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.env.local
+*.pem
+*.key
+*.cert
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*.pyc
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Linting
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Logs & Runtime
+logs/
+*.log
+paramiko*.log
+
+# Database Dumps & Backups
+*.sql
+!tests/fixtures/schema/*.sql
+*.sql.gz
+*.dump
+*.tar
+*.bak
+
+# Storage & Uploaded Media (Preserve directory structure via .gitkeep)
+storage/uploads/*
+!storage/uploads/.gitkeep
+storage/videos/*
+!storage/videos/.gitkeep
+storage/temp/*
+!storage/temp/.gitkeep
+
+# Generated media and local browser artifacts (source assets are not globbed)
+bench_4k_output/
+studio/fonts/
+browser-artifacts/
+playwright-report/
+test-results/
+
+# Local-only audit and generated workspace data
+/backups/
+/scratch/
+/screenshots/
+/scratch_fonts_s1/
+/scratch_subs_s1/
+/studio/data/jobs.db
+/studio/data/live_acceptance_summary.json
+/studio/data/resume_proof_summary.json
+/studio/data/
+/cookie.txt
+/tests/test_storage/
+/storage/temp/*.db*
+
+# Local acceptance evidence may contain machine paths, profiles, and binaries.
+/audit_reports/
+/release-recovery-p0.6h/
+/recovery/
+/release/
+/dist/
+/build/
+installer-output/
+*.iss.tmp
+*.spec.tmp
+
+# Generated databases, browser captures, and temporary media/packages.
+*.sqlite
+*.sqlite3
+*.db
+*.m3u8
+*.tar.gz
+test-results/
+
+# IDE & OS Specific
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini

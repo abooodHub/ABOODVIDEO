@@ -1,0 +1,60 @@
+{% macro nav_link(href, label, icon, current=false, badge=false) -%}
+<a class="nav-item{% if current %} is-active{% endif %}" href="{{ href }}"{% if current %} aria-current="page"{% endif %}>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#{{ icon }}"></use></svg>
+  <span class="nav-label">{{ label }}</span>{% if badge %}<span class="nav-badge hidden" data-processing-badge id="processingBadge">0</span>{% endif %}
+</a>
+{%- endmacro %}
+{% set current_page = page_id|default('') %}
+<aside class="sidebar console-sidebar" id="adminSidebar" aria-label="القائمة الرئيسية" tabindex="-1">
+  <div class="console-brand-row">
+    <a href="/admin" class="sidebar-brand" aria-label="ABOODVIDEO — نظرة عامة">
+      <span class="brand-icon" aria-hidden="true">AV</span>
+      <span class="brand-wordmark">ABOOD<strong>VIDEO</strong></span>
+    </a>
+    <button type="button" id="sidebarCloseBtn" class="console-icon-button console-sidebar-close" aria-label="إغلاق القائمة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+  </div>
+  <nav class="sidebar-nav console-nav" aria-label="التنقل الرئيسي">
+    <div class="console-nav-primary">
+      {{ nav_link('/admin', 'نظرة عامة', 'home', current_page == 'dashboard') }}
+      {{ nav_link('/admin/upload', 'الرفع والاستيراد', 'upload', current_page == 'upload') }}
+    </div>
+    <details class="console-nav-section"{% if current_page in ['dashboard', 'content', 'video-detail', 'series-detail', 'subtitles', 'shares', 'inspector'] %} open{% endif %}>
+      <summary>إدارة المحتوى<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></summary>
+      <div class="console-nav-section-items">
+        {{ nav_link('/admin/videos', 'الملفات والمجلدات', 'folder', current_page in ['content', 'video-detail', 'series-detail', 'subtitles', 'inspector']) }}
+        {{ nav_link('/admin/shares', 'المشاركة والتضمين', 'shares', current_page == 'shares') }}
+        {{ nav_link('/admin/videos?filter=trash', 'سلة المحذوفات', 'trash') }}
+      </div>
+    </details>
+    <details class="console-nav-section"{% if current_page in ['processing', 'analytics'] %} open{% endif %}>
+      <summary>التشغيل والمتابعة<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></summary>
+      <div class="console-nav-section-items">
+        {{ nav_link('/admin/processing', 'مركز المعالجة', 'processing', current_page == 'processing', true) }}
+        {{ nav_link('/admin/analytics', 'التحليلات', 'clock', current_page == 'analytics') }}
+      </div>
+    </details>
+    <details class="console-nav-section"{% if current_page in ['settings', 'storage', 'api-keys', 'users', 'audit'] %} open{% endif %}>
+      <summary>الإعدادات والإدارة<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></summary>
+      <div class="console-nav-section-items">
+        {{ nav_link('/admin/settings', 'الإعدادات العامة', 'settings', current_page == 'settings') }}
+        {{ nav_link('/admin/settings#storage', 'التخزين', 'storage', current_page == 'storage') }}
+        {{ nav_link('/admin/settings#playback', 'جودات المشاهدة', 'play') }}
+        {% if server_transcoding_enabled|default(true) %}{{ nav_link('/admin/settings#encoder', 'إعدادات الإنكودر', 'processing') }}{% endif %}
+        {{ nav_link('/admin/settings#network', 'الشبكة والسرعة', 'upload') }}
+        {{ nav_link('/admin/settings#protection', 'الأمان والمناطق', 'shield') }}
+        {{ nav_link('/admin/settings#player', 'المشغل والتضمين', 'video') }}
+        {{ nav_link('/admin/settings#banner', 'بانر التوقف', 'alert') }}
+        {{ nav_link('/admin/api-keys', 'مفاتيح API', 'key', current_page == 'api-keys') }}
+        {{ nav_link('/admin/users', 'المستخدمون', 'home', current_page == 'users') }}
+        {{ nav_link('/admin/audit', 'سجل التدقيق', 'clock', current_page == 'audit') }}
+      </div>
+    </details>
+  </nav>
+  <footer class="sidebar-footer console-sidebar-footer">
+    <div class="sidebar-user" id="sidebarUserRow">
+      <span class="user-avatar" aria-hidden="true">{{ (admin_name|default('A', true))[0] | upper }}</span>
+      <span class="user-info"><span class="user-name">{{ admin_name|default('المدير العام', true) }}</span><span class="user-role">{{ admin_role|default('مدير النظام', true) }}</span></span>
+    </div>
+    <button id="logout-btn" class="btn-logout" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#logout"></use></svg><span>تسجيل الخروج</span></button>
+  </footer>
+</aside>

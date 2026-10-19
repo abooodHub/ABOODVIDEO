@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABOODVIDEO Studio {{ version }}</title>
+  <link rel="stylesheet" href="/static/css/studio.css">
+  <link rel="stylesheet" href="/static/css/p06-migration.css">
+</head>
+<body>
+
+  <!-- Application Startup Splash Overlay -->
+  <div id="app-splash-overlay" class="p06-inline-001">
+    <div class="p06-inline-002">
+      A
+    </div>
+    <div class="p06-inline-003">ABOODVIDEO Studio</div>
+    <div class="p06-inline-004">
+      <span class="p06-inline-005"></span>
+      <span>جاري تشغيل ABOODVIDEO Studio...</span>
+    </div>
+  </div>
+
+  <!-- Studio Header -->
+  <header class="studio-header">
+    <div class="brand-section">
+      <div class="brand-logo">A</div>
+      <div>
+        <div class="p06-inline-006">
+          <span class="brand-title">ABOODVIDEO Studio</span>
+          <span class="brand-version">{{ version }}</span>
+        </div>
+        <div class="p06-inline-007">استوديو المعالجة المحلية وتجهيز حزم الفيديو المسبقة</div>
+      </div>
+    </div>
+
+    <div class="header-telemetry">
+      <div class="telemetry-pill" id="gpu-telemetry-pill">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+        <span id="gpu-telemetry-text">جاري فحص العتاد...</span>
+      </div>
+      <div class="connection-pill" id="server-connection-pill">
+        <span class="connection-dot disconnected" id="server-pulse-dot"></span>
+        <span id="server-connection-text">غير متصل</span>
+      </div>
+      <button type="button" class="btn btn-sm btn-secondary" id="btn-open-connection-modal" title="إعداد الاتصال بخادم ABOODVIDEO">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>إعداد الاتصال</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="studio-container">
+
+    <!-- HOME LANDING -->
+    <div id="home-landing" class="p06-inline-008">
+      <div class="home-landing">
+        <div class="home-logo-large">A</div>
+        <div class="home-title-large">ABOODVIDEO Studio</div>
+        <div class="home-subtitle-text">استوديو معالجة الفيديو المحلي — تحويل، تجهيز، رفع</div>
+
+        <div class="home-status-row">
+          <div class="telemetry-pill" id="home-connection-pill">
+            <span class="connection-dot disconnected" id="home-pulse-dot"></span>
+            <span id="home-connection-text">جاري الفحص...</span>
+          </div>
+          <div class="telemetry-pill" id="home-gpu-pill">
+            <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+            <span id="home-gpu-text">جاري فحص العتاد...</span>
+          </div>
+          <div class="telemetry-pill" id="home-disk-pill">
+            <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 12H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/></svg>
+            <span id="home-disk-text">...</span>
+          </div>
+        </div>
+
+        <div class="home-actions-row">
+          <button type="button" class="home-action-card primary-card" id="home-btn-single">
+            <div class="action-icon">
+              <svg class="icon p06-inline-009" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            </div>
+            <div class="action-label">معالجة فيديو واحد</div>
+            <div class="action-desc">MP4 / MKV / MOV — بدون قيود حجم</div>
+          </button>
+          <button type="button" class="home-action-card" id="home-btn-season">
+            <div class="action-icon">
+              <svg class="icon p06-inline-010" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="action-label">معالجة موسم كامل</div>
+            <div class="action-desc">اكتشاف تلقائي — رفع متوازٍ</div>
+          </button>
+        </div>
+
+        <div class="home-recent-box p06-inline-011" id="home-recent-panel">
+          <div class="recent-title">آخر المهام</div>
+          <div id="home-recent-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="p06-inline-011">
+      <div class="p06-inline-012">
+        <button type="button" class="btn-home" id="btn-back-to-home">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          الرئيسية
+        </button>
+      </div>
+
+    <!-- Studio Mode Switcher -->
+    <div class="p06-inline-013">
+      <button type="button" class="btn btn-secondary mode-tab active" id="tab-btn-single">
+        <svg class="icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <span>معالجة فيديو فردي</span>
+      </button>
+      <button type="button" class="btn btn-secondary mode-tab" id="tab-btn-batch">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span>طابور موسم كامل</span>
+      </button>
+    </div>
+
+    <!-- Single Video Flow -->
+    <div id="single-video-flow">
+      <!-- Steps Wizard Navigation -->
+      <nav class="steps-nav">
+      <div class="step-nav-item active" data-step="1">
+        <div class="step-num">1</div>
+        <div class="step-name">فحص الفيديو</div>
+      </div>
+      <div class="step-nav-item" data-step="2">
+        <div class="step-num">2</div>
+        <div class="step-name">المحول والجودات</div>
+      </div>
+      <div class="step-nav-item" data-step="3">
+        <div class="step-num">3</div>
+        <div class="step-name">الترجمات والخطوط</div>
+      </div>
+      <div class="step-nav-item" data-step="4">
+        <div class="step-num">4</div>
+        <div class="step-name">المعالجة والرفع</div>
+      </div>
+      <div class="step-nav-item" data-step="5">
+        <div class="step-num">5</div>
+        <div class="step-name">النشر والجاهزية</div>
+      </div>
+    </nav>
+
+    <!-- STEP 1: Video File Selection & ffprobe -->
+    <section class="step-section" data-step="1">
+      <div class="studio-card">
+        <div class="card-title-row">
+          <div class="card-title"> اختيار الفيديو وفحص ffprobe</div>
+          <div class="card-subtitle">يدعم MP4, MKV, MOV, WebM, FLV, TS بدون قيود حجم</div>
+        </div>
+
+        <div class="dropzone" id="video-dropzone">
+          <div class="dropzone-icon"></div>
+          <div class="dropzone-text">اسحب وأفلت ملف الفيديو هنا</div>
+          <div class="dropzone-hint">أو استخدم زر الاستعراض المباشر من جهازك</div>
+
+          <div class="browse-actions">
+            <button type="button" class="btn btn-primary" id="btn-browse-video">
+               استعراض ملف من الجهاز
+            </button>
+          </div>
+
+          <div class="p06-inline-014">
+            <input type="text" class="form-input form-input-mono" id="video-path-input" placeholder="أو الصق مسار الملف محلياً هنا... (مثال: C:\Videos\movie.mkv)">
+          </div>
+        </div>
+
+        <!-- Video Metadata Card (Populated after ffprobe) -->
+        <div id="video-metadata-card" class="p06-inline-015"></div>
+
+        <div class="p06-inline-016">
+          <button type="button" class="btn btn-primary" id="btn-go-step-2" disabled>
+            متابعة إلى المحول والجودات ←
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2: Encoder & Quality Ladder -->
+    <section class="step-section p06-inline-017" data-step="2">
+      <div class="studio-card">
+        <div class="card-title-row">
+          <div class="card-title"> محرك الترميز (Encoder)</div>
+          <div class="card-subtitle">اختر التسريع العتادي الأنسب لبطاقتك</div>
+        </div>
+
+        <div class="choice-group">
+          <div class="choice-item selected encoder-choice-btn" data-encoder="auto">
+            <div class="choice-title">تلقائي (Auto) </div>
+            <div class="choice-desc">استخدام NVIDIA NVENC تلقائياً مع الرجوع لـ CPU إذا تعذر</div>
+          </div>
+          <div class="choice-item encoder-choice-btn" data-encoder="nvenc">
+            <div class="choice-title">NVIDIA NVENC </div>
+            <div class="choice-desc">تسريع كامل ببطاقة NVIDIA RTX / GTX (أسرع 5-10 أضعاف)</div>
+          </div>
+          <div class="choice-item encoder-choice-btn" data-encoder="cpu">
+            <div class="choice-title">معالج النظام (CPU x264) </div>
+            <div class="choice-desc">ترميز برمجي عالي الجودة متوافق مع كافة المعالجات</div>
+          </div>
+        </div>
+        <!-- GPU note: CPU usage is normal even in NVENC mode -->
+        <div class="gpu-note-box p06-inline-011" id="gpu-encoder-note">
+          <strong>ملاحظة NVENC:</strong> وضع GPU يستخدم NVENC للترميز، لكن المعالج CPU لا يزال مستخدماً لـ: فك الترميز، الفلاتر، التحجيم، الصوت، والتغليف. استهلاك CPU في هذا الوضع طبيعي وغير قابل للإزالة كلياً.
+        </div>
+      </div>
+
+      <div class="studio-card">
+        <div class="card-title-row">
+          <div class="card-title"><svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v3M23 12h-3"/></svg> جودات سلم البث (Quality Ladder)</div>
+          <div class="card-subtitle">تم تفعيل الجودات المناسبة لدقة الفيديو تلقائياً مع منع الترقية (No Upscaling)</div>
+        </div>
+
+        <!-- Quality Presets -->
+        <div class="preset-group" id="quality-presets-row">
+          <span class="p06-inline-018">إعداد مسبق:</span>
+          <button type="button" class="preset-btn active" data-preset="balanced">متوازن</button>
+          <button type="button" class="preset-btn" data-preset="quality">جودة عالية</button>
+          <button type="button" class="preset-btn" data-preset="storage">توفير مساحة</button>
+          <button type="button" class="preset-btn" data-preset="custom">مخصص</button>
+        </div>
+        <div class="ladder-grid" id="ladder-container">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="p06-inline-019">
+          <button type="button" class="btn btn-secondary" data-return-step="1">
+            → السابق: فحص الفيديو
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-go-step-3">
+            متابعة إلى الترجمات والخطوط ←
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3: Subtitles & ASS Fonts -->
+    <section class="step-section p06-inline-017" data-step="3">
+      <div class="studio-card">
+        <div class="card-title-row">
+          <div class="card-title"><svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-5.5a9 9 0 0 1-.9-4A8.5 8.5 0 0 1 12.5 3h.5a8.5 8.5 0 0 1 8 8z"/></svg> وضع الترجمة (Subtitles)</div>
+          <div class="card-subtitle">اختر نوع الترجمة المطلوب تضمينها في الحزمة</div>
+        </div>
+
+        <!-- Embedded Subtitle Tracks (auto-populated after probe) -->
+        <div id="embedded-subs-section" class="p06-inline-020">
+          <div class="p06-inline-021">
+             الترجمات الموجودة داخل الملف
+          </div>
+          <div id="embedded-subs-list" class="p06-inline-022"></div>
+        </div>
+
+        <div class="choice-group">
+          <div class="choice-item selected sub-mode-btn" data-mode="none">
+            <div class="choice-title">بدون ترجمة</div>
+            <div class="choice-desc">معالجة الفيديو الأصلي فقط</div>
+          </div>
+          <div class="choice-item sub-mode-btn" data-mode="hardsub">
+            <div class="choice-title"><svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-4-3-6-3-10-2 2-3 3-3 6-2-1-3-3-3-5-3 3-5 6-5 9a7 7 0 0 0 7 7z"/><path d="M12 22a3 3 0 0 0 3-3c0-2-2-3-2-5-2 2-4 3-4 5a3 3 0 0 0 3 3z"/></svg> دمج مباشر بالفيديو (Hardsub)</div>
+            <div class="choice-desc">حرق الترجمة ومؤثراتها وخطوطها داخل إطارات الفيديو أثناء الترميز</div>
+          </div>
+          <div class="choice-item sub-mode-btn" data-mode="softsub">
+            <div class="choice-title"><svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1M9 8h6M9 12h6M9 16h6"/></svg> ترجمة منفصلة (Softsub)</div>
+            <div class="choice-desc">ASS حقيقي أو WebVTT — إرفاقها بقائمة تشغيل HLS</div>
+          </div>
+        </div>
+
+        <!-- External Subtitle File Selector (secondary action) -->
+        <div id="sub-file-section" class="p06-inline-023">
+          <div class="p06-inline-024">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> إضافة ترجمة خارجية (.ass / .srt / .vtt)
+          </div>
+          <div class="p06-inline-025">
+            <input type="text" class="form-input form-input-mono" id="sub-path-input" placeholder="مسار ملف الترجمة (.ass, .srt, .vtt)...">
+            <button type="button" class="btn btn-secondary" id="btn-browse-sub">
+              استعراض ملف ترجمة
+            </button>
+          </div>
+        </div>
+
+        <!-- Hardsub Designer -->
+        <div id="hardsub-designer" class="p06-inline-026">
+          <div class="hardsub-designer">
+            <div class="p06-inline-027">تصميم Hardsub</div>
+            <div class="p06-inline-028">
+              <label class="p06-inline-029">
+                <input type="radio" name="hardsub-src" value="original" checked id="hardsub-use-original"> استخدام تصميم ASS الأصلي
+              </label>
+              <label class="p06-inline-030">
+                <input type="radio" name="hardsub-src" value="custom" id="hardsub-use-custom"> تخصيص التصميم
+              </label>
+            </div>
+            <div id="hardsub-custom-fields" class="p06-inline-011">
+              <div class="hardsub-grid">
+                <div class="hardsub-field"><label>الخط</label><input type="text" id="hardsub-font" value="Cairo"></div>
+                <div class="hardsub-field"><label>الحجم</label><input type="number" id="hardsub-size" value="24" min="10" max="72"></div>
+                <div class="hardsub-field"><label>لون النص</label><input type="color" id="hardsub-color" value="#ffffff"></div>
+                <div class="hardsub-field"><label>لون الحدود</label><input type="color" id="hardsub-border-color" value="#000000"></div>
+                <div class="hardsub-field"><label>سمك الحدود</label><input type="number" id="hardsub-border-size" value="2" min="0" max="8" step="0.5"></div>
+                <div class="hardsub-field"><label>الموقع</label><select id="hardsub-position"><option value="bottom">أسفل</option><option value="top">أعلى</option><option value="center">وسط</option></select></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASS Fonts Audit Card -->
+        <div id="fonts-audit-card" class="p06-inline-031">
+          <div class="card-title-row">
+            <div class="card-title"><svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19 9 5l5 14M6 14h6M15 19h6M18 5v14"/></svg> فحص خطوط ASS المطلوبة وكشف الناقص منها</div>
+            <div class="p06-inline-032">
+              <button type="button" class="btn btn-secondary" id="btn-upload-font">
+                <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/></svg> إرفاق خطوط (TTF / OTF / ZIP)
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-browse-font-folder">
+                 استعراض مجلد خطوط
+              </button>
+            </div>
+            <input type="file" id="font-file-input" accept=".ttf,.otf,.ttc,.zip" multiple class="p06-inline-017">
+          </div>
+
+          <div id="fonts-summary-counts" class="telemetry-pill p06-inline-033"></div>
+          <div id="missing-fonts-notice" class="upscale-tag p06-inline-034"></div>
+
+          <table class="fonts-table">
+            <thead>
+              <tr>
+                <th>اسم الخط (Font Family)</th>
+                <th>الحالة</th>
+                <th>مكان الاستخدام</th>
+                <th>الملف بالنظام</th>
+              </tr>
+            </thead>
+            <tbody id="fonts-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p06-inline-019">
+          <button type="button" class="btn btn-secondary" data-return-step="2">
+            → السابق: المحول والجودات
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-go-step-4">
+            متابعة إلى طابور المعالجة والرفع ←
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 4: Live Queue, Telemetry & Upload -->
+    <section class="step-section p06-inline-017" data-step="4">
+      <div class="studio-card">
+        <div class="card-title-row">
+          <div class="card-title"> إعدادات نشر الحزمة على خادم ABOODVIDEO</div>
+        </div>
+
+        <div class="p06-inline-035">
+          <div>
+            <label class="p06-inline-036">عنوان الفيديو</label>
+            <input type="text" class="form-input" id="job-title-input" placeholder="اسم الفيديو المعروض بالمكتبة">
+          </div>
+          <div>
+            <label class="p06-inline-036">عنوان الخادم (Server API URL)</label>
+            <input type="text" class="form-input form-input-mono" id="server-url-input" value="http://localhost:8000/api/v1">
+          </div>
+        </div>
+
+        <div class="p06-inline-037">
+          <label class="p06-inline-036">مفتاح API الخاص بك (Personal API Key)</label>
+          <input type="password" class="form-input form-input-mono" id="api-key-input" placeholder="ak_live_... أو abv_...">
+        </div>
+
+        <!-- Disk Space Panel -->
+        <div class="disk-info-panel" id="disk-info-panel">
+          <div class="p06-inline-038">المساحة والتخزين</div>
+          <div class="disk-info-row">
+            <span class="disk-info-label">المساحة الحرة</span>
+            <span class="disk-info-value" id="disk-free-space">جاري الفحص...</span>
+          </div>
+          <div class="disk-info-row">
+            <span class="disk-info-label">الحزمة المتوقعة</span>
+            <span class="disk-info-value" id="disk-estimated-pkg">-</span>
+          </div>
+          <div class="disk-bar-wrap">
+            <div class="disk-bar-fill p06-inline-039" id="disk-bar-fill"></div>
+          </div>
+        </div>
+        <div class="p06-inline-040">
+          <button type="button" class="btn btn-primary p06-inline-041" id="btn-start-job">
+             بدء المعالجة والتحقق والرفع المباشر
+          </button>
+          <button type="button" class="btn btn-danger p06-inline-042" id="btn-cancel-job" disabled>
+             إلغاء
+          </button>
+        </div>
+
+        <!-- Live Progress Container -->
+        <div id="job-progress-container" class="p06-inline-043">
+          <div class="p06-inline-044">
+            <div class="p06-inline-045">
+              <span class="font-badge installed" id="job-status-badge">READY</span>
+              <span id="job-status-desc" class="p06-inline-046">جاري المعالجة...</span>
+            </div>
+            <strong id="overall-progress-pct" class="p06-inline-047">0%</strong>
+          </div>
+
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill p06-inline-048" id="overall-progress-bar"></div>
+          </div>
+
+          <!-- Gauges Grid -->
+          <div class="gauge-grid">
+            <div class="gauge-box">
+              <div class="gauge-label">سرعة الترميز (FPS)</div>
+              <div class="gauge-value" id="gauge-fps">0.0 fps</div>
+            </div>
+            <div class="gauge-box">
+              <div class="gauge-label">مضاعف السرعة</div>
+              <div class="gauge-value" id="gauge-speed">0x</div>
+            </div>
+            <div class="gauge-box">
+              <div class="gauge-label">الوقت المتبقي (ETA)</div>
+              <div class="gauge-value" id="gauge-eta">00:00:00</div>
+            </div>
+            <div class="gauge-box">
+              <div class="gauge-label">ضغط كرت الشاشة GPU</div>
+              <div class="gauge-value" id="gauge-gpu">0%</div>
+            </div>
+            <div class="gauge-box">
+              <div class="gauge-label">استهلاك VRAM</div>
+              <div class="gauge-value p06-inline-049" id="gauge-vram">0 MB</div>
+            </div>
+            <div class="gauge-box">
+              <div class="gauge-label">ضغط المعالج CPU</div>
+              <div class="gauge-value" id="gauge-cpu">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 5: Verification & READY Celebration -->
+    <section class="step-section p06-inline-017" data-step="5">
+      <div class="studio-card">
+        <div id="step5-success-card" class="success-banner p06-inline-017">
+          <div class="success-icon"></div>
+          <div class="success-title">اكتملت العملية بنجاح والفيديو الآن جاهز (READY)!</div>
+          <p class="p06-inline-050">
+            تم توليد الحزمة والتحقق من التجزئات، ورفع المقاطع كاملة إلى خادم ABOODVIDEO، واعتمد عامل الخلفية (RQ Worker) الجيل الجديد بنجاح.
+          </p>
+
+          <div class="success-meta">
+            <div class="meta-pill">
+              <div class="meta-label">معرف الفيديو (Video ID)</div>
+              <div class="meta-val" id="ready-video-id">-</div>
+            </div>
+            <div class="meta-pill">
+              <div class="meta-label">حالة الخادم</div>
+              <div class="meta-val p06-inline-051">READY ✓</div>
+            </div>
+          </div>
+
+          <div class="p06-inline-052">
+            <a href="#" target="_blank" class="btn btn-primary" id="link-watch-video">
+               فتح صفحة المشاهدة
+            </a>
+            <button type="button" class="btn btn-secondary" id="btn-process-new">
+               معالجة فيديو جديد
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    </div> <!-- /single-video-flow -->
+
+    <!-- SEASON BATCH QUEUE SECTION -->
+    <section id="season-batch-section" class="p06-inline-017">
+
+      <!-- Visual 4-Step Flow Stepper -->
+      <div class="flow-stepper">
+        <div class="flow-step active" id="flow-step-1">
+          <span class="flow-step-num">1</span>
+          <span>اختيار مجلد الموسم</span>
+        </div>
+        <span class="flow-separator">←</span>
+        <div class="flow-step" id="flow-step-2">
+          <span class="flow-step-num">2</span>
+          <span>تحديد الوجهة</span>
+        </div>
+        <span class="flow-separator">←</span>
+        <div class="flow-step" id="flow-step-3">
+          <span class="flow-step-num">3</span>
+          <span>مراجعة الحلقات</span>
+        </div>
+        <span class="flow-separator">←</span>
+        <div class="flow-step" id="flow-step-4">
+          <span class="flow-step-num">4</span>
+          <span>تشغيل الموسم تلقائياً</span>
+        </div>
+      </div>
+
+      <!-- Season Setup & Header Card -->
+      <div class="studio-card">
+        <div class="card-title-row">
+          <div>
+            <div class="card-title">
+              <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span>طابور موسم كامل (Season Queue)</span>
+            </div>
+            <div class="card-subtitle">حدد مجلد الموسم المحلي وتأكد من الوجهة للبدء بالمعالجة والرفع التلقائي</div>
+          </div>
+        </div>
+
+        <!-- Folder Selection & Destination 2-Column Grid -->
+        <div class="p06-inline-053">
+          <!-- Folder Selection -->
+          <div>
+            <label class="p06-inline-036">مجلد الموسم على القرص</label>
+            <div class="p06-inline-054">
+              <input type="text" class="form-input form-input-mono p06-inline-055" id="batch-folder-input" placeholder="مثال: D:\Donghua\Spirit Cage\Season 1\">
+              <button type="button" class="btn btn-secondary p06-inline-056" id="btn-browse-season-folder">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>استعراض</span>
+              </button>
+              <button type="button" class="btn btn-primary p06-inline-056" id="btn-import-season">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>فحص وإضافة</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Clean Destination Card -->
+          <div>
+            <div class="destination-card p06-inline-057" id="destination-card">
+              <div class="destination-info">
+                <div class="destination-icon-box">
+                  <svg class="icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                </div>
+                <div>
+                  <div class="destination-label-text">الوجهة على ABOODVIDEO</div>
+                  <div class="destination-val" id="destination-display-text">Donghua / Spirit Cage / الموسم 1</div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-secondary" id="btn-edit-destination" title="تعديل وجهة العرض">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span>تغيير</span>
+              </button>
+            </div>
+
+            <!-- Inline Destination Editor (revealed on click) -->
+            <div id="destination-edit-row" class="p06-inline-058">
+              <label class="p06-inline-059">تعديل وجهة العرض على المنصة</label>
+              <div class="p06-inline-060">
+                <input type="text" class="form-input p06-inline-061" id="batch-destination-input" value="Donghua / Spirit Cage / الموسم 1">
+                <button type="button" class="btn btn-sm btn-success p06-inline-062" id="btn-save-destination">حفظ</button>
+                <button type="button" class="btn btn-sm btn-secondary p06-inline-062" id="btn-cancel-destination">إلغاء</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="season-preflight-summary" class="season-preflight">
+          <div class="season-preflight-heading">
+            <div>
+              <span class="season-preflight-eyebrow">قبل بدء المعالجة</span>
+              <h3>ملخص الموسم</h3>
+            </div>
+            <div class="season-preflight-counts">
+              <span id="preflight-count" class="season-count-chip">— حلقة</span>
+              <span id="preflight-ready" class="season-count-chip is-ready">— جاهزة</span>
+              <span id="preflight-review" class="season-count-chip is-review">— تحتاج مراجعة</span>
+            </div>
+          </div>
+
+          <div class="season-stats-grid">
+            <div class="season-stat"><span>مدة المصدر</span><strong id="preflight-duration">—</strong></div>
+            <div class="season-stat"><span>حجم المصدر</span><strong id="preflight-source-size">—</strong></div>
+            <div class="season-stat"><span>الحجم المتوقع</span><strong id="preflight-output-size">—</strong></div>
+            <div class="season-stat"><span>المساحة المتاحة</span><strong id="preflight-disk">—</strong></div>
+          </div>
+
+          <div class="season-eta-grid">
+            <div class="season-eta-card is-primary">
+              <span>وقت التحويل المتوقع</span>
+              <strong id="preflight-transcode">—</strong>
+              <small id="preflight-transcode-detail">يتحدث حسب سرعة التحويل الفعلية</small>
+            </div>
+            <div class="season-eta-card">
+              <span>تجهيز الحزم</span>
+              <strong id="preflight-packaging">غير مقاس</strong>
+              <small id="preflight-packaging-detail">تقدير من عينة قياس</small>
+            </div>
+            <div class="season-eta-card">
+              <span>الرفع</span>
+              <strong id="preflight-upload">غير مقاس</strong>
+              <small id="preflight-upload-detail">سرعة الرفع غير مقاسة</small>
+            </div>
+            <div class="season-eta-card">
+              <span>الإجمالي المعروف</span>
+              <strong id="preflight-total">—</strong>
+              <small id="preflight-total-detail">يشمل التحويل والتجهيز</small>
+            </div>
+          </div>
+
+          <div id="preflight-dynamic-eta" class="season-dynamic-eta" style="display:none">
+            <span>التقدير الأولي <strong id="preflight-initial">—</strong></span>
+            <span>المتبقي الآن <strong id="preflight-remaining">—</strong></span>
+            <span>الانتهاء المتوقع <strong id="preflight-finish">—</strong></span>
+          </div>
+          <div class="season-time-actuals">
+            <b>الوقت الفعلي المحفوظ</b>
+            <span>التحويل <strong id="preflight-actual-transcode">—</strong></span>
+            <span>التجهيز والتحقق <strong id="preflight-actual-package">—</strong></span>
+            <span>الرفع <strong id="preflight-actual-upload">—</strong></span>
+            <span>المنقضي للحلقة النشطة <strong id="preflight-episode-elapsed">—</strong></span>
+          </div>
+          <div class="season-preflight-footer">
+            <span>معدل كتابة الأقراص: <strong id="preflight-disk-write">يقاس أثناء التشغيل</strong></span>
+            <span id="preflight-disk-status">فحص المساحة</span>
+          </div>
+        </div>
+        <details id="season-font-pool" class="advanced-details">
+          <summary id="season-font-pool-summary">Season Font Pool — لم يُفحص</summary>
+          <div class="advanced-content">
+            <table class="table"><thead><tr><th>Font Family</th><th>Source</th><th>Episodes</th><th>Status</th></tr></thead>
+              <tbody id="season-font-pool-rows"></tbody></table>
+          </div>
+        </details>
+
+        <section id="season-history-panel" class="season-history-panel" hidden>
+          <div class="season-history-heading">
+            <div><span class="season-preflight-eyebrow">سجل الأداء</span><h3>سجل المعالجة</h3></div>
+            <div id="season-performance-summary" class="season-performance-summary"></div>
+          </div>
+          <div id="season-history-list" class="season-history-list"></div>
+        </section>
+
+        <!-- Primary Action & Queue Controls -->
+        <div class="p06-inline-063">
+          <div class="p06-inline-032">
+            <button type="button" class="btn btn-primary p06-inline-064" id="btn-auto-pipeline">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+              <span>تشغيل الموسم تلقائياً</span>
+            </button>
+            <button type="button" class="btn btn-secondary p06-inline-017" id="btn-upload-ready">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/></svg>
+              <span>رفع الجاهز</span>
+            </button>
+            <button type="button" class="btn btn-secondary p06-inline-017" id="btn-pause-batch">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
+              <span>إيقاف مؤقت</span>
+            </button>
+            <button type="button" class="btn btn-primary p06-inline-017" id="btn-resume-batch">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+              <span>استئناف</span>
+            </button>
+            <button type="button" class="btn btn-secondary p06-inline-017" id="btn-stop-after-current">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" fill="currentColor"/></svg>
+              <span>إيقاف بعد الحالية</span>
+            </button>
+            <button type="button" class="btn btn-outline-danger p06-inline-017" id="btn-clear-batch">
+              <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>مسح الموسم</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Collapsed Advanced Panel (Authoritative IDs, Debug) -->
+        <details class="advanced-details" id="season-advanced-details">
+          <summary>
+            <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>الإعدادات المتقدمة (معرفات الربط ومعلومات النظام)</span>
+          </summary>
+          <div class="advanced-content">
+            <div class="p06-inline-068">
+              <div>
+                <label class="p06-inline-059">Folder ID</label>
+                <input type="text" class="form-input form-input-mono" id="batch-folder-id-input" placeholder="uuid...">
+              </div>
+              <div>
+                <label class="p06-inline-059">Series ID</label>
+                <input type="text" class="form-input form-input-mono" id="batch-series-id-input" placeholder="uuid...">
+              </div>
+              <div>
+                <label class="p06-inline-059">Season ID</label>
+                <input type="text" class="form-input form-input-mono" id="batch-season-id-input" placeholder="uuid...">
+              </div>
+            </div>
+            <div id="advanced-debug-info" class="p06-inline-069">
+              نظام المعالجة متصل • قاعدة البيانات jobs.db نشطة في مسار %LOCALAPPDATA%
+            </div>
+            <div id="ffmpeg-diagnostic-info" class="p06-inline-070">
+              أداة FFmpeg: جاري الفحص...
+            </div>
+            <div class="p06-inline-032">
+              <button type="button" class="btn btn-sm btn-secondary" id="btn-open-logs">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>فتح مجلد السجلات</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-secondary" id="btn-open-data">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>فتح مجلد البيانات</span>
+              </button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- FFmpeg Warning Alert Banner (if missing) -->
+      <div class="review-alert-banner p06-inline-071" id="ffmpeg-warning-banner">
+        <div class="review-alert-content">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="ffmpeg-warning-text">FFmpeg غير مثبت أو غير متاح في النظام. يرجى توفير FFmpeg لتفعيل الترميز.</span>
+        </div>
+      </div>
+
+      <!-- Needs Review Alert Banner -->
+      <div class="review-alert-banner p06-inline-017" id="needs-review-banner">
+        <div class="review-alert-content">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span id="needs-review-text">توجد حلقة تحتاج مراجعة الترجمة أو الخطوط قبل المتابعة.</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" id="btn-review-scroll">
+          <span>مراجعة</span>
+        </button>
+      </div>
+
+      <!-- Batch Summary Bar & Queue Table -->
+      <div class="studio-card p06-inline-017" id="batch-queue-card">
+        <div class="card-title-row p06-inline-072">
+          <div>
+            <div class="card-title" id="batch-season-title">طابور الموسم</div>
+            <div class="card-subtitle p06-inline-073" id="batch-overall-status-line">خامل</div>
+          </div>
+          <div class="p06-inline-074">
+            <div class="telemetry-pill">
+              <span>عدد الحلقات:</span>
+              <strong id="batch-total-count" class="p06-inline-075">0</strong>
+            </div>
+            <div class="telemetry-pill">
+              <span>الحجم الأصلي:</span>
+              <strong id="batch-total-bytes" class="p06-inline-076">0 MB</strong>
+            </div>
+            <div class="telemetry-pill">
+              <span>الحزم المحوّلة:</span>
+              <strong class="p06-inline-075">محفوظة محلياً</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Season Progress Bar -->
+        <div class="p06-inline-077">
+          <div class="p06-inline-078">
+            <span class="p06-inline-079">التقدم الإجمالي للموسم</span>
+            <span id="batch-overall-progress-text" class="p06-inline-080">0%</span>
+          </div>
+          <div class="progress-bar-wrap p06-inline-081">
+            <div class="progress-bar-fill p06-inline-082" id="batch-overall-progress-bar"></div>
+          </div>
+          <!-- Summary Badges Row -->
+          <div id="batch-summary-badges" class="p06-inline-083">
+            <span class="status-badge p06-inline-084" id="badge-total">0 حلقة</span>
+            <span class="status-badge ready" id="badge-ready">0 جاهزة</span>
+            <span class="status-badge active p06-inline-017" id="badge-uploading">0 رفع</span>
+            <span class="status-badge active p06-inline-017" id="badge-encoding">0 تحويل</span>
+            <span class="status-badge pending" id="badge-pending">0 انتظار</span>
+            <span class="status-badge failed p06-inline-017" id="badge-failed">0 فشل</span>
+          </div>
+        </div>
+
+        <!-- Dual Pipeline Live Tasks (GPU + Network) -->
+        <div id="pipelined-tasks-panel" class="p06-inline-085">
+          <!-- GPU Task -->
+          <div class="live-task-card">
+            <div class="live-task-header">
+              <span class="live-task-title live-task-gpu">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+                <span>معالجة الـ GPU (الترميز المحلي)</span>
+              </span>
+              <span id="gpu-task-badge" class="status-badge pending p06-inline-086">خامل</span>
+            </div>
+            <div id="gpu-task-file" class="live-task-file">-</div>
+            <div class="progress-bar-wrap p06-inline-087">
+              <div class="progress-bar-fill p06-inline-048" id="gpu-task-prog-bar"></div>
+            </div>
+            <div class="live-task-metrics">
+              <span id="gpu-task-metrics">- FPS</span>
+              <span id="gpu-task-eta">ETA: -</span>
+            </div>
+          </div>
+
+          <!-- Network Task -->
+          <div class="live-task-card">
+            <div class="live-task-header">
+              <span class="live-task-title live-task-network">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                <span>معالجة الشبكة (الرفع للسيرفر)</span>
+              </span>
+              <span id="network-task-badge" class="status-badge pending p06-inline-086">خامل</span>
+            </div>
+            <div id="network-task-file" class="live-task-file">-</div>
+            <div class="progress-bar-wrap p06-inline-087">
+              <div class="progress-bar-fill p06-inline-088" id="network-task-prog-bar"></div>
+            </div>
+            <div class="live-task-metrics">
+              <span id="network-task-speed">- MB/s</span>
+              <span id="network-task-eta">ETA: -</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9 Clean Queue Columns -->
+        <div class="p06-inline-089">
+          <table class="fonts-table p06-inline-090">
+            <thead>
+              <tr>
+                <th class="p06-inline-091">#</th>
+                <th class="p06-inline-092">اسم الحلقة</th>
+                <th class="p06-inline-093">الترجمة</th>
+                <th class="p06-inline-094">الجودة الحالية</th>
+                <th class="p06-inline-095">الحالة</th>
+                <th class="p06-inline-096">التقدم</th>
+                <th class="p06-inline-094">وقت التحويل</th>
+                <th class="p06-inline-094">الحجم</th>
+                <th class="p06-inline-097">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="batch-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    </div> <!-- /main-app -->
+
+  </main>
+
+  <!-- Connection Settings Modal -->
+  <div class="modal-backdrop p06-inline-017" id="connection-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>إعدادات الاتصال بـ ABOODVIDEO</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary p06-inline-098" id="modal-btn-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="p06-inline-099">
+          <label class="p06-inline-036">عنوان الخادم (Server API URL)</label>
+          <input type="text" class="form-input form-input-mono" id="modal-server-url" placeholder="http://127.0.0.1/api/v1">
+        </div>
+        <div class="p06-inline-099">
+          <label class="p06-inline-036">مفتاح API الخاص بك (API Key)</label>
+          <input type="password" class="form-input form-input-mono" id="modal-api-key" placeholder="ak_live_... أو abv_...">
+        </div>
+        <div id="modal-connection-status" class="p06-inline-100"></div>
+        <details class="advanced-details">
+          <summary>الإعدادات المتقدمة (تفاصيل الصلاحيات الفنية)</summary>
+          <div class="advanced-content p06-inline-101" id="modal-scopes-debug">
+            المفتاح يتطلب الصلاحيات المخصصة للنشر والحزم.
+          </div>
+        </details>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="modal-btn-test">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>اختبار الاتصال</span>
+        </button>
+        <button type="button" class="btn btn-success" id="modal-btn-save">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>حفظ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="episode-history-modal" class="episode-history-modal" hidden role="dialog" aria-modal="true" aria-labelledby="episode-history-title">
+    <section class="episode-history-dialog">
+      <header><h3 id="episode-history-title">سجل الحلقة</h3><button type="button" id="episode-history-close" class="btn btn-secondary btn-sm" aria-label="إغلاق">إغلاق</button></header>
+      <div id="episode-history-content" class="episode-history-content"></div>
+    </section>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+  <script src="/static/js/studio.js"></script>
+</body>
+</html>

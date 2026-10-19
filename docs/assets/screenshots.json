@@ -1,0 +1,20 @@
+[
+  {
+    "image": "platform-dashboard.png",
+    "actual_template": "admin_dashboard.html",
+    "synthetic_offline_data": true,
+    "page_errors": []
+  },
+  {
+    "image": "platform-upload.png",
+    "actual_template": "admin_upload.html",
+    "synthetic_offline_data": true,
+    "page_errors": []
+  },
+  {
+    "image": "studio.png",
+    "actual_template": "index_v3.html",
+    "synthetic_offline_data": true,
+    "page_errors": []
+  }
+]

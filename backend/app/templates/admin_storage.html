@@ -1,0 +1,14 @@
+{% extends "admin_base.html" %}
+{% block title %}ملخص التخزين{% endblock %}
+{% block topbar_title %}ملخص التخزين{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_platform.css?v=m6-admin-platform-20261016-fix2">{% endblock %}
+{% block content %}
+<section class="platform-page" aria-labelledby="storage-heading">
+  <header class="platform-heading"><div><p class="platform-eyebrow">قراءة فقط · لا حذف تلقائي</p><h1 id="storage-heading">ملخص التخزين</h1><p>الحجوم محسوبة من الملفات الموجودة. تعذّر الفحص يظهر كحالة غير مكتملة ولا يُخفى.</p></div><button id="storage-refresh" class="btn btn-secondary" type="button">تحديث</button></header>
+  <p id="storage-status" class="platform-status" role="status" aria-live="polite">جارٍ فحص التخزين…</p>
+  <div class="platform-cards" id="storage-categories"></div>
+  <section class="platform-panel"><h2>مرشحات التخزين المؤقتة</h2><p class="platform-muted">العناصر أدناه اقتراحات مراجعة فقط. لا تُحذف تلقائيًا.</p><ul id="storage-orphans"></ul></section>
+  <section class="platform-panel"><h2>مساحة نظام الملفات</h2><dl id="storage-filesystem" class="platform-facts"></dl><p class="platform-muted">لا تنفّذ هذه الصفحة تنظيفًا أو حذفًا للملفات.</p></section>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="/static/js/admin_platform.js?v=github-readiness-20261019" defer></script>{% endblock %}

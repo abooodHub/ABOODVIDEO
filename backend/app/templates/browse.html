@@ -1,0 +1,142 @@
+{% extends "viewer_base.html" %}
+
+{% block title %}المكتبة — ABOODVIDEO{% endblock %}
+
+{% block content %}
+<div class="viewer-container">
+
+    <!-- Page Header & Filters -->
+    <div class="page-header">
+        <h1 class="page-title">المكتبة</h1>
+        <p class="page-subtitle">استعراض وسائط ومحتويات المنصة الخاصة بجودة فائقة وبث متكيف.</p>
+    </div>
+
+    <!-- Interactive Filter Toolbar -->
+    <form action="{{ prefix or '' }}/browse" method="GET" id="browse-filter-form" class="viewer-filter-bar">
+        <!-- Search Field -->
+        <div class="viewer-filter-search-wrap">
+            <input type="search" name="q" id="browse-search-input" value="{{ search_query or '' }}" class="viewer-input" placeholder="بحث سريع في العناوين والمسلسلات..." aria-label="بحث سريع">
+        </div>
+
+        <!-- Type Pills -->
+        <div class="viewer-filter-group">
+            <a href="{{ prefix or '' }}/browse?{% if search_query %}q={{ search_query }}&{% endif %}{% if quality_filter %}quality={{ quality_filter }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}" class="viewer-filter-pill {% if not type_filter %}is-active{% endif %}">الكل</a>
+            <a href="{{ prefix or '' }}/browse?type=series{% if search_query %}&q={{ search_query }}{% endif %}{% if quality_filter %}&quality={{ quality_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="viewer-filter-pill {% if type_filter == 'series' %}is-active{% endif %}">المسلسلات</a>
+            <input type="hidden" name="type" value="{{ type_filter or '' }}">
+        </div>
+
+        <!-- Quality Select -->
+        <div class="viewer-filter-group">
+            <select name="quality" class="viewer-select" aria-label="تصفية حسب الجودة">
+                <option value="" {% if not quality_filter %}selected{% endif %}>جميع الجودات</option>
+                <option value="4K" {% if quality_filter == '4K' %}selected{% endif %}>4K Ultra HD</option>
+                <option value="1440p" {% if quality_filter == '1440p' %}selected{% endif %}>1440p 2K</option>
+                <option value="1080p" {% if quality_filter == '1080p' %}selected{% endif %}>1080p FHD</option>
+                <option value="720p" {% if quality_filter == '720p' %}selected{% endif %}>720p HD</option>
+            </select>
+
+            <!-- Subtitle Filter -->
+            <select name="sub" class="viewer-select" aria-label="تصفية حسب الترجمة">
+                <option value="" {% if not sub_filter %}selected{% endif %}>كل الترجمات</option>
+                <option value="ass" {% if sub_filter == 'ass' %}selected{% endif %}>ترجمة ASS متقدمة</option>
+                <option value="vtt" {% if sub_filter == 'vtt' %}selected{% endif %}>ترجمة VTT عادية</option>
+            </select>
+
+            <!-- Sort By Select -->
+            <select name="sort" id="browse-sort-select" class="viewer-select" aria-label="ترتيب النتائج">
+                <option value="latest" {% if sort_by == 'latest' or not sort_by %}selected{% endif %}>الأحدث إضافة</option>
+                <option value="title" {% if sort_by == 'title' %}selected{% endif %}>العنوان (أ-ي)</option>
+                <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>المدة</option>
+            </select>
+        </div>
+    </form>
+
+    <!-- Active Filter Summary -->
+    <div class="viewer-filter-summary">
+        <div class="viewer-filter-summary-text">
+            النتائج: <strong class="viewer-filter-strong">{{ videos|length }}</strong> فيديو
+            {% if search_query %}
+            <span>لبحث: «<strong class="viewer-filter-highlight">{{ search_query }}</strong>»</span>
+            {% endif %}
+        </div>
+        {% if search_query or type_filter or quality_filter or sub_filter %}
+        <a href="{{ prefix or '' }}/browse" class="viewer-filter-reset">إعادة ضبط الفلاتر</a>
+        {% endif %}
+    </div>
+
+    <!-- Responsive Compact Video Grid (High Density) -->
+    {% if videos and videos|length > 0 %}
+    <div class="viewer-grid">
+        {% for item in videos %}
+        <article class="viewer-card">
+            <div class="viewer-card-media">
+                {% if item.has_poster and item.poster_url %}
+                <img src="{{ item.poster_url }}" alt="{{ item.title }}" class="viewer-card-img" loading="lazy" decoding="async">
+                {% else %}
+                <div class="viewer-card-placeholder">
+                    <svg class="viewer-card-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span class="viewer-card-placeholder-title"><bdi dir="auto">{{ item.title }}</bdi></span>
+                </div>
+                {% endif %}
+                <div class="viewer-card-overlay"></div>
+
+                <div class="viewer-card-actions">
+                    <a href="{{ prefix or '' }}/watch/{{ item.share_id }}" class="viewer-card-action-btn viewer-card-action-play">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                        تشغيل
+                    </a>
+                    <a href="{{ prefix or '' }}/title/{{ item.id }}" class="viewer-card-action-btn viewer-card-action-details">
+                        تفاصيل
+                    </a>
+                </div>
+            </div>
+
+            <div class="viewer-card-info">
+                <h3 class="viewer-card-title" title="{{ item.title }}"><bdi dir="auto">{{ item.title }}</bdi></h3>
+                <div class="viewer-card-meta">
+                    {% if item.is_4k %}
+                    <span class="viewer-badge-mini viewer-badge-mini-4k">4K</span>
+                    {% elif item.max_quality %}
+                    <span class="viewer-badge-mini viewer-badge-mini-hd">{{ item.max_quality }}</span>
+                    {% endif %}
+                    {% if item.has_ass %}
+                    <span class="viewer-badge-mini viewer-badge-mini-ass">ASS</span>
+                    {% endif %}
+                    {% if item.duration_formatted %}
+                    <span class="viewer-card-meta-dot">•</span>
+                    <span class="ltr-text">{{ item.duration_formatted }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Results Found Empty State -->
+    <div class="viewer-empty-state">
+        <svg class="viewer-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <h3 class="viewer-empty-title">لا توجد وسائط مطابقة</h3>
+        <p class="viewer-empty-desc">
+            {% if search_query %}
+            لم نعثر على أي محتوى يطابق «{{ search_query }}». جرب استخدام كلمات مفتاحية أخرى أو إلغاء بعض الفلاتر.
+            {% else %}
+            لا يوجد أي محتوى يطابق الفلاتر المحددة حالياً في المكتبة.
+            {% endif %}
+        </p>
+        <a href="{{ prefix or '' }}/browse" class="viewer-btn viewer-btn-secondary">
+            عرض جميع المحتويات
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/viewer_browse.js?v=m6-admin-platform-20261016-fix2" defer></script>
+{% endblock %}

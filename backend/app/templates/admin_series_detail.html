@@ -1,0 +1,30 @@
+{% extends 'admin_base.html' %}
+{% block title %}تفاصيل المسلسل | ABOODVIDEO{% endblock %}
+{% block topbar_title %}تفاصيل المسلسل{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_series.css?v=m6-admin-platform-20261016-fix2">{% endblock %}
+
+{% block content %}
+        <div id="sd-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+        <div id="sd-loading" class="empty-state">جاري تحميل المسلسل...</div>
+
+        <div id="sd-detail" class="hidden">
+            <div class="page-header">
+                <div class="detail-heading">
+                    <div class="series-poster" id="sd-poster">م</div>
+                    <div>
+                        <h1 class="page-title" id="sd-title">—</h1>
+                        <p class="page-desc" id="sd-subtitle">—</p>
+                        <div class="detail-badges" id="sd-badges"></div>
+                    </div>
+                </div>
+                <div class="page-actions">
+                    <a href="/admin/series" class="btn btn-ghost">كل المسلسلات</a>
+                    <a href="#" id="sd-upload-link" class="btn btn-primary">+ رفع حلقة</a>
+                </div>
+            </div>
+
+            <div id="sd-seasons"></div>
+        </div>
+{% endblock %}
+
+{% block extra_js %}<script src="/static/js/admin_series_detail.js?v=m6-admin-platform-20261016-fix2"></script>{% endblock %}

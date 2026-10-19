@@ -1,0 +1,298 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}الإعدادات{% endblock %}
+{% block topbar_title %}الإعدادات{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/admin_settings.css?v=m6-admin-platform-20261016-fix2">
+<link rel="stylesheet" href="/static/css/system/layout-admin-operations.css?v=m6-admin-platform-20261016-fix2">
+<link rel="stylesheet" href="/static/css/admin_encoder.css?v=encoder-workspace-20261018">
+{% endblock %}
+
+{% block content %}
+<div id="settings-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+
+<div class="settings-layout">
+
+  <!-- TOP TABS BAR -->
+  <div class="settings-tabs-bar" role="tablist" aria-label="أقسام الإعدادات">
+    {% if server_transcoding_enabled|default(true) %}<button class="settings-tab-btn" id="settings-tab-encoder" role="tab" aria-selected="false" aria-controls="tab-encoder" data-tab="encoder" data-section="encoder" type="button"><span>الإنكودر</span></button>{% endif %}
+    <button class="settings-tab-btn" id="settings-tab-playback" role="tab" aria-selected="false" aria-controls="tab-playback" data-tab="playback" data-section="playback" type="button"><span>المشاهدة والجودة</span></button>
+    <button class="settings-tab-btn" id="settings-tab-network" role="tab" aria-selected="false" aria-controls="tab-network" data-tab="network" data-section="network" type="button"><span>الشبكة والرفع</span></button>
+    <button class="settings-tab-btn is-active"
+            id="settings-tab-storage"
+            role="tab"
+            aria-selected="true"
+            aria-controls="tab-storage"
+            data-tab="storage"
+            data-section="storage"
+            type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+      <span>التخزين</span>
+    </button>
+
+    <button class="settings-tab-btn"
+            id="settings-tab-protection"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-protection"
+            data-tab="protection"
+            data-section="protection"
+            type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path d="m9 12 2 2 4-4"/></svg>
+      <span>الحماية والنطاقات</span>
+    </button>
+
+    <button class="settings-tab-btn"
+            id="settings-tab-player"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-player"
+            data-tab="player"
+            data-section="player"
+            type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4z"/></svg>
+      <span>مظهر المشغل</span>
+    </button>
+
+    <button class="settings-tab-btn"
+            id="settings-tab-banner"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-banner"
+            data-tab="banner"
+            data-section="banner"
+            type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5l-1 4z"/><path d="M8 8h8M8 12h5"/></svg>
+      <span>بانر التوقف</span>
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="settings-main">
+    {% if server_transcoding_enabled|default(true) %}{% include "admin_encoder.html" %}{% endif %}
+
+    <section id="tab-network" class="settings-section tab-pane" role="tabpanel" aria-labelledby="settings-tab-network" aria-hidden="true">
+      <div class="settings-section-header"><h2>حدود النقل</h2><p>تُطبق حدود المشاهدة لكل استجابة فيديو عبر Nginx، وتُبطّأ واجهة الرفع الرسمية بين الأجزاء.</p></div>
+      <div class="settings-card"><div class="settings-card-header"><div class="settings-card-title"><h3>المشاهدة والرفع</h3><p>أدخل 0 لإيقاف الحد. الحدود بوحدة كيلوبت/ثانية (Kbps).</p></div></div><div class="settings-card-body">
+        <div class="form-row"><label class="form-label" for="transfer-playback-rate">حد كل استجابة مشاهدة أو تنزيل مباشر</label><select class="input" id="transfer-playback-rate"><option value="0">غير محدود</option><option value="8000">1 MB/s</option><option value="24000">3 MB/s</option><option value="40000">5 MB/s</option><option value="80000">10 MB/s</option><option value="custom">مخصص…</option></select><input class="input transfer-custom-rate" id="transfer-playback-kbps" type="number" min="0" max="1000000" step="256" value="0" aria-label="سرعة مشاهدة مخصصة بالكيلوبت في الثانية"><span class="form-hint">يُطبّق على كل استجابة HLS أو تنزيل مباشر منفردة؛ لا يمثل حدًا إجماليًا للمستخدم أو للخادم. القيمة المخصصة بوحدة Kbps.</span></div>
+        <div class="form-row"><label class="form-label" for="transfer-upload-rate">سرعة الرفع لكل ملف في واجهة الإدارة</label><select class="input" id="transfer-upload-rate"><option value="0">غير محدود</option><option value="8000">1 MB/s</option><option value="24000">3 MB/s</option><option value="40000">5 MB/s</option><option value="80000">10 MB/s</option><option value="custom">مخصص…</option></select><input class="input transfer-custom-rate" id="transfer-upload-kbps" type="number" min="0" max="1000000" step="256" value="0" aria-label="سرعة رفع مخصصة بالكيلوبت في الثانية"><span class="form-hint">تباعد بين أجزاء الرفع في المتصفح الرسمي؛ الملفات المتوازية لكل منها هذا المعدل. القيمة المخصصة بوحدة Kbps.</span></div>
+        <div class="form-row"><label class="form-label" for="transfer-concurrency">أقصى ملفات متزامنة في واجهة الرفع</label><input class="input" id="transfer-concurrency" type="number" min="1" max="8" step="1" value="2"></div>
+        <p id="transfer-policy-status" role="status" aria-live="polite"></p><button type="button" class="btn btn-primary" id="transfer-policy-save">حفظ حدود النقل</button>
+      </div></div>
+    </section>
+
+    <section id="tab-playback" class="settings-section tab-pane" role="tabpanel" aria-labelledby="settings-tab-playback" aria-hidden="true">
+      <div class="settings-section-header"><h2>الجودات الظاهرة للمشاهد</h2><p>تُطبّق هذه السياسة على قوائم HLS وطلبات ملفات الجودة مباشرة. لا تحذف الملفات ولا تغيّر ما يُنتج للمهام الجديدة.</p></div>
+      <div class="settings-card"><div class="settings-card-header"><div class="settings-card-title"><h3>السماح بالجودة</h3><p>اختر مستويات الجودة المتاحة للمشاهدين. التغيير يسري على طلبات التشغيل الجديدة فور الحفظ.</p></div></div>
+        <div class="settings-card-body"><div id="playback-quality-options" class="quality-options-grid" aria-live="polite"><span>جارٍ تحميل السياسة…</span></div><p class="form-hint" id="playback-quality-status" role="status" aria-live="polite"></p><button type="button" class="btn btn-primary" id="playback-quality-save">حفظ سياسة المشاهدة</button></div>
+      </div>
+    </section>
+
+    <!-- STORAGE SECTION -->
+    <section id="tab-storage"
+             class="settings-section tab-pane is-active"
+             role="tabpanel"
+             aria-labelledby="settings-tab-storage"
+             aria-hidden="false">
+      <div class="settings-section-header">
+        <h2>تفاصيل التخزين</h2>
+        <p>متابعة استهلاك مساحة التخزين ومسارات النظام.</p>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">
+            <h3>استهلاك التخزين</h3>
+            <p>المساحة الإجمالية والمستخدمة والمتبقية لمكتبة الفيديوهات.</p>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div class="setting-row">
+            <span class="setting-label">حالة التخزين:</span>
+            <span class="setting-value" id="storage-status">—</span>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">المساحة المستخدمة:</span>
+            <span class="setting-value font-mono text-number" id="storage-used">—</span>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">المساحة المتبقية:</span>
+            <span class="setting-value font-mono text-number" id="storage-free">—</span>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">إجمالي السعة:</span>
+            <span class="setting-value font-mono text-number" id="storage-total">—</span>
+          </div>
+          <div class="storage-usage-meter"><progress id="storage-usage-progress" max="100" value="0" aria-label="نسبة استخدام مساحة التخزين"></progress><span id="storage-usage-percent">—</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCESS AND DOMAIN PROTECTION -->
+    <section id="tab-protection"
+             class="settings-section tab-pane"
+             role="tabpanel"
+             aria-labelledby="settings-tab-protection"
+             aria-hidden="true">
+      <div class="settings-section-header">
+        <h2>الحماية والنطاقات</h2>
+        <p>تحكم في السماح بالمشاهدة المباشرة والنطاقات المسموح لها بتضمين المشغل.</p>
+      </div>
+
+      <!-- Card 1: Embed Only (CDN) Mode -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">
+            <h3>وضع الـ CDN والتضمين فقط (Embed Only Mode)</h3>
+            <p>إلغاء التصفح المباشر للمنصة وحصر تشغيل الفيديوهات داخل المواقع الشريكة فقط.</p>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div class="form-row">
+            <label class="quality-option" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="embed-only-mode">
+              <strong>تفعيل وضع الـ CDN فقط (حظر المشاهدة المباشرة من المنصة وتوجيه الزوار للموقع الخارجي)</strong>
+            </label>
+            <span class="form-hint">عند التفعيل، لن يتمكن الزوار العاديون من المشاهدة مباشرة عبر رابط المنصة، وسيتم تحويلهم تلقائياً إلى الموقع الخارجي المحدد أدناه. (يبقى حساب الإدارة قادراً على المعاينة).</span>
+          </div>
+          <div class="form-row" style="margin-top: 14px;">
+            <label class="form-label" for="embed-redirect-url">رابط الموقع الخارجي للتوجيه التلقائي (Redirect URL)</label>
+            <input type="url" id="embed-redirect-url" class="input input-full max-w-400 font-mono" placeholder="https://partner.example">
+            <span class="form-hint">الرابط الذي يتم تحويل الزوار المباشرين إليه تلقائياً.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Hotlink Protection & Allowed Domains -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">
+            <h3>حماية الروابط والنطاقات المصرح لها (Hotlink Protection)</h3>
+            <p>منع أي موقع خارجي غير مصرح به من سرقة المشغل أو تضمين الحلقات.</p>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div class="form-row">
+            <label class="form-label" for="allowed-domains-input">النطاقات المعتمدة (مفصولة بفواصل أو أسطر)</label>
+            <textarea id="allowed-domains-input" class="input input-full font-mono dir-ltr" rows="4" placeholder="partner.example&#10;localhost&#10;127.0.0.1"></textarea>
+            <span class="form-hint">أي محاولة لتضمين المشغل في موقع خارج هذه القائمة سيتم حظرها فوراً وعرض شاشة الحماية (403 Forbidden).</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card"><div class="settings-card-header"><div class="settings-card-title"><h3>الحجب الجغرافي</h3><p>حظر تشغيل الفيديو حسب رمز الدولة الموثوق من Cloudflare.</p></div></div><div class="settings-card-body">
+        <label class="quality-option"><input type="checkbox" id="geo-block-enabled"> تفعيل الحجب الجغرافي</label>
+        <label class="form-label" for="geo-block-countries">رموز الدول، مفصولة بفواصل</label><input id="geo-block-countries" class="input input-full font-mono dir-ltr" type="text" placeholder="US, CA" autocomplete="off">
+        <p class="form-hint">إذا فُعّل الحجب، يُمنع البلد المجهول أو غياب الترويسة الموثوقة.</p><p id="geo-policy-status" role="status" aria-live="polite"></p><button type="button" id="geo-block-save" class="btn btn-secondary">حفظ سياسة الدول</button>
+      </div></div>
+
+    </section>
+
+    <!-- EMBEDDED PLAYER APPEARANCE -->
+    <section id="tab-player"
+             class="settings-section tab-pane"
+             role="tabpanel"
+             aria-labelledby="settings-tab-player"
+             aria-hidden="true">
+      <div class="settings-section-header">
+        <h2>مظهر المشغل المضمّن</h2>
+        <p>الإعدادات الافتراضية لشكل المشغل عند تضمينه في المواقع الخارجية.</p>
+      </div>
+
+      <!-- Card 3: Default Player Appearance -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">
+            <h3>المظهر الافتراضي للمشغل المضمّن</h3>
+            <p>الخيارات الافتراضية التي يتم تطبيقها على المشغل في المواقع الخارجية ما لم يتم تجاوزها في كود الـ iframe.</p>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+            <div class="form-row">
+              <label class="form-label" for="embed-default-color">لون السمة الافتراضي (Accent Color)</label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="embed-default-color" class="input font-mono dir-ltr" style="width: 100px;" value="#00d2be">
+                <input type="color" id="embed-default-color-picker" value="#00d2be" style="width: 36px; height: 36px; padding: 2px; border-radius: 6px; border: 1px solid var(--border-subtle); background: transparent; cursor: pointer;">
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="embed-default-watermark">العلامة المائية الافتراضية (Watermark)</label>
+              <input type="text" id="embed-default-watermark" class="input input-full" value="ABOODVIDEO" maxlength="40">
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="embed-default-skip">تخطي المقدمة الافتراضي (ثوانٍ)</label>
+              <input type="number" id="embed-default-skip" class="input" style="width: 100px;" value="85" min="0" max="600">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PAUSE PROMO BANNER -->
+    <section id="tab-banner"
+             class="settings-section tab-pane"
+             role="tabpanel"
+             aria-labelledby="settings-tab-banner"
+             aria-hidden="true">
+      <div class="settings-section-header">
+        <h2>بانر التوقف</h2>
+        <p>رسالة اختيارية تظهر للمشاهد عند إيقاف الفيديو مؤقتاً.</p>
+      </div>
+
+      <!-- Card 4: Default Pause Ad / Promo Banner -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">
+            <h3>بانر التوقف الترويجي الافتراضي (Pause Promo Banner)</h3>
+            <p>إعلان أو بانر ترويجي يظهر تلقائياً عندما يقوم المشاهد بإيقاف الفيديو مؤقتاً.</p>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div class="form-row">
+            <label class="quality-option" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="embed-banner-enabled">
+              <strong>تفعيل إظهار البانر عند التوقف المؤقت افتراضياً</strong>
+            </label>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 12px;">
+            <div class="form-row">
+              <label class="form-label" for="embed-banner-title">عنوان البانر</label>
+              <input type="text" id="embed-banner-title" class="input input-full" placeholder="تابعنا على قنواتنا الرسمية">
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="embed-banner-link">رابط البانر عند النقر</label>
+              <input type="url" id="embed-banner-link" class="input input-full font-mono dir-ltr" placeholder="https://example.com/community">
+            </div>
+          </div>
+          <div class="form-row" style="margin-top: 12px;">
+            <label class="form-label" for="embed-banner-text">نص البانر الترويجي</label>
+            <input type="text" id="embed-banner-text" class="input input-full" placeholder="انضم إلينا لمتابعة جميع الحلقات والإصدارات الجديدة بجودة 4K">
+          </div>
+        </div>
+      </div>
+    </section>
+
+      </main>
+</div>
+
+<!-- STICKY SAVE BAR -->
+<div id="sticky-save-bar" class="settings-save-bar" role="status" aria-live="polite">
+  <span class="save-bar-msg">تغييرات غير محفوظة</span>
+  <div class="save-bar-actions">
+    <button type="button" class="btn btn-secondary" id="btn-reset-settings">
+      إلغاء
+    </button>
+    <button type="button" class="btn btn-primary" id="btn-save-settings">
+      حفظ التغييرات
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/admin_settings.js?v=github-readiness-20261019"></script>
+<script src="/static/js/admin_encoder.js?v=github-readiness-20261019"></script>
+{% endblock %}

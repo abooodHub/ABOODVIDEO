@@ -1,0 +1,12 @@
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+filterwarnings = [
+    "error",
+    "ignore:.*datetime.datetime.utcnow\\(\\) is deprecated.*:DeprecationWarning",
+    "ignore::DeprecationWarning:rq.*",
+    "ignore::ResourceWarning",
+]

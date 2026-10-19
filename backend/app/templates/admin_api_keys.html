@@ -1,0 +1,390 @@
+{% extends 'admin_base.html' %}
+{% block title %}مفاتيح API{% endblock %}
+{% block topbar_title %}مفاتيح API{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_api_keys.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/system/layout-admin-operations.css?v=m6-admin-platform-20261016-fix2">
+{% endblock %}
+
+{% block content %}
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE HEADER
+     ═══════════════════════════════════════════════════════════ -->
+<div id="keys-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+<div class="page-header">
+    <div class="page-header-title-box">
+        <h1 class="page-title">مفاتيح API</h1>
+        <p class="page-desc">إدارة مفاتيح الوصول للاستخدام البرمجي</p>
+    </div>
+    <div class="page-header-actions">
+        <button type="button" id="btnCreateApiKey" class="btn btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            إنشاء مفتاح جديد
+        </button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     REGISTERED KEYS TABLE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="admin-panel">
+    <div class="panel-header">
+        <div class="panel-header-title">
+            <h2 class="panel-title">المفاتيح المسجلة</h2>
+            <span class="badge badge-muted" id="apiKeyCount">0</span>
+        </div>
+        <div id="keys-bulk-toolbar" class="keys-bulk-toolbar" hidden>
+            <span id="keys-selected-count">0 مفتاح محدد</span>
+            <button type="button" id="keys-bulk-delete" class="btn btn-danger btn-sm" disabled>حذف المحدد</button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table" id="apiKeysTable">
+            <thead>
+                <tr>
+                    <th aria-label="تحديد"></th>
+                    <th>الاسم</th>
+                    <th>البادئة</th>
+                    <th>الصلاحيات</th>
+                    <th>الإنشاء</th>
+                    <th>آخر استخدام</th>
+                    <th>الحالة</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="keys-tbody">
+                <tr class="table-empty-row">
+                    <td colspan="7" class="table-empty-cell">
+                        <div class="table-empty-inner">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="8" cy="14" r="4"/><path d="m11 11 9-9"/><path d="m16 4 3 3M13.5 6.5l3 3"/>
+                            </svg>
+                            <span>لا توجد مفاتيح مسجلة بعد</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL: CREATE API KEY
+     ═══════════════════════════════════════════════════════════ -->
+<div id="createApiKeyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="createApiKeyTitle" aria-hidden="true">
+    <form id="key-form" class="modal-card modal-card-wide" novalidate>
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h3 class="modal-title" id="createApiKeyTitle">إنشاء مفتاح API جديد</h3>
+            <button type="button" class="modal-close-btn" aria-label="إغلاق" data-modal-close="createApiKeyModal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+
+            <!-- Field: Key Name -->
+            <div class="modal-field">
+                <label class="form-label" for="apiKeyName">
+                    اسم المفتاح <span class="required-star" aria-hidden="true">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="key-name"
+                    class="modal-input"
+                    placeholder="مثال: ABOODVIDEO Studio — جهاز المونتاج"
+                    maxlength="100"
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            <div class="modal-field">
+                <label class="form-label" for="key-expiry">تاريخ الانتهاء</label>
+                <select id="key-expiry" class="input"><option value="">بلا انتهاء</option><option value="30">30 يوماً</option><option value="90">90 يوماً</option><option value="365">سنة</option></select>
+            </div>
+
+            <!-- Field: Preset -->
+            <div class="modal-field">
+                <span class="form-label" id="presetLabel">البريست</span>
+                <div class="preset-cards" role="radiogroup" aria-labelledby="presetLabel">
+
+                    <!-- Preset: Studio -->
+                    <label class="preset-card" for="presetStudio">
+                        <input type="radio" id="btn-preset-studio" name="apiKeyPreset" value="studio" checked>
+                        <div class="preset-card-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+                            </svg>
+                        </div>
+                        <span class="preset-name">ABOODVIDEO Studio</span>
+                        <span class="preset-desc">وصول كامل للرفع والتحرير</span>
+                    </label>
+
+                    <!-- Preset: Read-only -->
+                    <label class="preset-card" for="presetReadonly">
+                        <input type="radio" id="presetReadonly" name="apiKeyPreset" value="readonly">
+                        <div class="preset-card-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <span class="preset-name">قراءة فقط</span>
+                        <span class="preset-desc">استعراض البيانات بدون تعديل</span>
+                    </label>
+
+                    <!-- Preset: Custom -->
+                    <label class="preset-card" for="presetCustom">
+                        <input type="radio" id="presetCustom" name="apiKeyPreset" value="custom">
+                        <div class="preset-card-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.14-1.4l2-1.55-2-3.46-2.36.95A7 7 0 0 0 14.1 5.1L13.75 2.6h-3.5L9.9 5.1a7 7 0 0 0-2.4 1.44l-2.36-.95-2 3.46 2 1.55a7 7 0 0 0 0 2.8l-2 1.55 2 3.46 2.36-.95a7 7 0 0 0 2.4 1.44l.35 2.5h3.5l.35-2.5a7 7 0 0 0 2.4-1.44l2.36.95 2-3.46-2-1.55A7 7 0 0 0 19 12z"/>
+                            </svg>
+                        </div>
+                        <span class="preset-name">مخصص</span>
+                        <span class="preset-desc">اختر الصلاحيات يدوياً</span>
+                    </label>
+
+                </div>
+            </div>
+
+            <!-- Advanced Scopes (collapsible) -->
+            <div class="modal-field">
+                <button type="button" class="scopes-toggle" id="scopesToggleBtn" aria-expanded="false" aria-controls="advancedScopes">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="scopes-chevron" aria-hidden="true">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                    صلاحيات متقدمة (Scopes)
+                </button>
+
+                <div id="advancedScopes" class="scopes-panel" hidden>
+                    <div class="scopes-grid" role="group" aria-label="صلاحيات المفتاح">
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="videos:read" id="scope_videos_read">
+                            <span class="scope-label">
+                                <span class="scope-name">videos:read</span>
+                                <span class="scope-desc">قراءة بيانات الفيديوهات</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="videos:write" id="scope_videos_write">
+                            <span class="scope-label">
+                                <span class="scope-name">videos:write</span>
+                                <span class="scope-desc">تعديل وحذف الفيديوهات</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="upload:write" id="scope_upload_write">
+                            <span class="scope-label">
+                                <span class="scope-name">upload:write</span>
+                                <span class="scope-desc">رفع ملفات الفيديو</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="transcodes:read" id="scope_transcodes_read">
+                            <span class="scope-label">
+                                <span class="scope-name">transcodes:read</span>
+                                <span class="scope-desc">استعراض حالة الترميز</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="packages:create" id="scope_packages_create">
+                            <span class="scope-label">
+                                <span class="scope-name">packages:create</span>
+                                <span class="scope-desc">إنشاء حزم الاستوديو</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="packages:write" id="scope_packages_write">
+                            <span class="scope-label">
+                                <span class="scope-name">packages:write</span>
+                                <span class="scope-desc">رفع ملفات الحزمة</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="packages:publish" id="scope_packages_publish">
+                            <span class="scope-label">
+                                <span class="scope-name">packages:publish</span>
+                                <span class="scope-desc">نشر الحزم الجاهزة</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="subtitles:write" id="scope_subtitles_write">
+                            <span class="scope-label">
+                                <span class="scope-name">subtitles:write</span>
+                                <span class="scope-desc">إدارة الترجمات</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="shares:read" id="scope_shares_read">
+                            <span class="scope-label">
+                                <span class="scope-name">shares:read</span>
+                                <span class="scope-desc">استعراض روابط المشاركة</span>
+                            </span>
+                        </label>
+
+                        <label class="scope-item">
+                            <input type="checkbox" class="scope-checkbox key-scope" value="shares:write" id="scope_shares_write">
+                            <span class="scope-label">
+                                <span class="scope-name">shares:write</span>
+                                <span class="scope-desc">إنشاء وإدارة المشاركات</span>
+                            </span>
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-modal-close="createApiKeyModal">إلغاء</button>
+            <button type="submit" id="key-create-btn" class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                إنشاء
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL: SHOW KEY (one-time reveal)
+     ═══════════════════════════════════════════════════════════ -->
+<div id="key-result" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="showKeyTitle">
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h3 class="modal-title" id="showKeyTitle">مفتاح API الجديد</h3>
+            <button type="button" class="modal-close-btn" aria-label="إغلاق" data-modal-close="key-result">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body">
+
+            <!-- Warning banner -->
+            <div class="key-warning" role="alert">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>احتفظ بالمفتاح الآن — لن تتمكن من رؤيته مرة أخرى بعد إغلاق هذه النافذة.</span>
+            </div>
+
+            <!-- Key display + copy -->
+            <div class="modal-field">
+                <label class="form-label" for="newKeyValue">المفتاح السري</label>
+                <div class="key-value-row">
+                    <input
+                        type="text"
+                        id="key-raw"
+                        class="key-value-display"
+                        readonly
+                        dir="ltr"
+                        aria-label="قيمة المفتاح الجديد"
+                    >
+                    <button type="button" id="key-copy" class="btn btn-secondary btn-sm" title="نسخ المفتاح" aria-label="نسخ المفتاح">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        نسخ
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-modal-close="key-result">فهمت، أغلق</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL: REVOKE KEY CONFIRMATION
+     ═══════════════════════════════════════════════════════════ -->
+<div id="keys-confirm" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="revokeKeyTitle">
+    <div class="modal-card modal-card-sm">
+
+        <div class="modal-header">
+            <h3 class="modal-title" id="revokeKeyTitle">إلغاء صلاحية المفتاح؟</h3>
+            <button type="button" class="modal-close-btn" aria-label="إغلاق" data-modal-close="keys-confirm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-message">
+                سيتم إلغاء صلاحية هذا المفتاح فوراً. لن تتمكن أي أنظمة أو استوديوهات خارجية من استخدامه مجدداً.
+            </p>
+            <p class="modal-message">
+                <strong id="revokeKeyName" class="revoke-key-name">—</strong>
+            </p>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" id="keys-confirm-no" class="btn btn-ghost">إلغاء</button>
+            <button type="button" id="keys-confirm-yes" class="btn btn-danger">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                إلغاء المفتاح
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div id="keys-delete-confirm" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="deleteKeyTitle" aria-hidden="true">
+    <div class="modal-card modal-card-sm">
+        <div class="modal-header">
+            <h3 class="modal-title" id="deleteKeyTitle">حذف مفتاح API</h3>
+            <button type="button" class="modal-close-btn" aria-label="إغلاق" data-modal-close="keys-delete-confirm">×</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message" id="deleteKeyQuestion">هل تريد حذف هذا المفتاح من لوحة الإدارة؟</p>
+            <dl class="key-delete-details">
+                <dt>اسم المفتاح:</dt><dd id="deleteKeyName">—</dd>
+                <dt>البادئة:</dt><dd id="deleteKeyPrefix" dir="ltr">—</dd>
+                <dt>الحالة:</dt><dd id="deleteKeyStatus">ملغى</dd>
+            </dl>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="keys-delete-no" class="btn btn-ghost">إلغاء</button>
+            <button type="button" id="keys-delete-yes" class="btn btn-danger">حذف المفتاح</button>
+        </div>
+    </div>
+</div>
+
+<div id="keys-bulk-confirm" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="bulkDeleteTitle" aria-hidden="true">
+    <div class="modal-card modal-card-sm">
+        <div class="modal-header"><h3 class="modal-title" id="bulkDeleteTitle">حذف مفاتيح API</h3><button type="button" class="modal-close-btn" aria-label="إغلاق" data-modal-close="keys-bulk-confirm">×</button></div>
+        <div class="modal-body"><p class="modal-message" id="bulkDeleteQuestion"></p></div>
+        <div class="modal-footer"><button type="button" id="keys-bulk-no" class="btn btn-ghost">إلغاء</button><button type="button" id="keys-bulk-yes" class="btn btn-danger">حذف المحدد</button></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="/static/js/admin_api_keys.js?v=github-readiness-20261019"></script>{% endblock %}

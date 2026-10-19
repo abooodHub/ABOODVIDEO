@@ -1,0 +1,2 @@
+/* Compatibility entry point; token definitions live in the canonical dark-only system. */
+@import url("/static/css/system/tokens.css");

@@ -1,0 +1,131 @@
+    <aside class="sidebar" id="adminSidebar" aria-label="القائمة الرئيسية">
+
+
+
+
+
+        <!-- Brand -->
+
+
+        <a href="/admin" class="sidebar-brand">
+
+
+            <span class="brand-icon interface-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+
+
+            <span class="brand-wordmark">ABOOD<strong>VIDEO</strong><small>مساحة المحتوى</small></span>
+
+
+        </a>
+
+
+        <a class="interface-workspace" href="/admin"><span>أ</span><div><strong>مساحة المنصة</strong><small>المحتوى، الفريق والتشغيل</small></div></a>
+
+
+
+
+
+        <!-- Navigation -->
+
+
+<nav class="sidebar-nav" aria-label="التنقل الرئيسي">
+  <div class="interface-nav-group">
+    <span class="nav-section">المحتوى</span>
+    <a class="nav-item {% if active_nav == 'dashboard' %}is-active{% endif %}" href="/admin">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span class="nav-label">الرئيسية</span>
+    </a>
+    <a class="nav-item {% if active_nav in ['content', 'library', 'videos', 'video-detail', 'series', 'series-detail', 'drive', 'trash'] %}is-active{% endif %}" href="/admin/videos" id="{{ library_nav_id|default('navContentHub') }}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect width="14" height="14" x="1" y="5" rx="2"/></svg><span class="nav-label">مكتبة المحتوى</span>
+    </a>
+    <a class="nav-item {% if active_nav == 'upload' %}is-active{% endif %}" href="/admin/upload">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label">الرفع والاستيراد</span>
+    </a>
+    <a class="nav-item {% if active_nav == 'shares' %}is-active{% endif %}" href="/admin/shares">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span class="nav-label">المشاركة والتضمين</span>
+    </a>
+  </div>
+  <div class="interface-nav-group">
+    <span class="nav-section">التشغيل</span>
+    <a class="nav-item {% if active_nav == 'processing' %}is-active{% endif %}" href="/admin/processing">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4"/></svg><span class="nav-label">المعالجة</span><span class="nav-badge hidden" data-processing-badge id="processingBadge">0</span>
+    </a>
+  </div>
+  <div class="interface-nav-group">
+    <span class="nav-section">المتابعة والأدوات</span>
+    <a class="nav-item {% if active_nav == 'analytics' %}is-active{% endif %}" href="/admin/analytics" {% if active_nav == 'analytics' %}aria-current="page"{% endif %}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-5 5"/></svg><span class="nav-label">التحليلات</span>
+    </a>
+    <a class="nav-item {% if active_nav == 'api-keys' %}is-active{% endif %}" href="/admin/api-keys" {% if active_nav == 'api-keys' %}aria-current="page"{% endif %}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3"/><path d="m18.5 4.5 3 3"/></svg><span class="nav-label">مفاتيح API</span>
+    </a>
+
+
+  <span class="nav-section">الإعدادات</span>
+    <a class="nav-item {% if active_nav == 'settings' %}is-active{% endif %}" href="/admin/settings#system">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 15.4a1.65 1.65 0 0 0-1 1.51V17a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 15.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 11a1.65 1.65 0 0 0-1-1.51V9a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 9 10.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 15z"/></svg><span class="nav-label">الإعدادات العامة</span>
+    </a>
+  </div>
+</nav>
+
+
+
+
+
+        <!-- Footer: Storage + User + Logout -->
+
+
+        <div class="sidebar-footer">
+
+
+            
+
+
+
+
+
+            <!-- User row -->
+
+
+            <div class="sidebar-user" id="sidebarUserRow">
+
+
+                <span class="user-avatar" aria-hidden="true">A</span>
+
+
+                <span class="user-info">
+
+
+                    <span class="user-name">{{ admin_name|default("حسابك") }}</span>
+
+
+                    <span class="user-role">{{ admin_role|default("حساب المنصة") }}</span>
+
+
+                </span>
+
+
+            </div>
+
+
+
+
+
+            <!-- Logout -->
+
+
+            <button id="logout-btn" class="btn-logout" type="button">
+
+
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+
+
+                <span>تسجيل الخروج</span>
+
+
+            </button>
+
+
+        </div>
+
+
+    </aside>

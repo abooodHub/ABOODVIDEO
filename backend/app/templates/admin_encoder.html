@@ -1,0 +1,27 @@
+<section id="tab-encoder" class="settings-section tab-pane" role="tabpanel" aria-labelledby="settings-tab-encoder" aria-hidden="true">
+  <div class="settings-section-header"><h2>إعدادات الإنكودر</h2><p>احفظ إعداد التحويل مرة واحدة، وسيستخدمه رفع الفيديو تلقائيًا في المهام الجديدة.</p></div>
+  <form id="encoder-form" class="settings-card encoder-card">
+    <div class="settings-card-header"><div class="settings-card-title"><h3>تحويل الفيديو</h3><p>H.264 · CPU · AAC · HLS</p></div><span id="encoder-save-state" class="encoder-save-state" role="status">جارٍ التحميل…</span></div>
+    <fieldset id="encoder-controls" class="encoder-controls" disabled>
+      <legend class="sr-only">إعدادات ترميز الفيديو</legend>
+      <div class="encoder-profile-options" role="group" aria-label="إعدادات الإنكودر السريعة">
+        <button type="button" data-encoder-profile="fast" aria-pressed="false"><strong>أسرع</strong><small>veryfast · معدل بيانات 100%</small></button>
+        <button type="button" data-encoder-profile="balanced" aria-pressed="false"><strong>متوازن</strong><small>medium · معدل بيانات 100%</small></button>
+        <button type="button" data-encoder-profile="compact" aria-pressed="false"><strong>حجم أصغر</strong><small>slow · معدل بيانات 75%</small></button>
+      </div>
+      <div class="encoder-output-heading"><h3>دقّات الإخراج</h3><p>تُنشأ الدقّات المناسبة للمصدر دون تكبيره.</p></div>
+      <div id="encoder-output-options" class="encoder-output-options"></div>
+      <details class="encoder-advanced"><summary>تخصيص الترميز</summary>
+        <div class="encoder-custom-grid">
+          <label for="encoder-speed">سرعة الترميز<select id="encoder-speed" class="input"></select></label>
+          <label for="encoder-bitrate">معدل بيانات الفيديو <output id="encoder-bitrate-value" for="encoder-bitrate">100%</output><input id="encoder-bitrate" type="range" min="50" max="150" step="1" value="100"></label>
+        </div>
+        <p>100% هو المعدل القياسي لكل دقة. خفض النسبة يقلل الحجم وقد يقلل التفاصيل. تغيير السرعة لا يبدّل دقّات الإخراج.</p>
+      </details>
+      <div id="encoder-summary" class="encoder-summary" aria-live="polite"></div>
+      <div class="encoder-actions"><button type="submit" id="encoder-save" class="btn btn-primary" disabled>حفظ إعداد الإنكودر</button><button type="button" id="encoder-reset" class="btn btn-secondary" disabled>إلغاء التغييرات</button></div>
+    </fieldset>
+    <p id="encoder-feedback" class="encoder-feedback" role="status" aria-live="polite"></p>
+    <p class="encoder-scope-note">يسري الحفظ على مهام التحويل الجديدة في المنصة. ملفات المشاهدة المنشورة وحزم Studio الجاهزة تبقى بإعداداتها الحالية.</p>
+  </form>
+</section>

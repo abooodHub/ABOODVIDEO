@@ -1,0 +1,516 @@
+/* ============================================================
+   Watch page wrapper — works inside viewer_base.html shell
+   ============================================================ */
+
+/* No extra top offset needed — viewer-header is already sticky */
+.watch-main-offset {
+    min-height: calc(100vh - var(--viewer-header-height, 60px));
+    display: flex;
+    flex-direction: column;
+}
+
+.watch-page-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================================
+   ABOODVIDEO Viewer Design System — Watch Page Surrounding UI (V1)
+   Surrounding layout for Player V2, Below-player metadata,
+   True ASS subtitle indicators, Episode navigation,
+   and Password / Error prompt views.
+   ============================================================ */
+
+.watch-page-wrapper {
+    width: 100%;
+    max-width: 1380px;
+    margin-inline: auto;
+    padding-inline: clamp(12px, 2.5vw, 32px);
+    padding-top: 24px;
+    padding-bottom: 48px;
+}
+
+.watch-admin-badge {
+    font-size: 0.8rem;
+    padding: 5px 12px;
+}
+
+.watch-series-link {
+    color: var(--v-primary);
+    font-weight: 700;
+}
+
+.watch-more-section {
+    margin-top: 24px;
+}
+
+.watch-card-landscape {
+    aspect-ratio: 16 / 9;
+}
+
+.watch-ep-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+/* --- Player Container Surrounding Frame --- */
+.watch-player-frame {
+    position: relative;
+    width: 100%;
+    border-radius: var(--v-radius-xl);
+    overflow: hidden;
+    background: #020610;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
+    margin-bottom: 28px;
+}
+
+/* Ensure existing player-wrapper integrates cleanly */
+.watch-player-frame .player-wrapper {
+    margin: 0;
+    border-radius: var(--v-radius-xl);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+/* --- Below-Player Information Section --- */
+.watch-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 6px 4px 32px;
+}
+
+.watch-primary-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 1px solid var(--v-border);
+    padding-bottom: 20px;
+}
+
+.watch-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 280px;
+}
+
+.watch-title {
+    font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--v-text-primary);
+}
+
+.watch-sub-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--v-text-muted);
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.watch-capabilities-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Episode Navigation (Next / Prev) */
+.watch-episode-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.watch-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--v-radius-full);
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: var(--v-surface-1);
+    border: 1px solid var(--v-border);
+    color: var(--v-text-secondary);
+    text-decoration: none;
+    transition: all var(--v-transition-fast);
+}
+
+.watch-nav-btn:hover {
+    background: var(--v-surface-2);
+    border-color: var(--v-border-light);
+    color: var(--v-text-primary);
+}
+
+/* Video Description Section */
+.watch-description-box {
+    background: var(--v-surface-1);
+    border: 1px solid var(--v-border);
+    border-radius: var(--v-radius-lg);
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.watch-desc-heading {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--v-text-primary);
+}
+
+.watch-desc-text {
+    color: var(--v-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* Tech Info Badges */
+.watch-tech-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    border-top: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.watch-tech-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--v-text-muted);
+    background: var(--v-surface-2);
+    padding: 4px 10px;
+    border-radius: var(--v-radius-full);
+    border: 1px solid var(--v-border);
+}
+
+/* --- Password Protected Card --- */
+.watch-password-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 480px;
+    padding: 32px 16px;
+}
+
+.password-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--v-surface-2);
+    border: 1px solid var(--v-border-light);
+    border-radius: var(--v-radius-xl);
+    padding: 40px 32px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+    text-align: center;
+}
+
+.password-card-icon {
+    width: 48px;
+    height: 48px;
+    margin-inline: auto;
+    margin-bottom: 20px;
+    color: var(--v-primary);
+    background: var(--v-primary-soft);
+    padding: 10px;
+    border-radius: var(--v-radius-full);
+}
+
+.password-card h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--v-text-primary);
+}
+
+.password-card p {
+    color: var(--v-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin-bottom: 24px;
+}
+
+.pw-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: var(--v-radius-md);
+    background: var(--v-surface-1);
+    border: 1px solid var(--v-border);
+    color: var(--v-text-primary);
+    font-size: 1.1rem;
+    text-align: center;
+    letter-spacing: 0.2em;
+    outline: none;
+    margin-bottom: 16px;
+    transition: all var(--v-transition-fast);
+}
+
+.pw-input:focus {
+    border-color: var(--v-border-focus);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.pw-submit {
+    width: 100%;
+    height: 48px;
+    border-radius: var(--v-radius-md);
+    background: var(--v-primary);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: 0;
+    cursor: pointer;
+    transition: background var(--v-transition-fast), transform var(--v-transition-fast);
+}
+
+.pw-submit:hover {
+    background: var(--v-primary-hover);
+    transform: translateY(-1px);
+}
+
+.pw-error {
+    color: var(--v-danger);
+    font-size: 0.85rem;
+    margin-top: 12px;
+    min-height: 20px;
+}
+
+/* --- Responsive Rules for Watch --- */
+@media (max-width: 768px) {
+    .watch-page-wrapper {
+        padding-inline: 8px;
+    }
+    .watch-player-frame {
+        border-radius: 0;
+        margin-inline: -8px;
+        width: calc(100% + 16px);
+    }
+    .watch-player-frame .player-wrapper {
+        border-radius: 0;
+        border-inline: 0;
+    }
+    .watch-details-container {
+        padding-inline: 8px;
+    }
+}
+
+/* ============================================================
+   Watch Page Hotfix: Hidden State & Single-Icon Control Enforcer
+   ============================================================ */
+.hidden,
+.is-hidden,
+svg.hidden,
+button.hidden,
+div.hidden,
+span.hidden {
+    display: none !important;
+}
+
+/* Strict Native Controls Suppressor */
+video::-webkit-media-controls,
+video::-webkit-media-controls-enclosure,
+video::-webkit-media-controls-panel {
+    display: none !important;
+    -webkit-appearance: none !important;
+}
+
+/* ============================================================
+   Cinema Minimal Header Styles
+   ============================================================ */
+.watch-cinema-header {
+    background: #020610 !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
+    height: 56px !important;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.watch-cinema-header-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    height: 100% !important;
+}
+
+/* ============================================================
+   Watch Title Header above Player
+   ============================================================ */
+.watch-title-header {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.watch-cinema-title {
+    font-size: clamp(1.25rem, 2.2vw, 1.85rem);
+    font-weight: 800;
+    color: var(--v-text-primary, #f8fafc);
+    line-height: 1.3;
+    margin: 0;
+    word-break: break-word;
+}
+
+.admin-preview-badge {
+    align-self: flex-start;
+    padding: 3px 9px;
+    border: 1px solid var(--v-border-subtle, #334155);
+    border-radius: 999px;
+    background: var(--v-surface-raised, #172033);
+    color: var(--v-text-secondary, #cbd5e1);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.watch-series-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--v-text-secondary, #94a3b8);
+}
+
+.watch-meta-dot {
+    color: var(--v-text-muted, #64748b);
+    user-select: none;
+}
+
+/* ============================================================
+   Responsive Rules: 1920x1080, 1440x900, 1280x720, 390x844
+   ============================================================ */
+@media (max-width: 640px) {
+    .volume-slider {
+        display: none !important;
+    }
+    .watch-page-wrapper {
+        padding-inline: 8px !important;
+        padding-top: 12px !important;
+    }
+    .watch-cinema-title {
+        font-size: 1.15rem;
+    }
+    .controls-left, .controls-right {
+        gap: 6px;
+    }
+    .time-display {
+        font-size: 11px;
+    }
+}
+
+
+/* P0.6 watch visual consistency only */
+.watch-page-wrapper{background:var(--bg-base);color:var(--text-primary)}.watch-title-header{max-width:1440px;margin-inline:auto;padding-inline:20px}.watch-player-frame{border-color:var(--border-subtle);box-shadow:var(--shadow-md)}.watch-cinema-header{background:var(--bg-base);border-color:var(--border-subtle)}.player-wrapper{background:#000}@media(max-width:640px){.watch-page-wrapper{padding-inline:0}.watch-title-header{padding-inline:14px}.watch-player-frame{border-radius:0}}
+
+/* Fatal Playback Error Overlay */
+.player-fatal-error {
+    position: absolute;
+    inset: 0;
+    z-index: 65;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(2, 6, 23, 0.94);
+    backdrop-filter: blur(8px);
+}
+.player-fatal-error.hidden {
+    display: none !important;
+}
+.player-error-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding: 24px;
+    max-width: 440px;
+    background: #0b1322;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+.player-error-message {
+    color: #f1f5f9;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin: 0;
+}
+.player-retry-btn {
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+.player-retry-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+.player-retry-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================================
+   Seamless Fullscreen Embed Mode (WordPress / External iFrames)
+   ============================================================ */
+html:has(body.aboodvideo-embed-mode),
+body.aboodvideo-embed-mode {
+    background: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+body.aboodvideo-embed-mode .watch-main-offset {
+    min-height: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+body.aboodvideo-embed-mode .watch-page-wrapper {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+body.aboodvideo-embed-mode .watch-player-frame {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 1 100% !important;
+}
+
+body.aboodvideo-embed-mode .watch-player-frame .player-wrapper {
+    border-radius: 0 !important;
+    border: none !important;
+    width: 100% !important;
+    height: 100% !important;
+}

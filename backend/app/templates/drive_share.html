@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABOODVIDEO — {{ share.target_title }}</title>
+  <link rel="stylesheet" href="/static/css/admin_tokens.css?v=m6-admin-platform-20261016-fix2">
+  <link rel="stylesheet" href="/static/css/drive.css?v=m6-admin-platform-20261016-fix2">
+<link rel="stylesheet" href="/static/css/atelier-v2.css?v=m6-admin-platform-20261016-fix2">
+</head>
+<body class="share-viewer-body">
+  <div class="share-wrapper">
+    <!-- Header -->
+    <header class="share-header">
+      <div class="share-header-content">
+        <div class="share-brand">
+          <div class="brand-symbol">A</div>
+          <div class="brand-text">
+            <span class="brand-name">ABOODVIDEO</span>
+            <span class="brand-badge">رابط مشاركة</span>
+          </div>
+        </div>
+
+        <div class="share-meta-box">
+          <h1 class="share-title">{{ share.target_title }}</h1>
+          {% if share.target_description %}
+          <p class="share-description">{{ share.target_description }}</p>
+          {% endif %}
+          <div class="share-pills">
+            <span class="share-pill share-pill-type">
+              {% if share.target_type == 'season' %}موسم كامل
+              {% elif share.target_type == 'series' %}مسلسل
+              {% elif share.target_type == 'folder' %}مجلد
+              {% else %}فيديو
+              {% endif %}
+            </span>
+            <span class="share-pill share-pill-count">{{ share.total_items }} عناصر</span>
+            {% if share.allow_download %}
+            <span class="share-pill share-pill-dl-allow">التنزيل مسموح</span>
+            {% else %}
+            <span class="share-pill share-pill-dl-deny">للمشاهدة فقط</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content List -->
+    <main class="share-main">
+      <div class="share-card">
+        <div class="share-table-responsive">
+          <table class="drive-table share-table">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th class="col-title">العنوان</th>
+                <th class="col-quality">الجودة</th>
+                <th class="col-subtitles">الترجمة</th>
+                <th class="col-duration">المدة</th>
+                <th class="col-size">الحجم</th>
+                <th class="col-actions">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in items or (share.get('items', []) if share.get is defined else []) %}
+              <tr class="share-row" data-video-id="{{ item.id }}">
+                <td class="col-num text-muted">{{ item.episode_number if item.episode_number else loop.index }}</td>
+                <td class="col-title">
+                  <div class="cell-title-group">
+                    <span class="item-icon-video" aria-hidden="true"><svg class="av-icon"><use href="/static/icons.svg?v=m6-admin-platform-20261016-fix2#video"></use></svg></span>
+                    <span class="item-display-title">{{ item.title }}</span>
+                  </div>
+                </td>
+                <td class="col-quality">
+                  <span class="badge-quality {{ 'badge-4k' if item.quality == '4K' else 'badge-hd' }}">{{ item.quality }}</span>
+                </td>
+                <td class="col-subtitles">
+                  {% if item.subtitles == 'ASS' %}
+                  <span class="badge-sub-ass" title="{{ item.subtitles_detail }}">ASS ({{ item.font_count }} خطوط)</span>
+                  {% elif item.subtitles == 'VTT' %}
+                  <span class="badge-sub-vtt">{{ item.subtitles }}</span>
+                  {% else %}
+                  <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td class="col-duration text-muted">{{ item.duration_formatted }}</td>
+                <td class="col-size text-muted">{{ item.size_formatted }}</td>
+                <td class="col-actions">
+                  <div class="share-actions-row">
+                    {% if item.visibility != "PRIVATE" or can_preview_private %}<a href="/preview/share/{{ share.token }}/watch/{{ item.id }}" class="btn-share-action btn-share-watch">مشاهدة</a>{% else %}<span class="text-muted">فيديو خاص</span>{% endif %}
+                    {% if item.can_download %}
+                    <a href="/preview/share/{{ item.share_token }}/download/{{ item.id }}" class="btn-share-action btn-share-dl" download>تنزيل</a>
+                    {% else %}
+                    <span class="badge-dl-denied" title="التنزيل معطل لهذا الفيديو وفقاً لسياسة التنزيل">معطل</span>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="share-footer">
+      <p>ABOODVIDEO Private Media Drive — مشغل خاص بتقنية HLS ودعم كامل لخطوط ASS</p>
+    </footer>
+  </div>
+<script src="/static/js/atelier-motion.js?v=m6-admin-platform-20261016-fix2" defer></script>
+</body>
+</html>

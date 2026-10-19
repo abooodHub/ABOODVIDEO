@@ -1,0 +1,20 @@
+{
+  "package": "jassub",
+  "version": "1.8.8",
+  "source_commit": "ca27d60a672612b2b8a80d0728092c2164e32a07",
+  "package_url": "https://registry.npmjs.org/jassub/-/jassub-1.8.8.tgz",
+  "package_integrity": "sha512-Vtw27Z0/hN2Tm2Qs4HAR+eONwwSD5ULo/hisPvmiaW9Ya6aFCt7esvWQSZy6nvBASbRyKmpghgeioIPqXGHA0Q==",
+  "sha256": {
+    "COPYRIGHT": "420f27cc7703563bb12842b10244f4a4951dc8bbcc5456050e696db96533edfb",
+    "default.woff2": "886929903707c5bb28b07cd2eed69921b3d5ef5c49c73a0dd1e187ebf6546a4c",
+    "jassub-worker-modern.wasm": "465401b1b406e4f010dd2494a9cee47d78a1725b8adc3f381437fd32f0c1e9c2",
+    "jassub-worker.js": "461630248e9f72adba6b1aefe5b852fe33bb31156eb1c36f83dc0bf424cff8a6",
+    "jassub-worker.wasm": "b6e9d3b1a6318ecfb9728c03a763b1e60796ca59d454820913deec62eebb8927",
+    "jassub.umd.js": "ec8f992cfc9b69a435f8cd0fb7a060745184c5dfc5aac68ae3807cb7532c875d",
+    "LICENSE": "f300758600ecf59b736407f80f6dc8338a9879a062c6bcb16cc739d14814ec75"
+  },
+  "modified": [
+    "jassub-worker.js"
+  ],
+  "patch": "patches/csp-dispatch.patch"
+}

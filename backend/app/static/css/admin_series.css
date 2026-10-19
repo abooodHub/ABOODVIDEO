@@ -1,0 +1,94 @@
+/* ============================================================
+   ABOODVIDEO Admin — Series (Phase 9)
+   ============================================================ */
+
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+}
+
+.series-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, #142033, var(--bg-surface));
+    box-shadow: var(--shadow-1);
+    text-decoration: none;
+    color: var(--text);
+    transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.series-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-2);
+}
+
+.series-card-header { display: flex; align-items: center; gap: var(--space-3); }
+
+.series-poster {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 auto;
+    border-radius: var(--radius-md);
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border: 1px solid var(--border-strong);
+}
+
+.series-card h2 { margin: 0; font-size: var(--text-lg); line-height: 1.5; overflow-wrap: anywhere; }
+
+.series-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+}
+
+.series-stat {
+    padding: var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface-alt);
+    text-align: center;
+}
+
+.series-stat b { display: block; font-size: var(--text-lg); }
+.series-stat span { color: var(--text-faint); font-size: var(--text-xs); }
+
+.series-foot { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+
+/* Detail page */
+.detail-heading { display: flex; align-items: center; gap: var(--space-4); min-width: 0; }
+.detail-badges { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); }
+
+.season-block {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, #142033, var(--bg-surface));
+    box-shadow: var(--shadow-1);
+    margin-bottom: var(--space-5);
+    overflow: hidden;
+}
+
+.season-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--border);
+}
+
+.season-title { margin: 0; font-size: var(--text-lg); }
+
+@media (max-width: 760px) {
+    .series-stats { grid-template-columns: repeat(3, 1fr); }
+}

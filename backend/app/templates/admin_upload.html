@@ -1,0 +1,176 @@
+{% extends 'admin_base.html' %}
+{% block title %}الرفع والتحويل{% endblock %}
+{% block topbar_title %}الرفع والتحويل{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_upload.css?v=encoder-on-add-20261018"><link rel="stylesheet" href="/static/css/system/layout-admin-operations.css?v=m6-admin-platform-20261016-fix2">
+{% endblock %}
+
+{% block content %}
+<div class="upload-layout">
+
+  <!-- ════════════════════════════════════
+       LEFT COLUMN — Main upload area
+  ════════════════════════════════════ -->
+  <div class="upload-main">
+
+    <!-- Drop Zone -->
+    <div id="dropzone-section" class="upload-source-card">
+    <div id="dropzone" class="upload-dropzone" role="button" tabindex="0"
+         aria-label="منطقة رفع الفيديوهات — اسحب وأفلت أو اضغط لاختيار ملفات">
+
+      <!-- Cloud / Upload icon -->
+      <div class="dropzone-icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"
+             viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 16 12 12 8 16"/>
+          <line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+        </svg>
+      </div>
+
+      <h2 class="dropzone-title">اسحب الفيديوهات أو المجلد هنا</h2>
+      <p class="dropzone-desc">أو استخدم الأزرار أدناه</p>
+
+      <div class="dropzone-actions">
+        <button type="button" id="btn-pick-files" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          اختيار فيديوهات
+        </button>
+        <button type="button" id="btn-pick-folder" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          اختيار مجلد
+        </button>
+      </div>
+
+      <!-- Hidden file inputs (managed by admin_upload.js) -->
+      <input type="file" id="file-input-files" multiple
+             accept="video/*,video/mp4,video/webm,video/ogg,video/mkv,video/avi,video/mov"
+             aria-hidden="true" tabindex="-1" hidden>
+      <input type="file" id="file-input-folder"
+             webkitdirectory mozdirectory directory
+             aria-hidden="true" tabindex="-1" hidden>
+    </div>
+    <fieldset id="upload-processing-controls" class="upload-processing-controls hidden">
+      <legend>إعدادات الإنكودر</legend>
+      <div id="upload-conversion-options">
+        <label for="upload-encoder-profile">إعداد التحويل<select id="upload-encoder-profile" class="input" disabled><option value="saved">الإعداد المحفوظ</option><option value="fast">أسرع</option><option value="balanced">متوازن</option><option value="compact">حجم أصغر</option></select></label>
+        <details class="upload-output-details" open><summary>دقّات الإخراج</summary><div id="upload-output-options" class="upload-output-options"></div></details>
+      </div>
+      <p id="upload-processing-feedback" role="status" aria-live="polite">جارٍ تحميل إعدادات الإنكودر…</p>
+      <button type="button" id="upload-encoder-retry" class="btn btn-secondary btn-sm hidden">إعادة تحميل الإعدادات</button>
+    </fieldset>
+    </div>
+    <!-- /Drop Zone -->
+
+
+    <!-- Upload Queue (hidden until files are added) -->
+    <div id="queue-section" class="upload-queue hidden" aria-live="polite">
+
+      <div class="upload-queue-header">
+        <div class="upload-queue-header__title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+          طابور الرفع
+          <span id="queue-count-badge" class="queue-badge">0</span>
+        </div>
+        <span id="queue-size-badge" class="upload-queue-header__size text-muted text-xs font-mono"></span>
+        <div class="upload-queue-actions">
+          <button type="button" id="btn-add-more" class="btn btn-secondary btn-sm">إضافة ملفات</button>
+          <button type="button" id="btn-clear-queue" class="btn btn-ghost btn-sm">مسح الطابور</button>
+          <a id="link-processing-queue" class="btn btn-secondary btn-sm hidden" href="/admin/processing">عرض المعالجة</a>
+        </div>
+      </div>
+
+      <!-- Queue item template (cloned by JS) -->
+      <template id="uploadItemTemplate">
+        <div class="upload-item" data-file-id="">
+          <!-- File name -->
+          <div class="upload-item-name" title=""></div>
+          <!-- File size -->
+          <div class="upload-item-size"></div>
+          <!-- Progress bar -->
+          <div class="upload-item-progress">
+            <div class="progress-track">
+              <div class="progress-fill"></div>
+            </div>
+            <div class="progress-pct text-xs font-mono text-muted">0%</div>
+          </div>
+          <!-- Speed + ETA -->
+          <div class="upload-item-meta">
+            <span class="item-speed"></span>
+            <span class="item-eta"></span>
+          </div>
+          <!-- Status badge -->
+          <div class="upload-item-status">
+            <span class="badge badge-pending">انتظار</span>
+          </div>
+          <!-- Cancel / Retry action -->
+          <button type="button" class="upload-item-action btn-icon" aria-label="إلغاء">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </template>
+
+      <div id="queue-status-summary" class="upload-queue-summary hidden" aria-live="polite">
+        <span>مكتمل <b id="summary-completed-num">0</b></span><span>جارٍ <b id="summary-active-num">0</b></span><span>بالانتظار <b id="summary-queued-num">0</b></span>
+      </div>
+      <!-- Live item list -->
+      <div id="queue-list" class="upload-item-list"></div>
+      <div class="upload-batch-actions">
+        <button type="button" id="btn-start-batch" class="btn btn-primary"><span id="btn-start-batch-label">بدء الرفع</span></button>
+        <button type="button" id="btn-cancel-batch" class="btn btn-danger hidden">إيقاف الرفع</button>
+      </div>
+      <section id="batch-progress-card" class="upload-progress-card hidden" aria-live="polite">
+        <div><span>التقدم</span><strong id="batch-overall-pct">0%</strong><span><b id="batch-done-count">0</b> / <b id="batch-total-files">0</b></span></div>
+        <div class="progress-track"><div id="batch-progress-bar-fill" class="progress-fill"></div></div>
+        <div class="upload-progress-meta"><span id="batch-telemetry-speed">0 MB/s</span><span id="batch-telemetry-eta">--:--</span><span id="batch-telemetry-bytes">0 B</span></div>
+      </section>
+
+    </div>
+    <!-- /Upload Queue -->
+
+  </div>
+  <!-- /LEFT COLUMN -->
+
+</div>
+
+<div class="modal-overlay upload-modal" id="modal-destination" role="dialog" aria-modal="true" aria-labelledby="upload-destination-title" aria-hidden="true">
+  <section class="modal-box">
+    <header class="modal-header"><h2 id="upload-destination-title">اختر مجلدًا أو موسمًا</h2><button type="button" id="btn-close-dest-modal" class="icon-btn" aria-label="إغلاق">×</button></header>
+    <div class="modal-body"><nav id="destination-picker-path" class="upload-destination-breadcrumbs" aria-label="مسار وجهة الرفع"></nav><div id="folder-tree-list" class="folder-tree-list"><p class="text-muted">جاري تحميل المجلدات…</p></div>
+
+    </div>
+    <footer class="modal-footer"><button type="button" id="btn-cancel-dest-modal" class="btn btn-secondary">إلغاء</button><button type="button" id="btn-confirm-dest-modal" class="btn btn-primary">اختيار المجلد</button></footer>
+  </section>
+</div>
+<div class="modal-overlay upload-modal" id="modal-confirm-item" role="dialog" aria-modal="true" aria-labelledby="cancel-item-title" aria-hidden="true"><section class="modal-box"><header class="modal-header"><h2 id="cancel-item-title">إلغاء رفع الملف؟</h2></header><div class="modal-body"><p>سيتم إلغاء رفع <b id="cancel-item-filename"></b>.</p></div><footer class="modal-footer"><button id="btn-cancel-item-no" class="btn btn-secondary" type="button">متابعة الرفع</button><button id="btn-cancel-item-yes" class="btn btn-danger" type="button">إلغاء الرفع</button></footer></section></div>
+<div class="modal-overlay upload-modal" id="modal-confirm-batch" role="dialog" aria-modal="true" aria-labelledby="cancel-batch-title" aria-hidden="true"><section class="modal-box"><header class="modal-header"><h2 id="cancel-batch-title">إيقاف طابور الرفع؟</h2></header><div class="modal-body"><p>ستبقى الملفات المكتملة كما هي.</p></div><footer class="modal-footer"><button id="btn-cancel-batch-no" class="btn btn-secondary" type="button">متابعة</button><button id="btn-cancel-batch-yes" class="btn btn-danger" type="button">إيقاف</button></footer></section></div>
+{% endblock %}
+
+{% block extra_js %}<script src="/static/js/admin_upload.js?v=github-readiness-20261019"></script>{% endblock %}

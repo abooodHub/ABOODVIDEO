@@ -1,0 +1,91 @@
+{% extends 'admin_base.html' %}
+{% block title %}روابط المشاركة{% endblock %}
+{% block topbar_title %}روابط المشاركة{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_shares.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/system/layout-admin-operations.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/shares-motion-v1.css?v=m6-admin-platform-20261016-fix2">
+{% endblock %}
+
+{% block content %}
+<!-- ===== Page Header ===== -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1 class="page-title">روابط المشاركة</h1>
+    <p class="page-desc">عرض روابط المشاهدة المشتركة وإنشاؤها أو إيقافها.</p>
+  </div>
+</div>
+
+<!-- ===== Summary Stat Cards ===== -->
+<div class="shares-summary-row">
+  <!-- Active -->
+  <div class="share-stat-card">
+    <div class="share-stat-val badge-success" id="stat-shares-active">—</div>
+    <div class="share-stat-label">نشطة</div>
+  </div>
+  <!-- Expired -->
+  <div class="share-stat-card">
+    <div class="share-stat-val badge-muted" id="stat-shares-expired">—</div>
+    <div class="share-stat-label">منتهية</div>
+  </div>
+  <!-- Revoked -->
+  <div class="share-stat-card">
+    <div class="share-stat-val badge-danger" id="stat-shares-revoked">—</div>
+    <div class="share-stat-label">ملغاة</div>
+  </div>
+</div>
+
+<!-- ===== Filter Tabs ===== -->
+<div class="tabs-bar" id="sharesTabs" role="tablist" aria-label="تصفية المشاركات">
+  <button class="tab-btn is-active" data-tab="all"     role="tab" aria-selected="true"><span>كل المشاركات</span><span class="share-tab-count" data-share-count="all">—</span></button>
+  <button class="tab-btn"           data-tab="active"  role="tab" aria-selected="false"><span>نشطة</span><span class="share-tab-count" data-share-count="active">—</span></button>
+  <button class="tab-btn"           data-tab="expired" role="tab" aria-selected="false"><span>منتهية</span><span class="share-tab-count" data-share-count="expired">—</span></button>
+  <button class="tab-btn"           data-tab="revoked" role="tab" aria-selected="false"><span>ملغاة</span><span class="share-tab-count" data-share-count="revoked">—</span></button>
+</div>
+
+<!-- ===== Shares Table ===== -->
+<div class="admin-panel">
+  <div class="table-responsive">
+    <table class="data-table" id="sharesTable" aria-label="جدول المشاركات">
+      <thead>
+        <tr>
+          <th>المحتوى</th>
+          <th>الحالة</th>
+          <th>الرابط</th>
+          <th>تاريخ الإنشاء</th>
+          <th>الانتهاء</th>
+          <th>المشاهدات</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="sharesTableBody">
+        <!-- Empty state shown until JS populates rows -->
+        <tr class="empty-state-row" id="sharesEmptyRow">
+          <td colspan="7">
+            <div class="empty-state">
+              <span class="empty-state-icon" aria-hidden="true"><svg class="av-icon"><use href="/static/icons.svg?v=m6-admin-platform-20261016-fix2#shares"></use></svg></span>
+              <p class="empty-state-text">جاري تحميل المشاركات…</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== Revoke Confirm Modal ===== -->
+<div class="modal-overlay" id="revokeModal" role="dialog" aria-modal="true" aria-labelledby="revokeModalTitle" hidden>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="revokeModalTitle">تأكيد الإلغاء</h2>
+      <button class="modal-close icon-btn" id="revokeModalClose" aria-label="إغلاق"><svg class="av-icon" aria-hidden="true"><use href="/static/icons.svg?v=m6-admin-platform-20261016-fix2#close"></use></svg></button>
+    </div>
+    <div class="modal-body">
+      <p>هل أنت متأكد أنك تريد إلغاء هذا الرابط؟ لن يتمكن أحد من الوصول إليه بعد الآن.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="revokeCancelBtn">إلغاء</button>
+      <button class="btn btn-danger"    id="revokeConfirmBtn">تأكيد الإلغاء</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="/static/js/admin_shares.js?v=github-readiness-20261019"></script>{% endblock %}

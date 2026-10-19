@@ -1,0 +1,16 @@
+/* Viewer compatibility aliases backed by the canonical dark-only tokens. */
+:root {
+ --v-bg:var(--bg-base); --v-border:var(--border-subtle); --v-border-light:var(--border-subtle); --v-border-focus:var(--focus-ring);
+ --v-text-primary:var(--text-primary); --v-text-secondary:var(--text-secondary); --v-text-muted:var(--text-muted);
+ --v-primary:var(--accent); --v-primary-hover:var(--accent-hover); --v-primary-active:#0f766e; --v-primary-soft:var(--accent-soft); --v-danger:var(--danger);
+ --v-surface-1:var(--bg-surface); --v-surface-2:var(--bg-elevated); --v-surface-3:var(--bg-hover);
+ --v-radius-xs:3px; --v-radius-sm:var(--radius-sm); --v-radius-md:var(--radius-md); --v-radius-lg:var(--radius-lg); --v-radius-xl:var(--radius-xl); --v-radius-full:var(--radius-full);
+ --v-transition:var(--transition-base); --v-transition-fast:var(--transition-fast); --v-font:var(--font-sans); --v-header-height:60px; --v-container-max:1440px;
+ --v-badge-4k:var(--warning); --v-badge-4k-bg:var(--warning-bg); --v-badge-gold:var(--warning); --v-badge-gold-bg:var(--warning-bg);
+ --v-badge-hd:var(--accent-hover); --v-badge-hd-bg:var(--accent-soft); --v-badge-ass:var(--success); --v-badge-ass-bg:var(--success-bg);
+ --text-label:var(--text-secondary);
+ --primary:var(--accent); --primary-active:#0f766e;
+ --info:var(--accent); --shadow-modal:var(--shadow-lg);
+ --font-family:var(--font-sans); --text-xs:12px; --text-sm:13px; --text-base:14px; --text-md:14px;
+ --text-lg:16px; --text-xl:20px; --text-2xl:24px; --viewer-max-width:1440px;
+}

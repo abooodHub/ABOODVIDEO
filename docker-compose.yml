@@ -1,0 +1,244 @@
+# ==============================================================================
+# ABOODVIDEO - Production-Ready Docker Compose Architecture
+# Multi-container setup with logical isolation, healthchecks, and resource caps
+# ==============================================================================
+
+services:
+  postgres:
+    build:
+      context: ./deploy/postgres
+    image: aboodvideo-postgres:1.0.0
+    container_name: aboodvideo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aboodvideo_db}
+      POSTGRES_USER: ${POSTGRES_USER:-aboodvideo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - aboodvideo_postgres_data:/var/lib/postgresql/data
+    # RULE 12: DO NOT expose port 5432 to public interface (internal bridge network only)
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aboodvideo_user} -d ${POSTGRES_DB:-aboodvideo_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+    networks:
+      - aboodvideo_net
+    profiles:
+      - default
+      - backend
+      - full
+
+  redis:
+    build:
+      context: ./deploy/redis
+    image: aboodvideo-redis:1.0.0
+    container_name: aboodvideo_redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --save 60 1
+      --loglevel notice
+      --maxmemory 512mb
+      --maxmemory-policy volatile-lru
+    volumes:
+      - aboodvideo_redis_data:/data
+    # RULE 12: DO NOT expose port 6379 to public interface (internal bridge network only)
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+    networks:
+      - aboodvideo_net
+    profiles:
+      - default
+      - backend
+      - full
+
+  backend:
+    user: "10001:10001"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: aboodvideo-backend:1.0.0
+    container_name: aboodvideo_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - WEB_CONCURRENCY=${WEB_CONCURRENCY:-1}
+    volumes:
+      - aboodvideo_storage:/app/storage
+    expose:
+      - "8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+    networks:
+      - aboodvideo_net
+    profiles:
+      - default
+      - backend
+      - full
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: aboodvideo-nginx:1.0.0
+    container_name: aboodvideo_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - aboodvideo_storage:/var/www/storage:ro
+      - ./backend/app/static:/var/www/static:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/api/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+    networks:
+      - aboodvideo_net
+    profiles:
+      - default
+      - backend
+      - full
+
+  # Transcoding Worker (Phase 3 background worker, no profiles restriction)
+  worker:
+    user: "10001:10001"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: aboodvideo-backend:1.0.0
+    container_name: aboodvideo_worker
+    restart: unless-stopped
+    entrypoint: ["python", "-m", "app.workers.transcode_worker"]
+    env_file:
+      - .env
+    volumes:
+      - aboodvideo_storage:/app/storage
+    depends_on:
+      backend:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "8.0"
+          memory: 3072M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+    networks:
+      - aboodvideo_net
+
+  # Background Reconciler (Phase 5 stalled package sessions and cleanup)
+  reconciler:
+    user: "10001:10001"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: aboodvideo-backend:1.0.0
+    container_name: aboodvideo_reconciler
+    restart: unless-stopped
+    entrypoint: ["python", "-m", "app.workers.reconciler"]
+    env_file:
+      - .env
+    volumes:
+      - aboodvideo_storage:/app/storage
+    depends_on:
+      backend:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+    networks:
+      - aboodvideo_net
+
+networks:
+  aboodvideo_net:
+    driver: bridge
+    name: aboodvideo_net
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  aboodvideo_postgres_data:
+    name: aboodvideo_postgres_data
+  aboodvideo_redis_data:
+    name: aboodvideo_redis_data
+  aboodvideo_storage:
+    name: aboodvideo_storage

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="referrer" content="no-referrer">
+    <title>{% block title %}ABOODVIDEO — المكتبة الخاصة{% endblock %}</title>
+
+    <!-- Viewer Modular Design System V2 (CSP Compliant — no external resources) -->
+    <link rel="stylesheet" href="/static/css/system/tokens.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/system/layout-viewer.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/system/utilities.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/viewer_tokens.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/viewer_base.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/viewer_shell.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/viewer_components.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/viewer_cards.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/viewer_series.css?v=m6-admin-platform-20261016-fix2">
+    {% block extra_css %}{% endblock %}
+<link rel="stylesheet" href="/static/css/atelier-v2.css?v=m6-admin-platform-20261016-fix2">
+</head>
+<body{% if EMBED_MODE %} class="aboodvideo-embed-mode"{% endif %}>
+
+    <!-- ============================================================
+         HEADER — Sticky, RTL-first
+         ============================================================ -->
+    {% block header %}{% if not EMBED_MODE %}
+    <header class="viewer-header" id="viewer-header">
+        <div class="viewer-container viewer-header-inner">
+
+            <!-- Brand: ABOOD + accent VIDEO (direction: ltr so it reads correctly) -->
+            <a href="{{ prefix or '' }}/" class="viewer-brand" aria-label="ABOODVIDEO — الصفحة الرئيسية">
+                ABOOD<span class="brand-accent">VIDEO</span>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="viewer-nav" aria-label="التنقل الرئيسي">
+                <a href="{{ prefix or '' }}/"
+                   class="viewer-nav-link {% if active_nav == 'home' %}is-active{% endif %}">الرئيسية</a>
+                <a href="{{ prefix or '' }}/browse"
+                   class="viewer-nav-link {% if active_nav == 'library' %}is-active{% endif %}">المكتبة</a>
+                <a href="{{ prefix or '' }}/browse?type=series"
+                   class="viewer-nav-link {% if active_nav == 'series' %}is-active{% endif %}">المسلسلات</a>
+            </nav>
+
+            <!-- Header Search -->
+            <div class="viewer-header-search">
+                <form action="{{ prefix or '' }}/browse" method="GET"
+                      class="viewer-header-search-form" role="search">
+                    <svg class="viewer-search-icon" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="search" name="q"
+                           value="{{ search_query or '' }}"
+                           class="viewer-header-search-input"
+                           placeholder="ابحث في العناوين والمسلسلات..."
+                           aria-label="البحث في المنصة">
+                    <span class="viewer-search-shortcut" title="اضغط / للبحث سريعاً">/</span>
+                </form>
+            </div>
+
+            <!-- Actions: Admin link + Mobile hamburger -->
+            <div class="viewer-header-actions">
+                <a href="/admin" class="viewer-admin-link"
+                   title="الانتقال إلى لوحة إدارة المنصة">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span class="admin-label">لوحة التحكم</span>
+                </a>
+
+                <!-- Mobile Hamburger -->
+                <button type="button" class="viewer-hamburger"
+                        id="viewer-hamburger-btn" aria-label="فتح القائمة" aria-expanded="false"
+                        aria-controls="viewer-drawer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <line x1="3" y1="6"  x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+    </header>
+    {% endif %}{% endblock %}
+
+    <!-- ============================================================
+         MOBILE DRAWER — Backdrop + Aside
+         ============================================================ -->
+    {% block drawer %}{% if not EMBED_MODE %}
+    <div class="viewer-drawer-backdrop" id="viewer-drawer-backdrop" aria-hidden="true"></div>
+
+    <aside class="viewer-drawer" id="viewer-drawer"
+           aria-label="قائمة التنقل للأجهزة المحمولة" aria-modal="true" role="dialog">
+
+        <div class="viewer-drawer-header">
+            <a href="{{ prefix or '' }}/" class="viewer-brand" aria-label="ABOODVIDEO الرئيسية">
+                ABOOD<span class="brand-accent">VIDEO</span>
+            </a>
+            <button type="button" class="viewer-drawer-close"
+                    id="viewer-drawer-close" aria-label="إغلاق القائمة">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                     stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6"  x2="6"  y2="18"></line>
+                    <line x1="6"  y1="6"  x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Drawer Search -->
+        <div class="viewer-drawer-search">
+            <form action="{{ prefix or '' }}/browse" method="GET" role="search">
+                <input type="search" name="q"
+                       value="{{ search_query or '' }}"
+                       class="viewer-input"
+                       placeholder="ابحث في المنصة..."
+                       aria-label="البحث">
+            </form>
+        </div>
+
+        <!-- Drawer Nav Links -->
+        <ul class="viewer-drawer-nav">
+            <li>
+                <a href="{{ prefix or '' }}/"
+                   class="viewer-drawer-link {% if active_nav == 'home' %}is-active{% endif %}">
+                    الرئيسية
+                </a>
+            </li>
+            <li>
+                <a href="{{ prefix or '' }}/browse"
+                   class="viewer-drawer-link {% if active_nav == 'library' %}is-active{% endif %}">
+                    تصفح المكتبة
+                </a>
+            </li>
+            <li>
+                <a href="{{ prefix or '' }}/browse?type=series"
+                   class="viewer-drawer-link {% if active_nav == 'series' %}is-active{% endif %}">
+                    المسلسلات
+                </a>
+            </li>
+            <li>
+                <a href="/admin" class="viewer-drawer-link">
+                    لوحة الإدارة
+                </a>
+            </li>
+        </ul>
+
+    </aside>
+    {% endif %}{% endblock %}
+
+    <!-- ============================================================
+         MAIN CONTENT
+         ============================================================ -->
+    <main class="viewer-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if EMBED_MODE %}<style>
+      html,body{margin:0!important;padding:0!important;background:#000!important;overflow:hidden}
+      .watch-title-header,.watch-series-meta,.watch-details-container,.watch-nav-strip,.watch-related{display:none!important}
+      .viewer-main,.watch-page-wrapper{margin:0!important;padding:0!important;max-width:none!important;width:100%!important}
+      .watch-player-frame{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;width:100vw!important;height:100vh!important;aspect-ratio:auto!important}
+      .player-wrapper{width:100%!important;height:100%!important;aspect-ratio:auto!important}
+    </style>{% endif %}
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    {% block footer %}
+    {% if not EMBED_MODE %}<footer class="viewer-footer">
+        <div class="viewer-container viewer-footer-inner">
+            <div class="viewer-footer-top">
+                <div class="viewer-brand" aria-label="ABOODVIDEO">
+                    ABOOD<span class="brand-accent">VIDEO</span>
+                </div>
+                <ul class="viewer-footer-links">
+                    <li><a href="{{ prefix or '' }}/">الرئيسية</a></li>
+                    <li><a href="{{ prefix or '' }}/browse">المكتبة</a></li>
+                    <li><a href="{{ prefix or '' }}/browse?type=series">المسلسلات</a></li>
+                    <li><a href="/admin">إدارة المنصة</a></li>
+                </ul>
+            </div>
+            <div class="viewer-footer-copy">
+                ABOODVIDEO Private Media Platform &copy; 2026. جميع الحقوق محفوظة.
+            </div>
+        </div>
+    </footer>
+    {% endif %}{% endblock %}
+
+    <!-- Viewer Shell JS -->
+    {% if not EMBED_MODE %}<script src="/static/js/viewer_shell.js?v=m6-admin-platform-20261016-fix2" defer></script>{% endif %}
+    {% block extra_js %}{% endblock %}
+
+<script src="/static/js/atelier-motion.js?v=m6-admin-platform-20261016-fix2" defer></script>
+</body>
+</html>

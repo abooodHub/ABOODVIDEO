@@ -1,0 +1,125 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}لوحة التحكم | ABOODVIDEO{% endblock %}
+
+{% block topbar_title %}مساحة المحتوى / نظرة عامة{% endblock %}
+
+{% block topbar_extras %}
+
+
+<div class="dash-notif" id="dashNotif">
+
+
+  <button type="button" class="icon-btn" id="dashNotifBtn" aria-label="الإشعارات" aria-expanded="false" aria-haspopup="true" title="الإشعارات">
+
+
+    <svg class="av-icon" aria-hidden="true"><use href="/static/icons.svg?v=m6-admin-platform-20261016-fix2#bell"></use></svg>
+
+
+    <span class="nav-badge hidden" id="dashNotifBadge">0</span>
+
+
+  </button>
+
+
+  <div class="dash-notif-menu hidden" id="dashNotifMenu" role="menu" aria-label="آخر الإشعارات">
+
+
+    <div class="dash-notif-head">آخر الإشعارات</div>
+
+
+    <div class="dash-notif-list" id="dashNotifList"><div class="dash-notif-empty">لا إشعارات جديدة</div></div>
+
+
+  </div>
+
+
+</div>
+
+
+{% endblock %}
+
+
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_dashboard.css?v=dashboard-diagnostics-20261018">{% endblock %}
+{% block content %}
+
+<section class="dash-heading" aria-labelledby="dashTitle">
+
+  <div><p class="dash-eyebrow">مساحتك، في لمحة</p><h1 id="dashTitle">مرحبًا بك في مساحة المحتوى</h1><p class="dash-description">حالة مكتبتك وخدمات المنصة مباشرة.</p></div>
+
+  <div class="dash-actions">
+
+    <a href="/admin/upload" class="btn btn-primary"><svg class="av-icon" aria-hidden="true"><use href="/static/icons.svg?v=m6-admin-platform-20261016-fix2#upload"></use></svg>رفع فيديو</a>
+
+    <a href="/admin/videos" class="btn btn-secondary"><svg class="av-icon" aria-hidden="true"><use href="/static/icons.svg?v=m6-admin-platform-20261016-fix2#folder"></use></svg>فتح المكتبة</a>
+
+  </div>
+
+</section>
+
+<section class="dash-summary" aria-label="مؤشرات المنصة">
+
+  <article class="dash-summary-item"><span class="dash-summary-mark mark-ready" aria-hidden="true"></span><div><span class="dash-summary-label">إجمالي الفيديوهات</span><strong class="dash-summary-value is-loading" id="kpiVideosVal">—</strong><span class="dash-summary-note" id="kpiVideosSub">جارٍ التحميل</span></div></article>
+
+  <article class="dash-summary-item"><span class="dash-summary-mark mark-storage" aria-hidden="true"></span><div><span class="dash-summary-label">التخزين المستخدم</span><strong class="dash-summary-value is-loading" id="kpiStorageVal">—</strong><span class="dash-summary-note" id="kpiStorageSub">جارٍ التحميل</span></div></article>
+
+  <article class="dash-summary-item"><span class="dash-summary-mark mark-work" aria-hidden="true"></span><div><span class="dash-summary-label">معالجة نشطة</span><strong class="dash-summary-value is-loading" id="kpiProcessingVal">—</strong><span class="dash-summary-note" id="kpiProcessingSub">جارٍ التحميل</span></div></article>
+
+  <article class="dash-summary-item dash-network-card"><span class="dash-summary-mark mark-network" aria-hidden="true"></span><div class="dash-network-content"><span class="dash-summary-label">سرعة الإرسال والاستقبال</span><div class="dash-network-values"><span><small>رفع إلى الخادم</small><strong id="kpiNetworkUploadVal">—</strong></span><span><small>تنزيل من الخادم</small><strong id="kpiNetworkDownloadVal">—</strong></span></div><span class="dash-summary-note" id="kpiNetworkNote">تتحدث مباشرة</span></div></article>
+
+</section>
+
+<div class="dashboard-workspace" aria-label="مكتبتك وتشغيل المنصة">
+
+  <section class="dash-panel dash-content-panel" aria-labelledby="dashContentTitle">
+
+    <header class="dash-panel-head dash-content-head">
+
+      <div><h2 id="dashContentTitle">محتواك الآن</h2><p>أحدث المقاطع ومتابعة المعالجة من مكان واحد</p></div>
+
+      <div class="dash-tabs" role="tablist" aria-label="محتوى لوحة الرئيسية">
+
+        <button type="button" class="dash-tab is-active" id="dashTabRecent" role="tab" aria-selected="true" aria-controls="dashRecentPanel">وصل حديثًا إلى مكتبتك</button>
+
+        <button type="button" class="dash-tab" id="dashTabQueue" role="tab" aria-selected="false" aria-controls="dashQueuePanel" tabindex="-1">يجري الآن: المعالجة والطابور</button>
+
+      </div>
+
+    </header>
+
+    <section id="dashRecentPanel" class="dash-tab-panel" role="tabpanel" aria-labelledby="dashTabRecent">
+
+      <div class="dash-panel-subhead"><span>آخر مقاطع الفيديو المضافة</span><a href="/admin/videos" class="dash-panel-link">كل الفيديوهات ←</a></div>
+
+      <div id="dashLatestVideos" class="dash-latest-list" aria-live="polite"><div class="dash-skeleton-row"></div><div class="dash-skeleton-row"></div><div class="dash-skeleton-row"></div></div>
+
+    </section>
+
+    <section id="dashQueuePanel" class="dash-tab-panel" role="tabpanel" aria-labelledby="dashTabQueue" hidden>
+
+      <div class="dash-panel-subhead"><span>المعالجة الحالية والمهام المنتظرة</span><a href="/admin/processing" class="dash-panel-link">كل المهام ←</a></div>
+
+      <div id="dashQueue" class="dash-queue-list" aria-live="polite"><div class="dash-skeleton-row"></div></div>
+
+    </section>
+
+  </section>
+
+  <section class="dash-panel dash-service-panel" aria-labelledby="dashServicesTitle">
+
+    <header class="dash-panel-head"><div><h2 id="dashServicesTitle">حالة الخدمات</h2><p id="dashServicesUpdated">قراءة مباشرة من الخادم</p></div></header>
+    <div id="dashServices" class="dash-service-list" aria-live="polite"><span class="dash-service-skeleton"></span><span class="dash-service-skeleton"></span><span class="dash-service-skeleton"></span><span class="dash-service-skeleton"></span></div>
+    <details id="system-diagnostics" class="dash-diagnostics">
+      <summary>تفاصيل التشخيص</summary>
+      <div class="dash-diagnostics-body">
+        <div class="dash-diagnostics-heading"><p id="dashDiagnosticsStatus" role="status" aria-live="polite">افتح القسم لفحص تفاصيل التشغيل.</p><button id="dashDiagnosticsRefresh" class="btn btn-secondary btn-sm" type="button">تحديث الفحص</button></div>
+        <dl id="dashDiagnosticsFacts" class="dash-diagnostics-facts" aria-label="تفاصيل خدمات المنصة"></dl>
+      </div>
+    </details>
+
+  </section>
+
+</div>
+
+{% endblock %}
+{% block extra_js %}<script src="/static/js/admin_dashboard.js?v=github-readiness-20261019"></script>{% endblock %}

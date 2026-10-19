@@ -1,0 +1,48 @@
+/* Tools belong to the currently selected video. */
+.video-tool-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+.video-tool-heading p { flex:1; min-width:180px; color:var(--text-secondary); margin:0; }
+.video-tool-heading > div { display:flex; flex-wrap:wrap; gap:8px; }
+.video-tool-check { display:flex; align-items:center; gap:8px; margin-block:12px; }
+.video-tool-check input { accent-color:var(--accent); flex:none; }
+.video-subtitle-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px; border:1px solid var(--console-border); border-radius:10px; margin-block:8px; }
+.video-subtitle-info { display:grid; gap:5px; min-width:0; overflow-wrap:anywhere; }
+.video-subtitle-info span,.video-subtitle-info small { color:var(--text-secondary); font-size:12px; }
+.video-subtitle-actions { display:flex; gap:8px; flex:none; }
+.video-tool-dialog { width:min(520px,calc(100vw - 28px)); max-height:calc(100dvh - 28px); overflow:auto; padding:20px; border:1px solid var(--console-border); border-radius:14px; background:var(--console-surface); color:var(--console-text); }
+.video-tool-dialog::backdrop { background:rgb(0 0 0 / 65%); }
+.video-tool-dialog header,.video-tool-dialog footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+.video-tool-dialog h2 { font-size:18px; margin:0; }
+.video-tool-dialog label { display:block; margin-block:10px 5px; }
+.video-tool-dialog .video-tool-check { display:flex; }
+.video-tool-dialog input:not([type=checkbox]) { width:100%; min-width:0; padding:9px; }
+.video-tool-dialog footer { justify-content:flex-start; margin-top:18px; }
+.video-tool-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.video-tool-dialog :is([role=alert],[role=status]) { color:var(--ui-danger,#ff9c9c); }
+.video-inspection { margin-top:22px; border:1px solid var(--console-border); border-radius:12px; padding:16px; scroll-margin-top:120px; min-width:0; }
+.video-inspection > summary { cursor:pointer; padding-block:7px; font-weight:600; }
+.video-inspection[open] > summary { margin-bottom:14px; }
+.video-inspection .inspector-card { max-width:100%; overflow:auto; }
+.video-inspection .checks-table { min-width:580px; }
+.video-inspection .inspector-summary-banner { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.video-inspection .summary-stat-box { min-width:0; overflow-wrap:anywhere; }
+.video-inspection .preview-viewport-controls { flex-wrap:wrap; }
+.video-inspection .card-link { overflow-wrap:anywhere; }
+.video-picker-search { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-block:20px; }
+.video-picker-search input { flex:1; min-width:160px; padding:10px; }
+.video-picker-list { display:grid; gap:10px; }
+.video-picker-item { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:16px; text-decoration:none; color:var(--console-text); background:var(--console-surface); border:1px solid var(--console-border); border-radius:10px; }
+.video-picker-item:hover { border-color:var(--console-emerald); }
+.video-picker-item strong { min-width:0; overflow-wrap:anywhere; }
+.video-picker-item span { color:var(--console-emerald); font-size:12px; flex:none; }
+.video-picker-pagination { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:20px; }
+body[data-page="video-detail"] #share-link { min-width:0 !important; }
+body[data-page="video-detail"] .hero-title { overflow-wrap:anywhere; }
+body[data-page="video-detail"] .detail-tabs { max-width:100%; overflow-x:auto; }
+@media(max-width:600px) {
+  .video-subtitle-row,.video-picker-item { align-items:flex-start; flex-direction:column; }
+  .video-subtitle-actions { width:100%; }
+  .video-tool-fields { grid-template-columns:minmax(0,1fr); }
+  .video-inspection { padding:12px; }
+  .video-inspection .inspector-summary-banner { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .video-tool-heading p { min-width:0; flex-basis:100%; }
+}

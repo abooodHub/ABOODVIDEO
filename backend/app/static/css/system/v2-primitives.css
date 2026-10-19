@@ -1,0 +1,71 @@
+/* ABOODVIDEO 2.0 shared visual primitives. The current HTML/API contract stays intact. */
+:root {
+  --av-surface-base: #080d16;
+  --av-surface-raised: #101a29;
+  --av-surface-overlay: #162337;
+  --av-text-primary: #f4f7fb;
+  --av-text-secondary: #aab8c9;
+  --av-text-muted: #75869b;
+  --av-border-subtle: #26364a;
+  --av-border-strong: #3a506b;
+  --av-accent: #55c6c5;
+  --av-accent-strong: #2ba9ad;
+  --av-accent-soft: #15363b;
+  --av-status-success: #54d2a1;
+  --av-status-warning: #edba67;
+  --av-status-danger: #f07c86;
+  --av-status-info: #78bcea;
+  --av-focus: #8de1df;
+  --av-selection: #225458;
+  --av-space-0: 0;
+  --av-space-1: 4px;
+  --av-space-2: 8px;
+  --av-space-3: 12px;
+  --av-space-4: 16px;
+  --av-space-5: 20px;
+  --av-space-6: 24px;
+  --av-space-8: 32px;
+  --av-space-10: 40px;
+  --av-space-12: 48px;
+  --av-radius-sm: 7px;
+  --av-radius-md: 11px;
+  --av-radius-lg: 16px;
+  --av-radius-xl: 22px;
+  --av-shadow-panel: 0 14px 34px rgb(0 0 0 / 18%);
+  --av-motion-fast: 120ms ease;
+  --av-motion-standard: 180ms cubic-bezier(.2,.7,.2,1);
+  --av-motion-slow: 260ms cubic-bezier(.2,.7,.2,1);
+  --av-content-max: 1500px;
+  --av-reading-max: 1120px;
+  --av-z-header: 20;
+  --av-z-drawer: 80;
+  --av-z-dialog: 100;
+}
+
+::selection { color: var(--av-text-primary); background: var(--av-selection); }
+:focus-visible { outline: 2px solid var(--av-focus); outline-offset: 3px; }
+button, input, select, textarea { font: inherit; }
+img { max-width: 100%; }
+.av2-kicker { color: var(--av-accent); font-size: .72rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+.av2-surface { background: var(--av-surface-raised); border: 1px solid var(--av-border-subtle); border-radius: var(--av-radius-lg); }
+.av2-status { display: inline-flex; align-items: center; gap: .45rem; width: fit-content; padding: .28rem .62rem; border: 1px solid var(--av-border-subtle); border-radius: 999px; color: var(--av-text-secondary); background: var(--av-surface-overlay); font-size: .76rem; font-weight: 650; }
+.av2-status::before { content: ""; width: .42rem; height: .42rem; border-radius: 50%; background: currentColor; }
+.av2-status--success { color: var(--av-status-success); }
+.av2-status--warning { color: var(--av-status-warning); }
+.av2-status--danger { color: var(--av-status-danger); }
+.av2-status--info { color: var(--av-status-info); }
+.av2-empty { display: grid; justify-items: start; gap: .6rem; padding: clamp(1.1rem, 3vw, 2rem); border: 1px dashed var(--av-border-strong); border-radius: var(--av-radius-lg); background: linear-gradient(145deg, rgb(16 26 41 / 72%), rgb(8 13 22 / 42%)); }
+.av2-empty h2, .av2-empty h3, .av2-empty p { margin: 0; }
+.av2-empty p { max-width: 58ch; color: var(--av-text-secondary); line-height: 1.7; }
+.av2-skeleton { min-height: 1rem; border-radius: var(--av-radius-sm); background: linear-gradient(90deg, var(--av-surface-raised), var(--av-surface-overlay), var(--av-surface-raised)); background-size: 200% 100%; animation: av2-skeleton 1.7s ease-in-out infinite; }
+.av2-button, .viewer-btn, .btn { min-height: 42px; border-radius: var(--av-radius-md); font-weight: 680; transition: color var(--av-motion-fast), background var(--av-motion-fast), border-color var(--av-motion-fast), transform var(--av-motion-fast); }
+.av2-button:hover, .viewer-btn:hover, .btn:hover { transform: translateY(-1px); }
+.av2-button:active, .viewer-btn:active, .btn:active { transform: translateY(0); }
+.viewer-input, .viewer-select, .input, .form-control, .form-select, input[type="search"], input[type="text"], input[type="password"], input[type="number"], textarea, select { min-height: 42px; border-radius: var(--av-radius-md); }
+.data-table thead th { position: sticky; top: 0; z-index: 2; }
+.table-responsive, .data-table-wrapper { scrollbar-color: var(--av-border-strong) transparent; }
+.hidden[hidden] { display: none !important; }
+@keyframes av2-skeleton { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

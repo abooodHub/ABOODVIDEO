@@ -1,0 +1,44 @@
+{% extends 'admin_base.html' %}
+{% block title %}رفع الملفات الجاهزة{% endblock %}
+{% block topbar_title %}رفع الملفات الجاهزة{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_ready_import.css?v=ready-platform-20261019">{% endblock %}
+{% block content %}
+
+<section class="card ready-import-card" id="ready-import-card" dir="rtl" aria-label="منطقة رفع الفيديو الجاهز">
+  <div class="ready-import-header">
+    <div><h2 class="ready-import-title">رفع فيديو جاهز</h2><p class="ready-import-muted">نوع الرفع: فيديو جاهز — بدون تحويل. تُحفظ الجودة والملفات الأصلية كما هي.</p></div>
+    <span class="badge badge-success ready-import-format">HLS / MP4 جاهز · لا يوجد FFmpeg</span>
+  </div>
+  <p class="ready-import-description">ارفع HLS ZIP أو مجلد HLS جاهزًا، أو MP4 مباشرًا. يمكن رفع عدة فيديوهات دفعة واحدة أو استيراد ملفات من مجلد ABOODVIDEO المخصص. لا يوجد تحويل أو إعادة ترميز.</p>
+  <p class="ready-import-drop-hint">اسحب الملف إلى هذه المنطقة أو استخدم زر الاختيار.</p>
+  <div class="ready-import-actions">
+    <button id="ready-single-picker" class="btn btn-primary" type="button">رفع فيديو جاهز</button>
+    <button id="ready-batch-picker" class="btn btn-secondary" type="button">رفع عدة فيديوهات</button>
+    <button id="ready-folder-picker" class="btn btn-secondary" type="button">رفع مجلد HLS</button>
+    <input id="ready-package-file" type="file" accept=".zip,.mp4,.mkv,application/zip,video/mp4,video/x-matroska" hidden>
+    <input id="ready-folder-file" type="file" webkitdirectory directory multiple hidden>
+  </div>
+  <p id="ready-folder-status" class="ready-import-muted" aria-live="polite"></p>
+  <div id="ready-package-name" class="ready-import-name" role="status"></div>
+  <progress id="ready-package-progress" class="ready-import-progress" max="100" value="0" aria-label="تقدم رفع الحزمة"></progress>
+  <div id="ready-package-status" class="ready-import-status" role="status" aria-live="polite">لم يبدأ الرفع</div>
+  <div id="ready-upload-queue" class="ready-upload-queue" aria-live="polite"></div>
+  <div class="ready-import-actions">
+    <button id="ready-package-start" class="btn btn-primary" type="button" disabled>بدء / استئناف الرفع</button>
+    <button id="ready-package-pause" class="btn btn-secondary" type="button" disabled>إيقاف مؤقت</button>
+    <button id="ready-package-cancel" class="btn btn-ghost" type="button" disabled>إلغاء الرفع</button>
+  </div>
+  <div id="ready-package-result" class="ready-import-result"></div>
+</section>
+<section class="card ready-import-card" id="server-import-card" dir="rtl" aria-label="استيراد ملفات جاهزة من مجلد ABOODVIDEO">
+  <div class="ready-import-header"><div><h2 class="ready-import-title">استيراد ملفات من الخادم</h2><p class="ready-import-muted">يعرض هذا الخيار الملفات الموجودة مباشرة داخل مجلد ABOODVIDEO المخصص فقط.</p></div></div>
+  <div class="ready-import-actions">
+    <button id="server-import-refresh" class="btn btn-secondary" type="button">عرض ملفات مجلد الاستيراد</button>
+    <select id="server-import-select" aria-label="اختيار ملف أو مجلد للاستيراد"><option value="">لم يتم عرض الملفات بعد</option></select>
+    <button id="server-import-start" class="btn btn-primary" type="button" disabled>استيراد المحدد</button>
+  </div>
+  <div id="server-import-status" class="ready-import-status" role="status" aria-live="polite"></div>
+  <div id="server-import-result" class="ready-import-result"></div>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="/static/js/admin_ready_import.js?v=ready-platform-20261019"></script>{% endblock %}

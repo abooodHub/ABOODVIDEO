@@ -1,0 +1,399 @@
+/* ============================================================
+   ABOODVIDEO Viewer Design System — Media Cards & Rows (V1)
+   High-density Canonical Media Card, Responsive Catalog Grid,
+   Horizontal Media Rows with Arrow Controls, and Hover Overlays.
+   ============================================================ */
+
+/* --- Canonical Media Card Component --- */
+.viewer-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--v-radius-sm);
+    background: transparent;
+    transition: transform var(--v-transition-fast), box-shadow var(--v-transition-fast);
+    user-select: none;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.viewer-card:hover {
+    transform: translateY(-2px);
+}
+
+.viewer-card-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    max-height: 240px;
+    border-radius: var(--v-radius-sm);
+    overflow: hidden;
+    background: var(--v-surface-1);
+    border: 1px solid var(--v-border);
+    transition: border-color var(--v-transition-fast), box-shadow var(--v-transition-fast);
+}
+
+.viewer-card:hover .viewer-card-media {
+    border-color: var(--v-border-light);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.viewer-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform var(--v-transition);
+}
+
+.viewer-card:hover .viewer-card-img {
+    transform: scale(1.03);
+}
+
+/* Card Fallback Background when physical image is absent */
+.viewer-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #101a2c 0%, #0d1524 100%);
+    color: var(--v-text-muted);
+    padding: 12px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.viewer-card-placeholder-icon {
+    width: 32px;
+    height: 32px;
+    opacity: 0.35;
+    margin-bottom: 6px;
+    color: var(--v-primary);
+}
+
+.viewer-card-placeholder-title {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--v-text-secondary);
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Card Subtle Gradient Overlay */
+.viewer-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 14, 23, 0) 60%, rgba(9, 14, 23, 0.75) 100%);
+    pointer-events: none;
+}
+
+/* Desktop Hover Quick Action Button */
+.viewer-card-actions {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(9, 14, 23, 0.75);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--v-transition-fast);
+    z-index: 3;
+    padding: 8px;
+}
+
+.viewer-card:hover .viewer-card-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.viewer-card-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: var(--v-radius-full);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform var(--v-transition-fast), background var(--v-transition-fast);
+}
+
+.viewer-card-action-play {
+    background: var(--v-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.viewer-card-action-play:hover {
+    background: var(--v-primary-hover);
+    transform: scale(1.04);
+}
+
+.viewer-card-action-details {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    backdrop-filter: blur(4px);
+}
+
+.viewer-card-action-details:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: scale(1.04);
+}
+
+/* Card Content / Metadata below media */
+.viewer-card-info {
+    padding-top: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.viewer-card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--v-text-primary);
+    line-height: 1.35;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    unicode-bidi: isolate;
+    text-align: start;
+    direction: rtl;
+    transition: color var(--v-transition-fast);
+}
+
+.viewer-card:hover .viewer-card-title {
+    color: var(--v-primary);
+}
+
+/* Unified Metadata Line (NO SCATTERED BADGES) */
+.viewer-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: var(--v-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.viewer-card-meta-dot {
+    opacity: 0.5;
+}
+
+/* Compact Mini Badges for Unified Metadata Line */
+.viewer-badge-mini {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: var(--v-radius-xs);
+    white-space: nowrap;
+}
+
+.viewer-badge-mini-4k {
+    background: rgba(16, 185, 129, 0.16);
+    color: var(--v-badge-4k);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.viewer-badge-mini-ass {
+    background: rgba(139, 92, 246, 0.16);
+    color: var(--v-badge-ass);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+.viewer-badge-mini-hd {
+    background: rgba(45, 212, 191, 0.14);
+    color: var(--v-badge-hd);
+    border: 1px solid rgba(45, 212, 191, 0.35);
+}
+
+/* --- Horizontal Media Rows --- */
+.viewer-row-section {
+    margin-bottom: 34px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.viewer-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.viewer-row-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.viewer-row-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--v-text-primary);
+}
+
+.viewer-row-count {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: var(--v-radius-full);
+    background: var(--v-surface-2);
+    color: var(--v-text-muted);
+}
+
+.viewer-row-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--v-primary);
+    transition: all var(--v-transition-fast);
+}
+
+.viewer-row-link:hover {
+    color: #60a5fa;
+    transform: translateX(-3px);
+}
+
+.viewer-row-container {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.viewer-row-track {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding: 4px 0 10px 0;
+    margin: 0;
+    scrollbar-width: none;
+    box-sizing: border-box;
+}
+
+.viewer-row-track::-webkit-scrollbar {
+    display: none;
+}
+
+.viewer-row-item {
+    flex: 0 0 165px;
+    width: 165px;
+    scroll-snap-align: start;
+    box-sizing: border-box;
+}
+
+/* Row Navigation Arrow Buttons (Positioned inside safely to prevent clipping) */
+.viewer-row-arrow {
+    position: absolute;
+    top: calc(50% - 20px);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--v-radius-full);
+    background: rgba(14, 22, 36, 0.94);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--v-border-light);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    transition: all var(--v-transition-fast);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.viewer-row-container:hover .viewer-row-arrow {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.viewer-row-arrow:hover {
+    background: var(--v-primary);
+    border-color: var(--v-primary);
+    transform: scale(1.08);
+}
+
+.viewer-row-arrow-prev {
+    right: 4px;
+}
+
+.viewer-row-arrow-next {
+    left: 4px;
+}
+
+/* --- Responsive Catalog Grid (Library / Browse) --- */
+.viewer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .viewer-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 14px;
+    }
+    .viewer-row-item {
+        flex: 0 0 150px;
+        width: 150px;
+    }
+}
+
+@media (max-width: 768px) {
+    .viewer-grid {
+        grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+        gap: 12px;
+    }
+    .viewer-row-item {
+        flex: 0 0 135px;
+        width: 135px;
+    }
+    .viewer-row-arrow {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .viewer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .viewer-row-item {
+        flex: 0 0 130px;
+        width: 130px;
+    }
+    .viewer-card-title {
+        font-size: 0.8rem;
+    }
+    .viewer-card-meta {
+        font-size: 0.68rem;
+    }
+}

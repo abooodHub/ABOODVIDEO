@@ -1,0 +1,162 @@
+/* ABOODVIDEO shares page: visual polish and restrained motion. */
+.shares-summary-row {
+  gap: 14px;
+  margin-block: 4px 22px;
+}
+
+.share-stat-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 112px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  background: linear-gradient(145deg, var(--bg-surface, #121820), var(--bg-elevated, #19222c));
+  border-color: var(--border-subtle, rgba(148, 163, 184, .16));
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .12);
+  animation: shares-rise-in .48s cubic-bezier(.2, .75, .25, 1) both;
+}
+
+.share-stat-card:nth-child(2) { animation-delay: 60ms; }
+.share-stat-card:nth-child(3) { animation-delay: 120ms; }
+
+.share-stat-card::after {
+  content: '';
+  position: absolute;
+  inset: auto -18px -34px auto;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .045;
+  filter: blur(2px);
+  z-index: -1;
+  transition: transform .35s ease, opacity .35s ease;
+}
+
+.share-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, currentColor 24%, var(--border-subtle, #293241));
+  box-shadow: 0 16px 32px rgba(0, 0, 0, .2);
+}
+
+.share-stat-card:hover::after { transform: scale(1.3); opacity: .075; }
+.share-stat-val { font-size: clamp(26px, 3vw, 34px); letter-spacing: -.03em; }
+.share-stat-label { font-size: .82rem; color: var(--text-secondary, #9aa8b7); }
+
+#sharesTabs {
+  width: fit-content;
+  max-width: 100%;
+  gap: 5px;
+  padding: 5px;
+  margin-block: 0 18px;
+  border: 1px solid var(--border-subtle, rgba(148, 163, 184, .16));
+  border-radius: 13px;
+  background: var(--bg-surface, rgba(17, 24, 32, .78));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .1);
+}
+
+#sharesTabs .tab-btn {
+  position: relative;
+  margin: 0;
+  padding: 9px 15px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--text-secondary, #9aa8b7);
+  font-weight: 600;
+  transition: color .18s ease, background .18s ease, transform .18s ease;
+}
+
+#sharesTabs .tab-btn:hover { background: rgba(255, 255, 255, .055); transform: translateY(-1px); }
+#sharesTabs .tab-btn.is-active {
+  color: var(--text-primary, #e8eef5);
+  background: linear-gradient(135deg, rgba(45, 212, 191, .18), rgba(45, 212, 191, .07));
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, .2), 0 3px 10px rgba(0, 0, 0, .12);
+}
+
+.share-tab-count {
+  display: inline-grid;
+  min-width: 22px;
+  height: 22px;
+  place-items: center;
+  padding-inline: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, .12);
+  color: var(--text-secondary, #a9b7c5);
+  font-size: .7rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+
+#sharesTabs .tab-btn.is-active .share-tab-count {
+  background: rgba(45, 212, 191, .2);
+  color: #75e0d1;
+  transform: scale(1.04);
+}
+
+.shares-summary-row + #sharesTabs + .admin-panel,
+#sharesTabs + .admin-panel {
+  overflow: hidden;
+  border: 1px solid var(--border-subtle, rgba(148, 163, 184, .16));
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(20, 28, 37, .94), rgba(14, 20, 27, .98));
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .14);
+  animation: shares-panel-in .38s ease-out both;
+}
+
+#sharesTable { border-collapse: separate; border-spacing: 0; }
+#sharesTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-block: 14px;
+  background: var(--bg-elevated, #18212b);
+  color: var(--text-secondary, #a9b7c5);
+  font-size: .76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#sharesTable tbody tr:not(.empty-state-row) { animation: shares-row-in .3s ease both; }
+#sharesTable tbody tr:not(.empty-state-row):hover { background: rgba(45, 212, 191, .045); }
+#sharesTable tbody td { padding-block: 13px; border-bottom-color: var(--border-subtle, rgba(148, 163, 184, .1)); }
+.share-content-name { font-weight: 650; }
+.share-link-value { max-width: min(250px, 24vw); padding: 5px 8px; border: 1px solid rgba(148, 163, 184, .12); border-radius: 7px; background: rgba(5, 10, 15, .28); }
+.share-type-badge, .status-badge { padding: 4px 10px; line-height: 1.35; }
+.shares-actions { gap: 7px; }
+.shares-actions .icon-btn { width: 35px; height: 35px; border-radius: 10px; background: rgba(148, 163, 184, .045); }
+.shares-actions .copy-btn:hover { color: #65d8c8; border-color: rgba(45, 212, 191, .35); background: rgba(45, 212, 191, .1); }
+.shares-actions .revoke-btn:hover { transform: translateY(-1px); }
+.icon-btn:focus-visible, #sharesTabs .tab-btn:focus-visible { outline: 2px solid #48cabb; outline-offset: 2px; }
+
+.empty-state-row td { padding: 58px 16px; }
+.empty-state-icon { display: grid; place-items: center; width: 54px; height: 54px; border: 1px solid rgba(45, 212, 191, .16); border-radius: 17px; background: rgba(45, 212, 191, .07); color: #69d6c7; }
+.empty-state-icon .av-icon { width: 25px; height: 25px; }
+
+.modal-overlay:not([hidden]) { animation: shares-fade-in .18s ease-out both; }
+.modal-box { border-color: rgba(148, 163, 184, .2); background: var(--bg-elevated, #18212b); animation: shares-modal-in .24s cubic-bezier(.2, .8, .25, 1) both; }
+.modal-footer .btn { min-width: 112px; }
+
+@keyframes shares-rise-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shares-panel-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shares-row-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shares-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shares-modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+@media (max-width: 700px) {
+  #sharesTabs { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #sharesTabs .tab-btn { padding-inline: 8px; }
+  .share-stat-card { min-height: 90px; }
+  .share-link-value { max-width: 180px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share-stat-card, .shares-summary-row, #sharesTabs + .admin-panel,
+  #sharesTable tbody tr, .modal-overlay:not([hidden]) .modal-box {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

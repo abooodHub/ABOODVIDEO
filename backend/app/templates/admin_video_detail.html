@@ -1,0 +1,333 @@
+{% extends 'admin_base.html' %}
+{% block title %}تفاصيل الفيديو | ABOODVIDEO{% endblock %}
+{% block topbar_title %}تفاصيل الفيديو{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_video_detail.css?v=video-tools-20261018"><link rel="stylesheet" href="/static/css/admin_inspector.css?v=m6-admin-platform-20261016-fix2"><link rel="stylesheet" href="/static/css/video_tools.css?v=video-tools-20261018">{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb -->
+    <nav class="detail-breadcrumb" aria-label="مسار التنقل">
+        <a href="/admin">الرئيسية</a>
+        <span class="detail-breadcrumb-sep">/</span>
+        <a href="/admin/videos">مكتبة الفيديوهات</a>
+        <span class="detail-breadcrumb-sep">/</span>
+        <span id="breadcrumb-title" class="text-primary">تفاصيل الفيديو</span>
+    </nav>
+
+    <div id="video-feedback" class="alert hidden" role="status" aria-live="polite"></div>
+    <div id="video-loading" class="empty-state">جاري تحميل تفاصيل الفيديو والمواصفات...</div>
+
+    <div id="video-detail" class="hidden">
+        <!-- ═══════════════════════════════════════════════════
+             1. HERO SHOWCASE BANNER
+             ═══════════════════════════════════════════════════ -->
+        <section class="video-hero-banner" aria-label="لوحة معلومات الفيديو الرئيسية">
+            <!-- 16:9 Interactive Player Preview Box -->
+            <div class="hero-player-box" id="hero-player-container">
+                <div id="detail-thumb" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>
+                </div>
+                <a href="#" id="hero-play-action" class="hero-play-overlay" title="تشغيل الفيديو الآن في المشغل">
+                    <div class="hero-play-btn" aria-label="تشغيل">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </div>
+                </a>
+                <span class="hero-quality-overlay" id="hero-quality-chip">READY</span>
+                <span class="hero-badge-overlay" id="hero-duration-chip">00:00</span>
+            </div>
+
+            <!-- Video Metadata & Actions -->
+            <div class="hero-content">
+                <h1 class="hero-title" id="detail-title">—</h1>
+                <div class="hero-subtitle">
+                    <span id="detail-subtitle">—</span>
+                    <span class="detail-breadcrumb-sep">·</span>
+                    <span id="spec-source-filename" class="font-mono dir-ltr" style="font-size: 12px; color: #94a3b8; word-break: break-all;">—</span>
+                </div>
+
+                <div class="hero-badges" id="detail-badges"></div>
+
+                <!-- Action Toolbar -->
+                <div class="hero-actions">
+                    <a href="#" id="btn-preview" class="btn-hero-primary hidden" target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        <span>تشغيل المشغل</span>
+                    </a>
+                    <button type="button" id="btn-quick-embed" class="btn btn-secondary">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        <span>كود التضمين &lt;iframe&gt;</span>
+                    </button>
+                    <a href="#" id="btn-inspect" class="btn btn-secondary" title="فحص المشاهدة وسجلات الجودات">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+                        <span>فحص التشغيل</span>
+                    </a>
+                    <button type="button" id="btn-copy-link" class="btn btn-ghost" title="نسخ رابط المشاهدة المباشر">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <span>نسخ الرابط</span>
+                    </button>
+                    <a href="/admin/videos" class="btn btn-ghost">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        <span>رجوع للمكتبة</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════
+             2. 4 HIGH-TECH KPI METRIC CARDS
+             ═══════════════════════════════════════════════════ -->
+        <section class="kpi-grid" aria-label="المؤشرات والمواصفات الأساسية">
+            <!-- KPI 1: Quality -->
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="15" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">أعلى دقة متوفرة</span>
+                    <span class="kpi-value" id="spec-quality" style="color: #38bdf8;">—</span>
+                    <span class="kpi-sub">جودات HLS المتعددة</span>
+                </div>
+            </div>
+
+            <!-- KPI 2: Duration -->
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">مدة التشغيل الإجمالية</span>
+                    <span class="kpi-value" id="spec-duration">—</span>
+                    <span class="kpi-sub">توقيت الفيديو المعتمد</span>
+                </div>
+            </div>
+
+            <!-- KPI 3: Size -->
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">حجم المصدر التخزيني</span>
+                    <span class="kpi-value" id="spec-size">—</span>
+                    <span class="kpi-sub">حجم الملف الأصلي</span>
+                </div>
+            </div>
+
+            <!-- KPI 4: Subtitles -->
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">مسارات الترجمة المدمجة</span>
+                    <span class="kpi-value" id="spec-subtitles">—</span>
+                    <span class="kpi-sub">مسارات VTT / ASS جاهزة</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════
+             3. DOWNLOAD POLICY & ACCESS PANEL (Shield Style)
+             ═══════════════════════════════════════════════════ -->
+        <section class="policy-panel" aria-label="إعدادات سياسة التنزيل">
+            <div class="policy-panel-header">
+                <h3 class="policy-panel-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>سياسة التنزيل والتحميل (DOWNLOAD POLICY)</span>
+                </h3>
+                <div class="policy-panel-status">
+                    <span style="font-size: 13px; color: #94a3b8;">الوضع الفعلي للتنزيل الآن:</span>
+                    <span id="detail-effective-badge" class="policy-live-badge allowed">مسموح</span>
+                </div>
+            </div>
+            <div class="policy-controls-row">
+                <div class="policy-input-group">
+                    <label for="detail-policy-select">السياسة المحددة لهذا الفيديو:</label>
+                    <select id="detail-policy-select" class="policy-select">
+                        <option value="INHERIT">موروثة من الأصل العام (INHERIT)</option>
+                        <option value="ALLOW">سماح بالتنزيل دائماً (ALLOW)</option>
+                        <option value="DENY">تعطيل التنزيل دائماً (DENY)</option>
+                    </select>
+                </div>
+                <div class="policy-actions-group">
+                    <button type="button" id="btn-save-policy" class="btn btn-primary" style="height: 40px; padding: 0 20px;">
+                        <span>حفظ السياسة</span>
+                    </button>
+                    <a href="#" id="btn-direct-download" class="btn btn-secondary" target="_blank" style="height: 40px; padding: 0 16px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>تنزيل الملف المباشر</span>
+                    </a>
+                    <span id="policy-feedback" style="font-size: 13px; color: #34d399; font-weight: 600;"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════
+             4. TABS SYSTEM
+             ═══════════════════════════════════════════════════ -->
+        <div class="detail-tabs-container">
+            <div class="detail-tabs" role="tablist" aria-label="أقسام تفاصيل الفيديو">
+                <button type="button" class="detail-tab is-active" role="tab" aria-selected="true" aria-controls="tab-overview" id="tab-btn-overview">نظرة عامة</button>
+                <button type="button" class="detail-tab" role="tab" aria-selected="false" aria-controls="tab-media" id="tab-btn-media">التشغيل والجودات</button>
+                <button type="button" class="detail-tab" role="tab" aria-selected="false" aria-controls="tab-subtitles" id="tab-btn-subtitles">الترجمات</button>
+                <button type="button" class="detail-tab" role="tab" aria-selected="false" aria-controls="tab-processing" id="tab-btn-processing">سجل المعالجة</button>
+                <button type="button" class="detail-tab" role="tab" aria-selected="false" aria-controls="tab-sharing" id="tab-btn-sharing">المشاركة والتضمين</button>
+                <button type="button" class="detail-tab" role="tab" aria-selected="false" aria-controls="tab-storage" id="tab-btn-storage">توزيع التخزين</button>
+                <button type="button" class="detail-tab" role="tab" aria-selected="false" aria-controls="tab-analytics" id="tab-btn-analytics">التحليلات والمشاهدات</button>
+            </div>
+        </div>
+
+        <!-- ── TAB 1: OVERVIEW ── -->
+        <section class="tab-panel" role="tabpanel" id="tab-overview" aria-labelledby="tab-btn-overview">
+            <h3 class="specs-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="9" x2="9" y1="3" y2="21"/></svg>
+                <span>المواصفات والبيانات الكاملة</span>
+            </h3>
+            <div class="specs-grid" id="overview-grid"></div>
+        </section>
+
+        <!-- ── TAB 2: MEDIA & RENDITIONS ── -->
+        <section class="tab-panel hidden" role="tabpanel" id="tab-media" aria-labelledby="tab-btn-media">
+            <h3 class="specs-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <span>مواصفات ملف المصدر الأصلي</span>
+            </h3>
+            <div class="specs-grid" id="media-grid"></div>
+
+            <h3 class="specs-section-title" style="margin-top: var(--space-5);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>الجودات المولّدة للمشغل التكيفي (HLS Renditions)</span>
+            </h3>
+            <div class="table-card" style="border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow: hidden; background: var(--glass-bg-elevated);">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="padding: 12px 16px;">الجودة</th>
+                            <th style="padding: 12px 16px;">الأبعاد</th>
+                            <th style="padding: 12px 16px;">الكوديك</th>
+                            <th style="padding: 12px 16px;">معدل البت</th>
+                            <th style="padding: 12px 16px;">الحجم على القرص</th>
+                        </tr>
+                    </thead>
+                    <tbody id="renditions-tbody"></tbody>
+                </table>
+            </div>
+            {% include 'video_inspector_panel.html' %}
+        </section>
+
+        <!-- ── TAB 3: SUBTITLES ── -->
+        <section class="tab-panel hidden" role="tabpanel" id="tab-subtitles" aria-labelledby="tab-btn-subtitles">
+            <h3 class="specs-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>مسارات الترجمة المتاحة لهذا الفيديو</span>
+            </h3>
+            {% include 'video_subtitles_panel.html' %}
+        </section>
+
+        <!-- ── TAB 4: PROCESSING ── -->
+        <section class="tab-panel hidden" role="tabpanel" id="tab-processing" aria-labelledby="tab-btn-processing">
+            <h3 class="specs-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span>سجل وظائف المعالجة والتحويل (Transcode Jobs)</span>
+            </h3>
+            <div id="detail-jobs-list" class="jobs-history">
+                <div class="subs-loading" style="padding: 20px; text-align: center; color: var(--text-muted);">جاري التحميل...</div>
+            </div>
+        </section>
+
+        <!-- ── TAB 5: SHARING & EMBED ── -->
+        <section class="tab-panel hidden" role="tabpanel" id="tab-sharing" aria-labelledby="tab-btn-sharing">
+            <h3 class="specs-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <span>معلومات المشاركة والظهور</span>
+            </h3>
+            <div class="specs-grid" id="sharing-grid"></div>
+
+            <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+                <input type="text" id="share-link" readonly class="search-input input-full dir-ltr" style="flex: 1; min-width: 280px; font-family: var(--font-mono); font-size: 13px;" aria-label="رابط المشاركة">
+                <button type="button" id="btn-copy-share" class="btn btn-primary">نسخ الرابط</button>
+                <button type="button" id="btn-rotate-share" class="btn btn-secondary">تجديد الرابط وإبطال القديم</button>
+            </div>
+
+            <!-- EMBED IFRAME GENERATOR CARD -->
+            <div class="embed-card" id="embed-generator-section">
+                <div class="embed-card-header">
+                    <div>
+                        <h4 class="embed-card-title">مولّد كود التضمين للمواقع الخارجية (Embed iframe Generator)</h4>
+                        <p class="embed-card-subtitle">خصص مظهر المشغل وخصائصه ثم انسخ كود الـ iframe الجاهز وضعه في ووردبريس أو أي موقع شريك:</p>
+                    </div>
+                    <span class="badge badge-info" style="padding: 6px 12px; font-size: 12px; font-weight: 700;">Hotlink Protected 🛡️</span>
+                </div>
+
+                <!-- Customization Controls Grid -->
+                <div class="embed-controls-box">
+                    <div class="embed-ctrl-item">
+                        <label>لون شريط المشغل (Theme Accent):</label>
+                        <div class="color-swatches">
+                            <input type="text" id="embed-cfg-color" value="00d2be" class="search-input" style="width: 85px; padding: 5px 8px; font-size: 13px; direction: ltr; font-family: monospace;">
+                            <button type="button" class="btn-color-dot" data-col="00d2be" style="background: #00d2be;" title="تركواز"></button>
+                            <button type="button" class="btn-color-dot" data-col="2563eb" style="background: #2563eb;" title="أزرق"></button>
+                            <button type="button" class="btn-color-dot" data-col="f59e0b" style="background: #f59e0b;" title="ذهبي"></button>
+                            <button type="button" class="btn-color-dot" data-col="ef4444" style="background: #ef4444;" title="أحمر"></button>
+                        </div>
+                    </div>
+
+                    <div class="embed-ctrl-item">
+                        <label>العلامة المائية (Watermark Text):</label>
+                        <input type="text" id="embed-cfg-watermark" value="ABOODVIDEO" class="search-input input-full" style="padding: 6px 10px; font-size: 13px;">
+                    </div>
+
+                    <div class="embed-ctrl-item">
+                        <label>تخطي المقدمة تلقائياً (ثوانٍ):</label>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="number" id="embed-cfg-skip" value="85" min="0" max="300" class="search-input" style="width: 100px; padding: 6px 10px; font-size: 13px;">
+                            <span style="font-size: 12px; color: var(--text-muted);">(0 = تعطيل)</span>
+                        </div>
+                    </div>
+
+                    <div class="embed-ctrl-item" style="display: flex; flex-direction: column; gap: 10px; justify-content: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary); margin: 0;">
+                            <input type="checkbox" id="embed-cfg-autoplay">
+                            <span>تشغيل تلقائي (Autoplay)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary); margin: 0;">
+                            <input type="checkbox" id="embed-cfg-banner">
+                            <span>تفعيل بانر عند الإيقاف المؤقت</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">كود الـ iframe المولد:</label>
+                    <textarea id="embed-iframe-code" readonly class="embed-code-area" rows="3" aria-label="كود التضمين"></textarea>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <button type="button" id="btn-copy-iframe-code" class="btn btn-primary" style="padding: 9px 24px; font-weight: 700;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        <span>نسخ كود الـ iframe</span>
+                    </button>
+                    <span id="embed-copy-feedback" style="font-size: 13px; color: #34d399; font-weight: 700;"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── TAB 6: STORAGE ── -->
+        <section class="tab-panel hidden" role="tabpanel" id="tab-storage" aria-labelledby="tab-btn-storage">
+            <h3 class="specs-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                <span>توزيع استهلاك المساحة التخزينية</span>
+            </h3>
+            <div class="specs-grid" id="storage-grid"></div>
+        </section>
+
+        <!-- ── TAB 7: ANALYTICS ── -->
+        <section class="tab-panel hidden" role="tabpanel" id="tab-analytics" aria-labelledby="tab-btn-analytics">
+            <h3 class="specs-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38bdf8;"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                <span>إحصائيات المشاهدة ونقل البيانات</span>
+            </h3>
+            <div class="specs-grid" id="analytics-grid"></div>
+        </section>
+    </div>
+{% endblock %}
+
+{% block extra_js %}<script src="/static/js/video_subtitles.js?v=github-readiness-20261019"></script><script src="/static/js/admin_inspector.js?v=github-readiness-20261019"></script><script src="/static/js/admin_video_detail.js?v=github-readiness-20261019"></script>{% endblock %}

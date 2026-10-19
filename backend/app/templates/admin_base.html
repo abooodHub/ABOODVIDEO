@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ABOODVIDEO{% endblock %} | ABOODVIDEO</title>
+    <link rel="stylesheet" href="/static/css/system/tokens.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/system/base.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/system/components.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/system/utilities.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/system/layout-admin.css?v=m6-admin-platform-20261016-fix2">
+    {% block extra_css %}{% endblock %}
+<link rel="stylesheet" href="/static/css/atelier-v2.css?v=m6-admin-platform-20261016-fix2">
+<link rel="stylesheet" href="/static/css/platform-polish-v1.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/admin-console.css?v=nav-sizing-20261018">
+</head>
+<body class="abv-interface{% if embed_mode|default(false) %} upload-embed-mode{% endif %}" data-page="{{ page_id | default('') }}" data-server-transcoding="{{ 'true' if server_transcoding_enabled|default(true) else 'false' }}" data-csrf-cookie-name="{{ csrf_cookie_name|default('aboodvideo_csrf') }}">
+    {% if not embed_mode|default(false) %}
+    <!-- Mobile backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+    <!-- ═══════════════════════════════════════════════════
+         RIGHT SIDEBAR (RTL, responsive)
+         ═══════════════════════════════════════════════════ -->
+    {% include "admin_sidebar.html" %}
+
+    <!-- ═══════════════════════════════════════════════════
+         MAIN CONTENT
+         ═══════════════════════════════════════════════════ -->
+    {% endif %}
+    <main class="main-content{% if embed_mode|default(false) %} upload-embed-main{% endif %}">
+        {% if not embed_mode|default(false) %}
+        <header class="console-topbar" aria-label="شريط الأدوات">
+            <button type="button" id="sidebarToggleBtn" class="console-icon-button console-menu-toggle" aria-label="فتح القائمة" aria-controls="adminSidebar" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+            <div class="console-page-context"><span class="console-eyebrow">ABOODVIDEO / ADMIN</span><strong>{{ page_title|default('إدارة المنصة') }}</strong></div>
+            <label class="console-search" for="global-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg><input type="search" id="global-search" placeholder="ابحث في المحتوى…" autocomplete="off" aria-label="البحث في المحتوى"><kbd>Ctrl K</kbd></label>
+            <div class="console-status" id="consoleConnectionStatus" data-state="loading"><i aria-hidden="true"></i><span>جارٍ الاتصال</span></div>
+            <div class="console-activity" aria-label="نشاط المنصة"><span class="console-activity-chip" id="consoleProcessingIndicator"><span>معالجة</span><b data-processing-badge>0</b></span><span class="console-activity-chip is-hidden" id="consoleUploadIndicator"><span>رفع</span><b>0</b></span></div>
+            <button type="button" id="openUploadDrawer" class="console-upload-button" aria-label="رفع فيديو" title="رفع فيديو"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg><span>رفع فيديو</span></button>
+        </header>
+        {% endif %}
+        <div class="page-content{% if embed_mode|default(false) %} upload-embed-content{% endif %}">
+            {% block content %}{% endblock %}
+        </div>
+
+    </main>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    {% if not embed_mode|default(false) %}
+    <dialog class="console-upload-drawer" id="uploadDrawer" aria-labelledby="uploadDrawerTitle">
+        <div class="console-drawer-heading"><div><span class="console-eyebrow">UPLOAD WORKSPACE</span><h2 id="uploadDrawerTitle">رفع ملفات جديدة</h2></div><button type="button" class="console-icon-button" id="closeUploadDrawer" aria-label="إغلاق لوحة الرفع">×</button></div>
+        <iframe title="مساحة رفع الملفات" id="uploadDrawerFrame" data-src="/admin/upload?embed=1"></iframe>
+    </dialog>
+    {% endif %}
+
+    <!-- Shell script -->
+    <script src="/static/js/admin_shell.js?v=nav-sizing-20261018"></script>
+    <script src="/static/js/admin-console.js?v=auto-season-20261018" defer></script>
+    {% block extra_js %}{% endblock %}
+<script src="/static/js/atelier-motion.js?v=m6-admin-platform-20261016-fix2" defer></script>
+</body>
+</html>
+

@@ -1,0 +1,138 @@
+{% extends "viewer_base.html" %}
+
+{% block title %}{{ video.title }} — ABOODVIDEO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/viewer_series.css?v=m6-admin-platform-20261016-fix2">
+{% endblock %}
+
+{% block content %}
+<div class="viewer-container">
+
+    <!-- Title Detail Hero -->
+    <section class="series-hero">
+        <div class="series-hero-content">
+            <div class="series-hero-info">
+                <div class="series-hero-badges">
+                    {% if video.is_4k %}
+                    <span class="viewer-badge viewer-badge-4k">4K Ultra HD</span>
+                    {% elif video.max_quality %}
+                    <span class="viewer-badge viewer-badge-hd">{{ video.max_quality }}</span>
+                    {% endif %}
+                    {% if video.has_ass %}
+                    <span class="viewer-badge viewer-badge-ass">ترجمة ASS متقدمة</span>
+                    {% endif %}
+                    <span class="viewer-badge viewer-badge-neutral">{{ video.category or 'وسائط خاصة' }}</span>
+                </div>
+
+                <h1 class="series-hero-title"><bdi dir="auto">{{ video.title }}</bdi></h1>
+
+                <div class="series-hero-meta">
+                    {% if video.series_name %}
+                    <span class="series-hero-meta-item">
+                        <a href="{{ prefix or '' }}/series/{{ video.series_name }}" class="series-link-colored">
+                            {{ video.series_name }}
+                        </a>
+                    </span>
+                    {% endif %}
+                    {% if video.season_number %}
+                    <span class="series-hero-meta-item">الموسم {{ video.season_number }}</span>
+                    {% endif %}
+                    {% if video.episode_number %}
+                    <span class="series-hero-meta-item">الحلقة {{ video.episode_number }}</span>
+                    {% endif %}
+                    {% if video.duration_formatted %}
+                    <span class="series-hero-meta-item ltr-text">{{ video.duration_formatted }}</span>
+                    {% endif %}
+                </div>
+
+                <p class="series-hero-desc">
+                    {{ video.description or 'مشاهدة مباشرة بجودة فائقة مع تدفق متكيف HLS ودعم تقنيات العرض الحديثة.' }}
+                </p>
+
+                <!-- Technical Specs Pills -->
+                <div class="viewer-specs-pills">
+                    {% if video.resolution_str %}
+                    <span class="viewer-badge viewer-badge-neutral">الدقة: {{ video.resolution_str }}</span>
+                    {% endif %}
+                    {% if video.subtitle_languages %}
+                    <span class="viewer-badge viewer-badge-neutral">الترجمات: {{ video.subtitle_languages|join(', ') }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="series-hero-actions">
+                    <a href="{{ prefix or '' }}/watch/{{ video.share_id }}" class="viewer-btn viewer-btn-primary viewer-btn-lg">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                            <path d="M8 5v14l11-7z"></path>
+                        </svg>
+                        مشاهدة الآن
+                    </a>
+                </div>
+            </div>
+
+            {% if video.has_poster and video.poster_url %}
+            <div class="series-hero-poster">
+                <img src="{{ video.poster_url }}" alt="{{ video.title }}" loading="eager" decoding="async">
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Related Videos in Same Series / Category -->
+    {% if related_videos and related_videos|length > 0 %}
+    <section class="viewer-row-section">
+        <div class="viewer-row-header">
+            <h2 class="viewer-row-title">محتويات ذات صلة</h2>
+        </div>
+        <div class="viewer-grid">
+            {% for item in related_videos %}
+            <article class="viewer-card">
+                <div class="viewer-card-media">
+                    {% if item.has_poster and item.poster_url %}
+                    <img src="{{ item.poster_url }}" alt="{{ item.title }}" class="viewer-card-img" loading="lazy" decoding="async">
+                    {% else %}
+                    <div class="viewer-card-placeholder">
+                        <svg class="viewer-card-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <span class="viewer-card-placeholder-title"><bdi dir="auto">{{ item.title }}</bdi></span>
+                    </div>
+                    {% endif %}
+                    <div class="viewer-card-overlay"></div>
+
+                    <div class="viewer-card-actions">
+                        <a href="{{ prefix or '' }}/watch/{{ item.share_id }}" class="viewer-card-action-btn viewer-card-action-play">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                            تشغيل
+                        </a>
+                        <a href="{{ prefix or '' }}/title/{{ item.id }}" class="viewer-card-action-btn viewer-card-action-details">
+                            تفاصيل
+                        </a>
+                    </div>
+                </div>
+
+                <div class="viewer-card-info">
+                    <h3 class="viewer-card-title" title="{{ item.title }}"><bdi dir="auto">{{ item.title }}</bdi></h3>
+                    <div class="viewer-card-meta">
+                        {% if item.is_4k %}
+                        <span class="viewer-badge-mini viewer-badge-mini-4k">4K</span>
+                        {% elif item.max_quality %}
+                        <span class="viewer-badge-mini viewer-badge-mini-hd">{{ item.max_quality }}</span>
+                        {% endif %}
+                        {% if item.has_ass %}
+                        <span class="viewer-badge-mini viewer-badge-mini-ass">ASS</span>
+                        {% endif %}
+                        {% if item.duration_formatted %}
+                        <span class="viewer-card-meta-dot">•</span>
+                        <span class="ltr-text">{{ item.duration_formatted }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}

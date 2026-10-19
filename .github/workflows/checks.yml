@@ -1,0 +1,69 @@
+name: Project checks
+on: [push, pull_request]
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: abv_test
+          POSTGRES_PASSWORD: ci-disposable-database
+          POSTGRES_DB: aboodvideo_test
+        ports: ["15432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U abv_test -d aboodvideo_test"
+          --health-interval 5s --health-timeout 5s --health-retries 15
+      redis:
+        image: redis:7-alpine
+        ports: ["16379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 15
+    env:
+      ABOODVIDEO_TEST_DATABASE_URL: postgresql+asyncpg://abv_test:ci-disposable-database@127.0.0.1:15432/aboodvideo_test
+      ABOODVIDEO_TEST_REDIS_QUEUE_URL: redis://127.0.0.1:16379/0
+      ABOODVIDEO_TEST_REDIS_SESSION_URL: redis://127.0.0.1:16379/1
+      ABOODVIDEO_TEST_REDIS_CACHE_URL: redis://127.0.0.1:16379/2
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: "**/requirements*.txt"
+      - name: Install dependencies and media test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m playwright install --with-deps chromium
+      - name: Credentials and dependency checks
+        run: |
+          python scripts/check_repository_secrets.py --index --history
+          python -m pip_audit -r requirements-dev.txt
+          python -m pip check
+      - name: Migrations and tests
+        run: python scripts/run_tests.py -q --junitxml=test-results/unit.xml
+      - name: Browser regressions
+        env:
+          ABOODVIDEO_RUN_BROWSER_TEST: "1"
+        run: >-
+          python scripts/run_tests.py -q
+          tests/test_admin_security_browser_regression.py
+          tests/test_admin_upload_browser_regression.py
+          tests/test_share_security_browser.py
+          tests/test_drive_bulk_browser.py
+          --junitxml=test-results/browser.xml
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/*.xml

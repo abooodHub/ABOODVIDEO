@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ABOODVIDEO Studio</title>
+  <link rel="stylesheet" href="/static/css/studio_v3.css?v=studio-desktop-1">
+  <link rel="stylesheet" href="/static/css/studio_platform.css?v=studio-desktop-1">
+  <link rel="stylesheet" href="/static/css/studio_import.css?v=desktop-1">
+  <link rel="stylesheet" href="/static/css/studio_desktop.css?v=desktop-6">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div><strong>ABOOD<span class="brand-video">VIDEO</span></strong><span>STUDIO {{ version }}</span></div>
+      </div>
+      <div class="sidebar-section-label">أدوات Studio</div>
+      <nav id="main-nav" aria-label="التنقل الرئيسي">
+        <button class="nav-item active" data-page="import"><b aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></b><span class="nav-copy"><strong>إضافة محتوى</strong><small>اختيار الحلقات وتجهيزها</small></span></button>
+        <button class="nav-item" data-page="queue"><b aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 5 12 7-12 7z"/></svg></b><span class="nav-copy"><strong>التحويل والرفع</strong><small>تابع العمل خطوة بخطوة</small></span><em id="nav-queue-count">0</em></button>
+        <button class="nav-item" data-page="history"><b aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></b><span class="nav-copy"><strong>سجل المهام</strong><small>النتائج وإعادة المحاولة</small></span><em id="nav-history-count">0</em></button>
+        <button class="nav-item" data-page="library"><b aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></b><span class="nav-copy"><strong>المكتبة المحلية</strong><small>حلقاتك بعد التحويل</small></span></button>
+        <button class="nav-item" data-page="settings"><b aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="8" cy="7" r="3"/><circle cx="16" cy="17" r="3"/></svg></b><span class="nav-copy"><strong>الإعدادات</strong><small>خصّص البرنامج واتصاله</small></span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="mode-label">التحويل على هذا الجهاز</div>
+        <span class="workspace-local-note">مساحة العمل المحلية</span>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="page-heading"><span class="workspace-label">مساحة العمل</span><h1 id="page-title">إضافة محتوى</h1><p id="page-description">جهّز حلقاتك للتحويل، ثم ارفعها عندما تكون جاهزة.</p></div>
+
+        <div class="top-actions">
+          <span class="server-pill" role="status"><i id="server-dot"></i><span id="server-label">جارٍ فحص الخادم</span></span>
+          <span class="activity" id="running-indicator"><i></i><b id="running-count">0</b> مهام نشطة</span>
+          <button class="button secondary" id="refresh-button">تحديث</button>
+        </div>
+      </header>
+      <div class="runtime-bar">        <div class="header-monitor" aria-label="مراقبة النظام المباشرة">
+          <div class="monitor-item" title="استخدام المعالج"><span>CPU</span><strong id="cpu-value">—</strong><div class="meter"><i id="cpu-meter"></i></div><small id="cpu-detail">—</small></div>
+          <div class="monitor-item" title="استخدام بطاقة الرسوميات"><span>GPU</span><strong id="gpu-value">—</strong><div class="meter violet"><i id="gpu-meter"></i></div><small id="gpu-name">—</small></div>
+          <div class="monitor-item" title="الذاكرة"><span>RAM</span><strong id="ram-value">—</strong><div class="meter green"><i id="ram-meter"></i></div><small id="ram-detail">—</small></div>
+          <div class="monitor-item" title="ذاكرة بطاقة الرسوميات"><span>VRAM</span><strong id="vram-value">—</strong><div class="meter cyan"><i id="vram-meter"></i></div><small id="gpu-temp">—</small></div>
+        </div><span class="runtime-caption">موارد الجهاز · مباشر</span></div>
+      <section class="page active" id="page-import" aria-label="استيراد المحتوى">
+        <div class="import-workflow">
+          <section class="conversion-dock task-settings-fixed" id="import-config" aria-labelledby="task-settings-title">
+            <div class="task-settings-intro">
+              <span class="task-settings-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9zM9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/></svg></span>
+              <div><span class="task-settings-eyebrow">قبل إضافة الحلقات</span><h2 id="task-settings-title">إعدادات المهمة</h2><p>اختر مكوّن الجهاز الذي سينفّذ التحويل.</p></div>
+            </div>
+            <div class="dock-fields"><fieldset class="dock-group"><legend class="sr-only">جهاز التحويل</legend><div class="encoder-options" role="radiogroup" aria-label="جهاز التحويل" aria-describedby="import-device-help"><label class="encoder-choice"><input type="radio" name="import-encoder" id="import-encoder-cpu" value="cpu"><span class="encoder-choice-main"><span class="encoder-choice-icon cpu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 9h6v6H9zM9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/></svg></span><span class="encoder-choice-copy"><strong dir="ltr">CPU</strong><small>المعالج</small></span></span></label><label class="encoder-choice"><input type="radio" name="import-encoder" id="import-encoder-gpu" value="gpu"><span class="encoder-choice-main"><span class="encoder-choice-icon gpu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M7 9h1m-1 6h1m9-6h1m-1 6h1M8 19v2m8-2v2"/></svg></span><span class="encoder-choice-copy"><strong dir="ltr">GPU</strong><small>بطاقة الرسوميات</small></span></span></label></div><p id="import-device-help">اختر المعالج أو بطاقة الرسوميات للتحويل.</p></fieldset></div>
+          </section>
+          <section class="source-ribbon" aria-labelledby="source-stage-title">
+            <div class="workflow-heading"><h2 id="source-stage-title">إضافة المحتوى</h2></div>
+            <div id="drop-zone" class="source-actions" tabindex="0">
+              <button type="button" id="add-file" class="source-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/><path d="m10 12 5 3-5 3z"/></svg><span><strong>إضافة حلقة</strong><small>ملف فيديو واحد</small></span><span class="tile-arrow" aria-hidden="true">←</span></button>
+              <button type="button" id="add-season" class="source-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><path d="M8 12h8M8 16h6"/></svg><span><strong>إضافة موسم</strong><small>اكتشاف حلقات المجلد</small></span><span class="tile-arrow" aria-hidden="true">←</span></button>
+              <button type="button" id="add-series" class="source-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M6 6h12M9 3h6M8 13h8M8 17h5"/></svg><span><strong>إضافة مسلسل كامل</strong><small>كل المواسم والحلقات معًا</small></span><span class="tile-arrow" aria-hidden="true">←</span></button>
+            </div>
+          </section>
+          <section class="import-review" aria-labelledby="preview-stage-title">
+            <div class="workflow-heading review-toolbar"><h2 id="preview-stage-title">الحلقات</h2><span id="import-source-label" dir="auto">لم يتم اختيار مصدر</span><div class="review-tools"><button type="button" class="button secondary" id="import-expand-all" disabled>توسيع المواسم</button><button type="button" class="text-button" id="import-clear" disabled>إلغاء الاختيار</button></div></div>
+            <div id="import-preview" class="review-tree empty" aria-busy="false"></div>
+          </section>
+
+          <footer class="queue-commit"><div class="commit-selection"><div><strong id="import-selected-count">لم تُحدد حلقات بعد</strong><span id="import-validation" role="status" aria-live="polite">اختر مصدرًا لعرض الحلقات والتحقق منها.</span></div></div><button type="button" class="button primary" id="queue-selection" disabled>تجهيز للتحويل <span aria-hidden="true">←</span></button></footer>
+        </div>
+      </section>
+
+      <section class="page" id="page-queue">
+        <details class="connection-bar connection-quick-settings">
+          <summary class="connection-summary"><div class="connection-identity"><span class="status-chip" id="upload-server-chip">—</span><bdi id="server-url">—</bdi></div><span id="upload-server-copy">جارٍ فحص الاتصال…</span><span class="connection-toggle">إعداد الاتصال <span aria-hidden="true">⌄</span></span></summary>
+          <div class="connection-expanded">
+            <dl class="connection-diagnostics"><div><dt>سلامة الخدمة</dt><dd id="upload-health">—</dd></div><div><dt>الجاهزية</dt><dd id="upload-readiness">—</dd></div><div><dt>المصادقة</dt><dd id="auth-state">—</dd></div><div class="connection-scopes"><dt>صلاحيات الرفع</dt><dd id="upload-scopes">—</dd></div></dl>
+            <div class="connection-form"><label>عنوان الخادم<input id="queue-server-url-input" dir="ltr" autocomplete="url"></label><label>مفتاح Studio API<input id="queue-api-key-input" type="password" dir="ltr" autocomplete="new-password" placeholder="اتركه فارغاً للإبقاء على المفتاح المحفوظ"></label><div class="form-actions"><button class="button secondary" id="queue-test-connection" type="button">اختبار الاتصال</button><button class="button primary" id="queue-save-connection" type="button">حفظ الاتصال</button></div><p class="form-note" id="queue-connection-result" role="status" aria-live="polite"></p></div>
+          </div>
+        </details>
+        <div class="queue-workspace-tabs" role="tablist" aria-label="التحويل والرفع">
+          <button class="active" id="processing-tab" type="button" role="tab" aria-selected="true" aria-controls="processing-workspace" data-workspace-tab="processing">التحويل</button>
+          <button id="upload-tab" type="button" role="tab" aria-selected="false" aria-controls="page-upload" data-workspace-tab="upload">الرفع <span id="upload-ready-count">0 جاهزة</span></button>
+        </div>
+        <div id="processing-workspace" role="tabpanel" aria-labelledby="processing-tab">
+        <div class="section-intro queue-header desktop-command-bar"><div><span id="active-job-card" class="active-job empty">لا توجد مهمة قيد المعالجة</span><p class="upload-action-note">لبدء التحويل: اضغط «بدء تحويل هذه الدفعة». هذا الزر يشغّل الدفعة الظاهرة في هذه الصفحة فقط؛ ابدأ حلقة منفردة من زر «بدء» بجانبها. الحزم القديمة تبقى في تبويب «الرفع».</p></div><div class="toolbar"><button class="button primary" data-action="start-all">بدء تحويل هذه الدفعة</button><button class="button secondary" data-action="pause-all">إيقاف مؤقت</button><button class="button secondary" data-action="resume-all">استئناف</button><button class="button danger-quiet" id="delete-selected-queue" disabled>حذف المحدد</button><span id="selected-queue-count" class="selection-count" aria-live="polite">لم يتم تحديد حلقات</span><details class="queue-more-actions"><summary>المزيد</summary><div><button class="button secondary" data-action="stop-after-current">إيقاف بعد الحالية</button><button class="button secondary" data-action="retry-failed">إعادة الفاشلة</button><button class="button danger-quiet" data-action="clear-completed">مسح المكتملة</button></div></details></div></div>
+        <div class="queue-status-filters" id="queue-status-filters" role="tablist" aria-label="تصفية الحلقات حسب الحالة">
+          <button class="queue-status-filter active" type="button" role="tab" aria-selected="true" data-queue-filter="all">كل الحلقات <b id="queue-filter-all-count">0</b></button>
+          <button class="queue-status-filter" type="button" role="tab" aria-selected="false" data-queue-filter="active">قيد التنفيذ <b id="queue-filter-active-count">0</b></button>
+          <button class="queue-status-filter" type="button" role="tab" aria-selected="false" data-queue-filter="waiting">بانتظار البدء <b id="queue-filter-waiting-count">0</b></button>
+          <button class="queue-status-filter ready-filter" type="button" role="tab" aria-selected="false" data-queue-filter="ready">جاهزة للرفع <b id="queue-filter-ready-count">0</b></button>
+          <button class="queue-status-filter attention-filter" type="button" role="tab" aria-selected="false" data-queue-filter="attention">تحتاج إجراء <b id="queue-filter-attention-count">0</b></button>
+        </div>
+        <article class="panel table-panel"><div class="table-wrap"><table class="queue-table"><colgroup><col style="width:27%"><col style="width:11%"><col style="width:12%"><col style="width:18%"><col style="width:11%"><col style="width:7%"><col style="width:7%"><col style="width:7%"></colgroup><thead><tr><th><label class="queue-select-all"><input id="select-all-queue" type="checkbox" aria-label="تحديد كل الحلقات القابلة للحذف"><span>تحديد الكل</span></label>الحلقة</th><th>الحالة</th><th>المرحلة والجودة</th><th>التقدم الكلي / الحالي</th><th>المشفّر</th><th>السرعة · FPS</th><th>الوقت / ETA</th><th>الإجراءات</th></tr></thead><tbody id="queue-body"></tbody></table></div><div id="queue-empty" class="empty-state"><b>قائمة الدفعة فارغة</b><span>أضف ملفاً من «إضافة محتوى»، ثم ارجع إلى هنا واضغط «بدء تحويل هذه الدفعة».</span><button class="button primary" data-go="import">إضافة وسائط</button></div><div id="queue-filter-empty" class="empty-state hidden"><b>لا توجد حلقات بهذه الحالة</b><span>اختر فئة أخرى من الأعلى لمشاهدة بقية الحلقات.</span></div></article>
+        </div>
+        <section class="upload-workspace hidden" id="page-upload" role="tabpanel" aria-labelledby="upload-tab">
+          <article class="panel upload-ready-panel">
+            <div class="upload-list-toolbar"><div><h3>الحلقات الجاهزة والرفع الجاري</h3><p>ارفع الحزم المحوّلة، وتابع سرعة النقل والتحقق هنا.</p></div><div class="upload-actions"><button class="button primary" id="upload-ready" disabled>رفع الجاهز الآن</button><button class="button secondary" data-action="start-auto-pipeline" title="يبدأ تحويل الحلقات المنتظرة، ثم يرفع كل حلقة بعد اكتمالها">التحويل والرفع تلقائياً</button></div></div>
+            <div class="upload-table"><div class="upload-table-head" aria-hidden="true"><span>الحلقة / الملف</span><span>الحالة والتقدم</span><span>حجم الحزمة</span><span>التاريخ</span><span>الإجراءات</span></div><div id="upload-ready-list" aria-live="polite"></div></div>
+            <p class="upload-action-note">«رفع الجاهز» يرفع الحزم المكتملة فقط. «التحويل والرفع تلقائياً» يبدأ تحويل المهام المنتظرة أيضاً.</p>
+          </article>
+        </section>
+      </section>
+
+      <section class="page" id="page-history">
+        <div class="section-intro history-header"><div></div><button class="button secondary hidden" id="retry-failed-history" data-action="retry-failed">إعادة محاولة الفاشلة</button></div>
+        <div class="history-command-bar"><label class="list-search">بحث في السجل<input id="history-search" type="search" placeholder="اسم الملف أو الحلقة"></label>
+        <div class="history-filters" id="history-filters" role="tablist" aria-label="تصفية سجل المهام">
+          <button class="history-filter active" type="button" role="tab" aria-selected="true" data-history-filter="all">الكل <em id="history-all-count">0</em></button>
+          <button class="history-filter" type="button" role="tab" aria-selected="false" data-history-filter="completed">مرفوعة ومتحقق منها <em id="history-completed-count">0</em></button>
+          <button class="history-filter" type="button" role="tab" aria-selected="false" data-history-filter="failed">تحتاج إجراء <em id="history-failed-count">0</em></button>
+        </div>
+        </div>
+        <div class="history-table"><div class="history-table-head" aria-hidden="true"><span>الملف</span><span>التاريخ</span><span>الحالة</span><span>الإجراءات</span></div><div class="history-rows" id="history-list"></div></div>
+      </section>
+      <section class="page" id="page-library"><div class="section-intro"><div><p>الحلقات المحوّلة، مرتبة حسب المسلسل والموسم.</p></div><div class="hero-actions"><button class="button primary" data-go="upload">الانتقال إلى الرفع</button><button class="button secondary" id="open-output">فتح المجلد</button></div></div><div class="library-controls"><label class="list-search">بحث<input id="library-search" type="search" placeholder="ابحث باسم الحلقة أو المسلسل أو الموسم"></label><select id="library-filter" aria-label="حالة الحزمة"><option value="all">كل الحالات</option><option value="ready">جاهزة للرفع</option><option value="completed">مرفوعة</option></select><div class="segmented"><button id="library-list-view" class="active" type="button" aria-pressed="true">قائمة</button><button id="library-grid-view" type="button" aria-pressed="false">بطاقات</button></div></div><div id="library-summary" class="library-summary" role="status"></div><div class="library-grid list-view" id="library-list"></div></section>
+
+      <section class="page" id="page-settings">
+        <nav class="settings-anchor-nav" id="settings-tabs" aria-label="أقسام الإعدادات">
+          <button class="active" type="button" data-settings-tab="paths" aria-controls="settings-paths" aria-current="location"><span>01</span>مسارات الحفظ</button>
+          <button type="button" data-settings-tab="conversion" aria-controls="settings-conversion"><span>02</span>التحويل والأداء</button>
+          <button type="button" data-settings-tab="connection" aria-controls="settings-connection"><span>03</span>الاتصال بالخادم</button>
+          <button type="button" data-settings-tab="maintenance" aria-controls="settings-maintenance"><span>04</span>الصيانة والبيانات</button>
+        </nav>
+        <div class="settings-dashboard">
+          <section class="settings-section" id="settings-paths" data-settings-section="paths" aria-labelledby="settings-paths-title">
+            <header class="settings-section-heading"><span>01</span><div><h2 id="settings-paths-title">مسارات الحفظ</h2><p>مكان الحلقات بعد التحويل ومجلد الخطوط المستخدمة للترجمة.</p></div></header>
+            <div class="settings-section-grid"><article class="panel settings-block" data-tab-panel="paths"><h3>مجلد حفظ الحلقات بعد التحويل</h3><p>يتم حفظ الحلقات المحوّلة نهائياً في هذا المجلد.</p><div class="path-field"><input id="output-folder" dir="ltr" readonly placeholder="اختر مجلد الإخراج"><button class="button secondary" id="browse-output">تغيير المجلد</button></div><div class="form-actions"><button class="text-button" id="settings-open-output">فتح المجلد</button></div><label>تنظيم المجلدات<select id="output-organization"><option value="automatic">مسلسل / موسم / حلقة</option><option value="original">الاحتفاظ باسم الملف الأصلي</option></select></label></article>
+<article class="panel settings-block" data-tab-panel="paths"><h3>مجلد الخطوط</h3><p>يستخدم Studio الخطوط من هذا المجلد مباشرة، دون نسخها إلى بيانات التطبيق أو تثبيتها في Windows.</p><div class="path-field"><input id="font-library-folder" dir="ltr" readonly placeholder="D:\fonts"><button class="button secondary" id="browse-font-library">تغيير</button></div><div class="form-actions"><button class="text-button" id="open-font-library">فتح المجلد</button><button class="button secondary" id="rescan-font-library">إعادة الفحص</button></div><p id="font-library-status" role="status">جارٍ فحص الخطوط…</p></article></div>
+          </section>
+          <section class="settings-section" id="settings-conversion" data-settings-section="conversion" aria-labelledby="settings-conversion-title">
+            <header class="settings-section-heading"><span>02</span><div><h2 id="settings-conversion-title">التحويل والأداء</h2><p>حدد المشفّر الافتراضي، عدد المهام المتزامنة، وتحقق من دعم الجهاز.</p></div></header>
+            <div class="settings-section-grid"><article class="panel settings-block" data-tab-panel="conversion"><h3>التحويل</h3><label>المشفّر الافتراضي<select id="default-encoder"><option value="auto">تلقائي</option><option value="gpu">بطاقة الرسوميات GPU</option><option value="cpu">المعالج CPU</option></select></label><label>الإعداد المسبق<select id="default-preset"><option value="balanced" selected>متوازن</option><option value="quality">جودة عالية</option></select></label><div class="two-fields"><label>مهام CPU<input id="cpu-jobs" type="number" min="1" max="4"></label><label>مهام GPU<input id="gpu-jobs" type="number" min="1" max="4"></label></div></article>
+<article class="panel settings-block wide-panel" data-tab-panel="conversion"><div class="panel-head"><div><h3>المشفّرات المكتشفة</h3><p>لا يظهر كمُتاح إلا ما اجتاز اختبار FFmpeg الفعلي.</p></div><button class="button secondary" id="refresh-encoders">إعادة الفحص</button></div><div id="encoder-list" class="encoder-list"></div><div class="benchmark-row"><select id="benchmark-encoder"></select><button class="button primary" id="test-encoder">اختبار المشفّر</button><div id="benchmark-result">اختر مشفراً للاختبار.</div></div></article></div>
+          </section>
+          <section class="settings-section" id="settings-connection" data-settings-section="connection" aria-labelledby="settings-connection-title">
+            <header class="settings-section-heading"><span>03</span><div><h2 id="settings-connection-title">الاتصال بالخادم</h2><p>عنوان ABOODVIDEO ومفتاح Studio المستخدم لرفع الحزم.</p></div></header>
+            <div class="settings-section-grid"><article class="panel settings-block" data-tab-panel="connection"><h3>الاتصال بالخادم</h3><p>يُحفظ مفتاح Studio مشفراً في Windows DPAPI. اترك خانة المفتاح فارغة للإبقاء على المفتاح المحفوظ.</p><label>عنوان الخادم<input id="server-url-input" dir="ltr" value="" placeholder="http://localhost:8000/api/v1" autocomplete="url"></label><label>مفتاح Studio API<input id="api-key-input" type="password" dir="ltr" autocomplete="new-password" placeholder="أدخل مفتاحاً جديداً أو اتركه فارغاً"></label><div class="form-actions"><button class="button secondary" id="test-connection">اختبار الاتصال</button><button class="button primary" id="save-connection">حفظ الاتصال</button></div><p class="form-note" id="connection-result" role="status" aria-live="polite"></p></article></div>
+          </section>
+          <section class="settings-section" id="settings-maintenance" data-settings-section="maintenance" aria-labelledby="settings-maintenance-title">
+            <header class="settings-section-heading"><span>04</span><div><h2 id="settings-maintenance-title">الصيانة والبيانات</h2><p>راجع مساحة الملفات المؤقتة ومسارات بيانات Studio.</p></div></header>
+            <div class="settings-section-grid"><article class="panel settings-block" data-tab-panel="maintenance"><h3>التخزين المؤقت</h3><p>ملفات عمل مؤقتة؛ لا تُحفظ فيها الحزم النهائية.</p><p dir="ltr" id="temp-path">—</p><div class="temp-stat"><strong id="temp-size">—</strong><span id="temp-files">—</span></div><button class="button danger-quiet" id="clear-temp">مسح الملفات المؤقتة</button></article>
+<article class="panel settings-block" data-tab-panel="maintenance"><h3>معلومات متقدمة</h3><p>مسارات التشخيص المحلية</p><dl class="detail-list"><div><dt>قاعدة بيانات الطابور</dt><dd class="ltr" id="jobs-db-path">—</dd></div><div><dt>بيانات Studio</dt><dd class="ltr" id="appdata-path">—</dd></div><div><dt>السجلات</dt><dd class="ltr" id="logs-path">—</dd></div></dl></article></div>
+          </section>
+        </div>
+        <footer class="settings-savebar"><span>تُطبّق إعدادات التحويل على المهام الجديدة.</span><button class="button primary" id="save-settings">حفظ الإعدادات</button></footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="first-run-modal" aria-hidden="true"><div class="modal-card"><span class="modal-icon">⌂</span><p class="eyebrow">FIRST RUN</p><h2>اختر مجلد الإخراج الدائم</h2><p>سيحفظ Studio حزم HLS النهائية هنا. مجلد التطبيق المؤقت لن يُستخدم كوجهة نهائية.</p><button class="button primary wide" id="first-run-browse">اختيار المجلد</button></div></div>
+  <div class="toast-stack" id="toasts" aria-live="polite"></div>
+  <script src="/static/js/studio_v3.js?v=studio-desktop-2" defer></script>
+</body>
+</html>
+
+

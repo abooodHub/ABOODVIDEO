@@ -1,0 +1,2 @@
+/* Compatibility entry point; shared components live in system/components.css. */
+@import url("/static/css/system/components.css");

@@ -1,0 +1,376 @@
+"""
+Test WordPress Theme Embed Integration with ABOODVIDEO Player.
+Simulates a real WordPress episode post (e.g. Dooplay / Toroflix theme)
+embedding the video via <iframe> from https://platform.example/embed/{id}.
+"""
+import sys
+import time
+import threading
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
+WP_PORT = 8088
+ARTIFACTS_DIR = Path(r"C:\Users\abood\.gemini\antigravity\brain\c58b9ae4-6748-4d1c-828d-53dae7a841e8")
+HTML_DIR = Path(r"c:\aboodvideo\scripts\wp_simulation")
+HTML_DIR.mkdir(parents=True, exist_ok=True)
+
+# Create a realistic WordPress Anime post HTML file
+WP_HTML_CONTENT = """<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spirit Cage: Incarnation - الحلقة 1 | ABOODVIDEO (WordPress Theme)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", sans-serif;
+            line-height: 1.6;
+        }
+        /* WordPress Admin Bar Simulation */
+        .wp-admin-bar {
+            background: #1d2327;
+            color: #f0f0f1;
+            font-size: 13px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 16px;
+            border-bottom: 1px solid #3c434a;
+        }
+        .wp-admin-bar span { opacity: 0.8; }
+        .wp-admin-bar b { color: #00d2be; }
+
+        /* WordPress Header / Nav */
+        header.site-header {
+            background: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .site-logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: #f8fafc;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .site-logo span { color: #00d2be; }
+        .site-nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .site-nav a:hover, .site-nav a.active { color: #00d2be; }
+
+        /* Main Post Container */
+        .post-container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .post-breadcrumbs {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 16px;
+        }
+        .post-breadcrumbs a { color: #00d2be; text-decoration: none; }
+
+        .post-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        /* Dooplay / Theme Video Player Section */
+        .theme-player-box {
+            background: #020617;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .player-servers-tabs {
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+            padding: 8px 12px;
+            gap: 8px;
+        }
+        .server-tab {
+            background: #1e293b;
+            color: #94a3b8;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .server-tab.active {
+            background: #00d2be;
+            color: #020617;
+        }
+        .server-badge {
+            background: rgba(0,0,0,0.25);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        /* Responsive 16:9 Iframe Wrapper */
+        .responsive-player-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        .responsive-player-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Post Info & Episode Navigation below Player */
+        .post-meta-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #0f172a;
+            border-top: 1px solid #1e293b;
+        }
+        .ep-controls {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-ep {
+            background: #1e293b;
+            color: #f1f5f9;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-ep.primary { background: #00d2be; color: #020617; }
+        .post-description {
+            margin-top: 24px;
+            padding: 20px;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid #1e293b;
+        }
+        .post-description h3 {
+            font-size: 18px;
+            color: #00d2be;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- WordPress Top Bar -->
+    <div class="wp-admin-bar">
+        <span>لوحة تحكم ووردبريس (WordPress 6.6)</span>
+        <span>•</span>
+        <span>القالب: <b>Dooplay Anime Theme</b></span>
+        <span>•</span>
+        <span>الموقع: <b>ABOODVIDEO (partner.example)</b></span>
+    </div>
+
+    <!-- Site Header -->
+    <header class="site-header">
+        <a href="#" class="site-logo">OK-<span>DONGHUA</span></a>
+        <nav class="site-nav">
+            <a href="#" class="active">الرئيسية</a>
+            <a href="#">قائمة الأنمي</a>
+            <a href="#">أحدث الحلقات</a>
+            <a href="#">جدول العرض</a>
+        </nav>
+    </header>
+
+    <!-- Post Content -->
+    <main class="post-container">
+        <div class="post-breadcrumbs">
+            <a href="#">الرئيسية</a> / <a href="#">أنمي صيني</a> / <a href="#">Spirit Cage: Incarnation</a> / الحلقة 1
+        </div>
+
+        <h1 class="post-title">Spirit Cage: Incarnation - الحلقة 1 مترجمة اون لاين بجودة 4K</h1>
+
+        <!-- Dooplay Player Box -->
+        <div class="theme-player-box">
+            <div class="player-servers-tabs">
+                <button class="server-tab active">
+                    سيرفر ABOODVIDEO VIP
+                    <span class="server-badge">4K ULTRA HD + ASS</span>
+                </button>
+                <button class="server-tab">سيرفر بديل 2</button>
+                <button class="server-tab">سيرفر بديل 3</button>
+            </div>
+
+            <!-- Standard WordPress Iframe Embed -->
+            <div class="responsive-player-wrapper">
+                <iframe
+                    id="aboodvideo-iframe"
+                    src="https://platform.example/embed/7418b984-f22d-4515-9538-02eb520780e4?autoplay=1"
+                    title="مشغل ABOODVIDEO"
+                    allowfullscreen="true"
+                    webkitallowfullscreen="true"
+                    mozallowfullscreen="true"
+                    allow="autoplay; fullscreen; picture-in-picture; encrypted-media">
+                </iframe>
+            </div>
+
+            <div class="post-meta-bar">
+                <div>
+                    <strong>سيرفر المشاهدة السريع:</strong> يدعم الترجمة الحركية ASS والجودات المتعددة (تلقائي / 4K / 1080p).
+                </div>
+                <div class="ep-controls">
+                    <button class="btn-ep">الحلقة السابقة</button>
+                    <button class="btn-ep primary">الحلقة التالية</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="post-description">
+            <h3>قصة الأنمي</h3>
+            <p>في مستقبل بعيد بعد كارثة بيئية وزلازل مدمرة اجتاحت الأرض، تكافح البشرية الناجية على متن المنارة العائمة ضد وحوش المانا الغامضة. تدور القصة حول مارك وفريق الصيادين في معارك البقاء الأسطورية.</p>
+        </div>
+    </main>
+</body>
+</html>
+"""
+
+wp_file = HTML_DIR / "wordpress-sample.html"
+wp_file.write_text(WP_HTML_CONTENT, encoding="utf-8")
+
+class CustomHandler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(HTML_DIR), **kwargs)
+    def log_message(self, format, *args):
+        pass # Quiet
+
+def start_server():
+    server = HTTPServer(("127.0.0.1", WP_PORT), CustomHandler)
+    server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    server_thread.start()
+    return server
+
+def run_test():
+    print(f"Starting simulated WordPress local server on http://127.0.0.1:{WP_PORT}...")
+    server = start_server()
+    time.sleep(1)
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": 1400, "height": 950},
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
+        page = context.new_page()
+
+        console_logs = []
+        errors = []
+        page.on("console", lambda msg: console_logs.append(f"[{msg.type}] {msg.text}"))
+        page.on("pageerror", lambda err: errors.append(str(err)))
+
+        print("Navigating to WordPress episode page...", flush=True)
+        page.goto(f"http://127.0.0.1:{WP_PORT}/wordpress-sample.html", wait_until="domcontentloaded")
+
+        print("Page title:", page.title())
+
+        # Locate the iframe
+        iframe_element = page.locator("#aboodvideo-iframe")
+        assert iframe_element.is_visible(), "Iframe is not visible in WordPress theme!"
+        print("WordPress <iframe> found and visible ✓")
+
+        # Access iframe content
+        frame = page.frame_locator("#aboodvideo-iframe")
+
+        # Wait for player container to appear inside iframe
+        player_container = frame.locator("#player-container")
+        player_container.wait_for(state="visible", timeout=15000)
+        print("Player inside WordPress <iframe> loaded successfully ✓")
+
+        # Check for CSP or blocking errors
+        csp_errors = [log for log in console_logs if "Content Security Policy" in log or "frame-ancestors" in log or "blocked" in log]
+        print(f"CSP Error count: {len(csp_errors)}")
+        if csp_errors:
+            print("CSP Logs:", csp_errors)
+
+        # Wait for video element ready
+        video_el = frame.locator("#video-element")
+        video_el.wait_for(state="attached", timeout=10000)
+
+        # Dispatch click on big play button or video
+        print("Dispatching Play inside iframe...", flush=True)
+        frame.locator("#big-play-btn").evaluate("btn => btn.click()")
+
+        # Wait for active playback
+        print("Waiting for video playback to advance in WordPress embed...", flush=True)
+        playback_started = False
+        for _ in range(30):
+            time.sleep(0.5)
+            cur_time = frame.locator("video").evaluate("el => el.currentTime")
+            is_paused = frame.locator("video").evaluate("el => el.paused")
+            if cur_time > 1.5 and not is_paused:
+                playback_started = True
+                print(f"Playback active: currentTime={cur_time:.2f}s, paused={is_paused} ✓", flush=True)
+                break
+
+        # Check ASS canvas
+        ass_canvas = frame.locator("#ass-canvas")
+        canvas_visible = ass_canvas.is_visible()
+        print(f"JASSUB Subtitle Canvas Active: {canvas_visible} ✓")
+
+        # Take full WordPress page screenshot with active playback
+        screenshot_path1 = ARTIFACTS_DIR / "28_wordpress_theme_embed_playing.png"
+        page.screenshot(path=str(screenshot_path1), full_page=False)
+        print(f"Saved screenshot: {screenshot_path1} ✓")
+
+        # Click settings button inside player to show quality options in WordPress embed
+        btn_settings = frame.locator("#btn-settings")
+        if btn_settings.is_visible():
+            btn_settings.click()
+            time.sleep(0.5)
+            # Click quality option
+            btn_quality = frame.locator('[data-screen="quality"]')
+            if btn_quality.is_visible():
+                btn_quality.click()
+                time.sleep(0.5)
+
+        screenshot_path2 = ARTIFACTS_DIR / "29_wordpress_theme_embed_settings.png"
+        page.screenshot(path=str(screenshot_path2), full_page=False)
+        print(f"Saved screenshot: {screenshot_path2} ✓")
+
+        browser.close()
+        server.shutdown()
+        print("Test completed successfully!")
+
+if __name__ == "__main__":
+    run_test()

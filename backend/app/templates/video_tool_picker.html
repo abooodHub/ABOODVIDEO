@@ -1,0 +1,13 @@
+{% extends 'admin_base.html' %}
+{% block title %}اختيار فيديو{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/video_tools.css?v=video-tools-20261018">{% endblock %}
+{% block content %}
+<section id="video-tool-picker" data-tool="{{ tool_kind }}" aria-labelledby="video-picker-title">
+  <div class="page-header"><div><h1 id="video-picker-title">اختر الفيديو {% if tool_kind == 'subtitles' %}لإدارة ترجماته{% else %}لفحص تشغيله{% endif %}</h1><p class="page-desc">{% if tool_kind == 'subtitles' %}الترجمات أصبحت داخل تفاصيل كل فيديو.{% else %}فحص التشغيل أصبح ضمن قسم التشغيل والجودات في تفاصيل الفيديو.{% endif %}</p></div><a href="/admin/videos" class="btn btn-secondary">فتح المكتبة</a></div>
+  <form id="video-picker-search" class="video-picker-search" role="search"><label for="video-picker-query">ابحث بعنوان الفيديو</label><input id="video-picker-query" type="search" maxlength="100" placeholder="عنوان الفيديو…"><button class="btn btn-primary" type="submit">بحث</button></form>
+  <p id="video-picker-feedback" role="status" aria-live="polite"></p>
+  <div id="video-picker-list" class="video-picker-list" aria-busy="true"></div>
+  <nav class="video-picker-pagination" aria-label="صفحات الفيديوهات"><button type="button" id="video-picker-prev" class="btn btn-secondary" disabled>السابق</button><span id="video-picker-page"></span><button type="button" id="video-picker-next" class="btn btn-secondary" disabled>التالي</button></nav>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="/static/js/video_tool_picker.js?v=github-readiness-20261019"></script>{% endblock %}

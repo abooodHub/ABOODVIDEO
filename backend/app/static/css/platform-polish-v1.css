@@ -1,0 +1,202 @@
+/* ABOODVIDEO admin visual refinement — shared presentation only. */
+body.abv-interface {
+  --ui-bg: #080e13;
+  --ui-surface: #101920;
+  --ui-raised: #152129;
+  --ui-soft: #192832;
+  --ui-border: rgba(160, 190, 190, .14);
+  --ui-border-strong: rgba(160, 190, 190, .23);
+  --ui-text: #edf5f3;
+  --ui-muted: #9aadae;
+  --ui-dim: #74898c;
+  --ui-accent: #7ce2cf;
+  --ui-accent-strong: #a0f0df;
+  --ui-danger: #ff9c9c;
+  --ui-radius: 14px;
+  color: var(--ui-text);
+  background-color: var(--ui-bg);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+body.abv-interface .main-content { min-width: 0; }
+body.abv-interface .page-content {
+  width: min(100%, 1680px);
+  margin-inline: auto;
+  padding: clamp(20px, 2.5vw, 36px);
+}
+
+/* One heading rhythm across dashboard, library, settings, and operations. */
+body.abv-interface :is(.page-header, .page-heading, .platform-heading, .dash-heading, .section-heading,
+  .analytics-header, .inspector-header) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-block: 0 22px;
+}
+body.abv-interface :is(.page-title, .page-heading h1, .platform-heading h1, .dash-heading h1, .section-heading h1) {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: clamp(22px, 2vw, 30px);
+  font-weight: 650;
+  letter-spacing: -.025em;
+  line-height: 1.35;
+}
+body.abv-interface :is(.page-description, .page-desc, .page-subtitle, .platform-heading p, .dash-description, .section-heading p) {
+  max-width: 70ch;
+  margin-block: 7px 0;
+  color: var(--ui-muted);
+  font-size: 12px;
+  line-height: 1.85;
+}
+body.abv-interface :is(.eyebrow, .page-kicker, .platform-eyebrow, .dash-eyebrow) {
+  color: var(--ui-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+}
+
+/* Clear, quiet surfaces keep the content in front of decoration. */
+body.abv-interface :is(.card, .panel, .dash-panel, .platform-panel, .platform-card, .table-container,
+  .admin-panel, .settings-card, .settings-section, .upload-queue, .dest-card, .stats-card,
+  .job-card, .api-key-card, .share-stat-card, .analytics-panel-card, .video-detail-panel,
+  .processing-stat-card, .stat-card, .analytics-kpi, .kpi-card) {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: linear-gradient(155deg, rgba(19, 30, 37, .98), rgba(13, 22, 28, .98));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .15);
+}
+body.abv-interface :is(.card-header, .panel-header, .section-header, .dash-panel-head, .modal-header) {
+  border-color: var(--ui-border);
+}
+body.abv-interface :is(.card-title, .panel-title, .section-title, .dash-panel-head h2, .modal-title) {
+  color: var(--ui-text);
+  font-weight: 650;
+}
+body.abv-interface :is(.card-description, .panel-desc, .section-description, .help-text, .field-hint) {
+  color: var(--ui-muted);
+}
+
+/* Consistent controls with clear focus and disabled states. */
+body.abv-interface :is(button, .btn, .icon-btn, .tab-btn, .hub-tab-btn, .settings-tab-btn) {
+  font-family: inherit;
+  transition: color .16s ease, background-color .16s ease, border-color .16s ease,
+    box-shadow .16s ease, transform .16s ease;
+}
+body.abv-interface :is(.btn, .icon-btn) { min-height: 38px; border-radius: 9px; }
+body.abv-interface :is(.btn, .icon-btn):not(:disabled):active { transform: translateY(1px); }
+body.abv-interface :is(.btn, .icon-btn, .tab-btn, .hub-tab-btn, .settings-tab-btn):disabled {
+  cursor: not-allowed;
+  opacity: .48;
+  transform: none;
+}
+body.abv-interface :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), select, textarea) {
+  min-height: 40px;
+  color: var(--ui-text);
+  background-color: #0c151b;
+  border: 1px solid var(--ui-border-strong);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 12px;
+}
+body.abv-interface textarea { min-height: 96px; resize: vertical; }
+body.abv-interface :is(input, select, textarea):focus-visible {
+  border-color: rgba(124, 226, 207, .72);
+  outline: 3px solid rgba(124, 226, 207, .14);
+  outline-offset: 1px;
+  box-shadow: none;
+}
+body.abv-interface :is(input, textarea)::placeholder { color: #718589; opacity: 1; }
+body.abv-interface :is(label, .form-label) { color: #c5d3d1; font-weight: 550; }
+
+/* Tables and data lists share readable density and low-noise separators. */
+body.abv-interface :is(.table-wrap, .table-container, .platform-table-wrap, .data-table-wrap) {
+  overflow: auto;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: rgba(10, 17, 22, .55);
+}
+body.abv-interface table { border-collapse: separate; border-spacing: 0; }
+body.abv-interface :is(th, .data-table th, .platform-table th) {
+  color: #a6b8b8;
+  background: #121e25;
+  border-color: var(--ui-border);
+  font-size: 11px;
+  font-weight: 650;
+}
+body.abv-interface :is(td, .data-table td, .platform-table td) {
+  color: #d9e4e2;
+  border-color: rgba(160, 190, 190, .09);
+  font-size: 12px;
+}
+body.abv-interface tbody tr { transition: background-color .14s ease; }
+body.abv-interface tbody tr:hover td { background-color: rgba(124, 226, 207, .035); }
+
+/* Status, tabs, and progress use a restrained shared accent. */
+body.abv-interface :is(.badge, .status-badge, .panel-badge, .nav-badge, .viewer-badge) {
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 650;
+}
+body.abv-interface :is(.tabs-bar, .tabs, .hub-tabs, .settings-tabs, .content-hub-tabs) {
+  gap: 6px;
+  border-color: var(--ui-border);
+}
+body.abv-interface :is(.tab-btn.is-active, .tab-btn.active, .hub-tab-btn.is-active, .settings-tab-btn.is-active, .settings-tab-btn.active) {
+  color: var(--ui-accent-strong);
+  background: rgba(124, 226, 207, .09);
+  border-color: rgba(124, 226, 207, .25);
+}
+body.abv-interface :is(progress, .progress-bar, .progress-track) { accent-color: var(--ui-accent); }
+body.abv-interface :is(.progress-bar-fill, .progress-fill) {
+  background: linear-gradient(90deg, #42bba7, var(--ui-accent));
+}
+
+/* Dialogs and notifications remain legible above dense admin screens. */
+body.abv-interface :is(.modal-content, .modal-box, .modal-card, .platform-dialog) {
+  color: var(--ui-text);
+  background: #121e25;
+  border: 1px solid var(--ui-border-strong);
+  border-radius: 15px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .42);
+}
+body.abv-interface :is(.modal-header, .modal-footer) { border-color: var(--ui-border); }
+body.abv-interface :is(.toast, .toast-message) {
+  border: 1px solid var(--ui-border-strong);
+  border-radius: 11px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .3);
+}
+body.abv-interface :is(.empty-state, .dash-empty) { color: var(--ui-muted); }
+
+@media (max-width: 1100px) {
+  body.abv-interface .page-content { padding: 22px; }
+}
+@media (max-width: 720px) {
+  body.abv-interface .page-content { padding: 16px 13px 24px; }
+  body.abv-interface :is(.page-header, .page-heading, .platform-heading, .dash-heading, .section-heading,
+    .analytics-header, .inspector-header) {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 17px;
+  }
+  body.abv-interface :is(.page-header-actions, .page-actions, .dash-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  body.abv-interface :is(.card, .panel, .platform-card, .settings-card, .settings-section) { border-radius: 12px; }
+  body.abv-interface :is(.table-wrap, .table-container, .platform-table-wrap, .data-table-wrap) {
+    max-width: 100%;
+    overscroll-behavior-inline: contain;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.abv-interface *, body.abv-interface *::before, body.abv-interface *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

@@ -1,0 +1,2 @@
+/* Compatibility entry point; Admin shell rules live in system/layout-admin.css. */
+@import url("/static/css/system/layout-admin.css");

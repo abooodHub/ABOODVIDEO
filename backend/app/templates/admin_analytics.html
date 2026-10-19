@@ -1,0 +1,158 @@
+{% extends 'admin_base.html' %}
+{% block title %}التحليلات والترافيك للمواقع المضمّنة{% endblock %}
+{% block topbar_title %}التحليلات والترافيك{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/admin_analytics.css?v=m6-admin-platform-20261016-fix2">
+<link rel="stylesheet" href="/static/vendor/jsvectormap/jsvectormap.min.css?v=m6-admin-platform-20261016-fix2">
+{% endblock %}
+
+{% block content %}
+<div class="analytics-header">
+    <div>
+        <h1 class="page-title">إحصائيات المشاهدات والترافيك</h1>
+        <p class="page-desc">مراقبة الزوار والمشاهدات الحقيقية داخل المشغل المضمّن في المواقع الخارجية، وأعلى الجودات طلباً، واستهلاك الباندويث.</p>
+    </div>
+    <div class="analytics-actions">
+        <select id="analytics-period-select" class="form-select" aria-label="الفترة الزمنية">
+            <option value="7">آخر 7 أيام</option>
+            <option value="30" selected>آخر 30 يوماً</option>
+            <option value="90">آخر 3 أشهر</option>
+            <option value="365">كامل المدة</option>
+        </select>
+        <button type="button" id="btn-refresh-analytics" class="btn btn-secondary" title="تحديث البيانات">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            تحديث
+        </button>
+    </div>
+</div>
+
+<!-- KPI Cards Grid -->
+<div class="analytics-kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-views">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">إجمالي المشاهدات</span>
+            <span id="kpi-views" class="kpi-value">—</span>
+            <span class="kpi-subtext">مشاهدة حقيقية (+10 ثوانٍ)</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-visitors">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">الزوار الفريدون</span>
+            <span id="kpi-visitors" class="kpi-value">—</span>
+            <span class="kpi-subtext">زائر فريد للمشغل المضمّن</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-bandwidth">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">الترافيك المستهلك</span>
+            <span id="kpi-bandwidth" class="kpi-value dir-ltr">—</span>
+            <span class="kpi-subtext">إجمالي الباندويث المسحوب</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-quality">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">أعلى جودة مستخدمة</span>
+            <span id="kpi-top-quality" class="kpi-value dir-ltr">—</span>
+            <span class="kpi-subtext">الأكثر طلباً بين المتابعين</span>
+        </div>
+    </div>
+</div>
+
+<!-- Visual Breakdowns: Qualities & External Embedding Sites -->
+<div class="analytics-panels-row">
+    <!-- Quality Distribution Card -->
+    <div class="analytics-panel-card">
+        <div class="panel-header">
+            <h2 class="panel-title">توزيع الجودات المستخدمة</h2>
+            <span class="panel-badge">Quality Breakdown</span>
+        </div>
+        <p class="panel-desc">نسبة اختيار كل جودة من قِبل المشاهدين داخل المشغل في المواقع الخارجية.</p>
+        <div id="quality-bars-container" class="quality-bars-list">
+            <!-- Dynamically populated -->
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+        </div>
+    </div>
+
+    <!-- External Referrer Domains Card -->
+    <div class="analytics-panel-card">
+        <div class="panel-header">
+            <h2 class="panel-title">المواقع الخارجية المضمّنة (Domains)</h2>
+            <span class="panel-badge">Referrers</span>
+        </div>
+        <p class="panel-desc">المواقع والمنصات التي تضع روابط التضمين وتجلب المشاهدات لسيرفرك.</p>
+        <div id="referrers-container" class="referrers-list">
+            <!-- Dynamically populated -->
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+        </div>
+    </div>
+</div>
+
+<section class="analytics-panel-card geo-analytics-card" aria-labelledby="geo-map-title">
+    <div class="panel-header">
+        <div>
+            <h2 class="panel-title" id="geo-map-title">خريطة المشاهدات والحجب الجغرافي</h2>
+            <p class="panel-desc">الموقع التقريبي حسب الدولة من ترويسة Cloudflare الموثوقة. لا تُحفظ عناوين IP.</p>
+        </div>
+        <span class="panel-badge" id="geo-map-count">جارٍ التحميل</span>
+    </div>
+    <div class="geo-map-layout">
+        <div id="geo-world-map" role="img" aria-label="خريطة عالمية لتوزيع المشاهدات حسب الدولة"></div>
+        <p class="geo-map-caption">تُدار سياسة حجب الدول من الإعدادات والحماية.</p>
+    </div>
+    <p class="geo-no-data hidden" id="geo-map-empty">لا توجد بيانات دول مسجلة لهذه الفترة بعد. ستبدأ الإحصاءات الجديدة بعد تفعيل تمرير CF-IPCountry عبر Nginx.</p>
+</section>
+
+<!-- Videos & Episodes Detailed Table -->
+<div class="analytics-panel-card full-width">
+    <div class="panel-header">
+        <h2 class="panel-title">إحصائيات الحلقات والفيديوهات</h2>
+        <span class="panel-badge">Episodes Breakdown</span>
+    </div>
+    <div class="table-responsive">
+        <table class="data-table" id="analytics-videos-table">
+            <thead>
+                <tr>
+                    <th>الحلقة / الفيديو</th>
+                    <th>المسلسل</th>
+                    <th>المشاهدات</th>
+                    <th>الزوار</th>
+                    <th>أعلى جودة</th>
+                    <th>الترافيك</th>
+                </tr>
+            </thead>
+            <tbody id="analytics-videos-tbody">
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">جارٍ تحميل بيانات الحلقات...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Toast for Quick Copy -->
+<div id="analytics-toast" class="toast-popup hidden">تم نسخ كود التضمين بنجاح!</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/admin_analytics.js?v=github-readiness-20261019"></script>
+<script src="/static/vendor/jsvectormap/jsvectormap.min.js?v=m6-admin-platform-20261016-fix2"></script>
+<script src="/static/vendor/jsvectormap/world.js?v=m6-admin-platform-20261016-fix2"></script>
+{% endblock %}

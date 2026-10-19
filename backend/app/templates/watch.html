@@ -1,0 +1,331 @@
+{% extends "viewer_base.html" %}
+
+{% block title %}{{ VIDEO_TITLE }} — مشغل ABOODVIDEO{% endblock %}
+
+{% block extra_css %}
+    <script src="/static/js/vendor/hls.min.js?v=m6-admin-platform-20261016-fix2"></script>
+    <script src="/static/vendor/jassub/jassub.umd.js?v=m6-admin-platform-20261016-fix2"></script>
+    <link rel="stylesheet" href="/static/css/viewer_watch.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/watch.css?v=m6-admin-platform-20261016-fix2">
+    <link rel="stylesheet" href="/static/css/watch_premium.css?v=ass-viewport-20261018">
+    {% if PRIMARY_COLOR %}
+    <style id="custom-theme-color">
+        :root {
+            --primary: {{ PRIMARY_COLOR }} !important;
+            --primary-hover: {{ PRIMARY_COLOR }} !important;
+            --border-active: {{ PRIMARY_COLOR }} !important;
+            --accent-gold: {{ PRIMARY_COLOR }} !important;
+        }
+        .big-play-btn, .player-watermark { color: {{ PRIMARY_COLOR }} !important; }
+        .btn-ctrl.is-active svg { color: {{ PRIMARY_COLOR }} !important; }
+    </style>
+    {% endif %}
+{% endblock %}
+
+{% block header %}{% if not EMBED_MODE %}
+<header class="viewer-header watch-cinema-header" id="viewer-header">
+    <div class="viewer-container viewer-header-inner watch-cinema-header-inner">
+        <!-- Minimal cinema branding only: ABOOD + accent VIDEO -->
+        <span class="viewer-brand" aria-label="ABOODVIDEO">
+            ABOOD<span class="brand-accent">VIDEO</span>
+        </span>
+    </div>
+</header>{% endif %}{% endblock %}
+
+{% block drawer %}{% endblock %}
+
+{% block content %}
+<div class="watch-page-wrapper">
+    {% if IS_PASSWORD_REQUIRED %}
+    <!-- Password Verification Form -->
+    <div class="watch-password-wrap">
+        <div class="password-card">
+            <svg class="password-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <h2>هذا الفيديو محمي بكلمة مرور</h2>
+            <p>هذا الفيديو محمي بواسطة المالك. يرجى إدخال رمز المرور للمتابعة إلى المشاهدة.</p>
+            <form id="password-form">
+                <input type="password" id="pw-input" class="pw-input" placeholder="••••••••" required autofocus>
+                <button type="submit" id="pw-btn" class="pw-submit">دخول للمشاهدة</button>
+                <div id="pw-error" class="pw-error"></div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    {% if not EMBED_MODE %}<!-- Cinema Video Title Header above Player -->
+    <div class="watch-title-header">
+        <h1 class="watch-cinema-title"><bdi dir="auto">{{ VIDEO_TITLE }}</bdi></h1>
+        {% if IS_ADMIN_PREVIEW %}<span class="admin-preview-badge">معاينة خاصة</span>{% endif %}
+        {% if SERIES_NAME or SEASON_NUMBER or EPISODE_NUMBER %}
+        <div class="watch-series-meta">
+            {% if SERIES_NAME %}
+            <span class="watch-series-name">{{ SERIES_NAME }}</span>
+            {% endif %}
+            {% if SEASON_NUMBER_FORMATTED %}
+            <span class="watch-meta-dot">•</span>
+            <span class="watch-season-number">الموسم {{ SEASON_NUMBER_FORMATTED }}</span>
+            {% elif SEASON_NUMBER %}
+            <span class="watch-meta-dot">•</span>
+            <span class="watch-season-number">الموسم {{ "%02d"|format(SEASON_NUMBER) if SEASON_NUMBER is number else SEASON_NUMBER }}</span>
+            {% endif %}
+            {% if EPISODE_NUMBER_FORMATTED %}
+            <span class="watch-meta-dot">•</span>
+            <span class="watch-episode-number">الحلقة {{ EPISODE_NUMBER_FORMATTED }}</span>
+            {% elif EPISODE_NUMBER %}
+            <span class="watch-meta-dot">•</span>
+            <span class="watch-episode-number">الحلقة {{ EPISODE_NUMBER }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>{% endif %}
+
+    <!-- Custom ABOODVIDEO Player V2 Frame -->
+    <div class="watch-player-frame">
+        <div class="player-wrapper" id="player-container">
+            <video id="video-element" poster="{{ POSTER_URL }}" playsinline></video>
+            <div id="ass-viewport" class="ass-viewport" aria-hidden="true">
+                <canvas id="ass-canvas" class="ass-canvas" aria-hidden="true"></canvas>
+            </div>
+            <div class="sub-alert hidden" id="sub-warning-banner" role="alert">بعض خطوط الترجمة غير متوفرة وقد يختلف المظهر.</div>
+            <div class="quality-toast hidden" id="quality-toast" role="status" aria-live="polite"></div>
+
+            <!-- Advanced Diagnostics Panel (hidden by default) -->
+            <div class="player-diagnostics-panel hidden" id="player-diagnostics-panel" aria-label="لوحة التشخيص المتقدمة">
+                <div class="diag-header">
+                    <span>تشخيص جودة البث (QoE)</span>
+                    <button type="button" class="diag-close" id="btn-diag-close" title="إغلاق">✕</button>
+                </div>
+                <div class="diag-grid">
+                    <div class="diag-row"><span class="diag-label">الوضع:</span><span class="diag-val" id="diag-mode">Auto</span></div>
+                    <div class="diag-row"><span class="diag-label">الجودة المطلوبة:</span><span class="diag-val" id="diag-req-quality">Auto</span></div>
+                    <div class="diag-row"><span class="diag-label">الجودة الحالية:</span><span class="diag-val" id="diag-play-quality">-</span></div>
+                    <div class="diag-row"><span class="diag-label">السرعة المقدرة:</span><span class="diag-val" id="diag-est-bw">-</span></div>
+                    <div class="diag-row"><span class="diag-label">معدل البث:</span><span class="diag-val" id="diag-variant-bitrate">-</span></div>
+                    <div class="diag-row"><span class="diag-label">المخزن الأمامي:</span><span class="diag-val" id="diag-buffer">-</span></div>
+                    <div class="diag-row"><span class="diag-label">رقم القطعة (SN):</span><span class="diag-val" id="diag-sn">-</span></div>
+                    <div class="diag-row"><span class="diag-label">زمن التحميل:</span><span class="diag-val" id="diag-download-time">-</span></div>
+                    <div class="diag-row"><span class="diag-label">الإطارات الساقطة:</span><span class="diag-val" id="diag-dropped-frames">0</span></div>
+                    <div class="diag-row"><span class="diag-label">مرات التوقف:</span><span class="diag-val" id="diag-stalls">0</span></div>
+                    <div class="diag-row"><span class="diag-label">جلسة البث:</span><span class="diag-val" id="diag-session">Active</span></div>
+                </div>
+            </div>
+
+            <div class="spinner" id="buffering-spinner"></div>
+
+            <button type="button" class="big-play-btn" id="big-play-btn" aria-label="تشغيل الفيديو">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+
+            <!-- Dynamic Watermark -->
+            <div class="player-watermark" id="player-watermark">{{ WATERMARK_TEXT or 'ABOODVIDEO' }}</div>
+
+            <!-- Floating Next Episode Card -->
+            <div class="next-episode-card hidden" id="next-episode-card">
+                <div class="next-card-content">
+                    <span class="next-card-label">الحلقة التالية</span>
+                    <span class="next-card-countdown" id="next-countdown-text">تبدأ خلال 10 ثوانٍ</span>
+                </div>
+                <div class="next-card-actions">
+                    <button type="button" class="btn-next-play" id="btn-next-play-now">تشغيل الآن</button>
+                    <button type="button" class="btn-next-cancel" id="btn-next-cancel">إلغاء</button>
+                </div>
+            </div>
+
+            <!-- Floating Skip Intro Button -->
+            <button type="button" class="skip-intro-btn hidden" id="btn-skip-intro" data-skip-seconds="{{ SKIP_INTRO_SECONDS if SKIP_INTRO_SECONDS is not none else 85 }}" aria-label="تخطي شارة البداية">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                <span>تخطي شارة البداية</span>
+            </button>
+
+            <!-- Custom Pause Promo Banner Overlay -->
+            {% if PAUSE_BANNER %}
+            <div class="pause-banner-card hidden" id="pause-banner-card">
+                <button type="button" class="btn-banner-close" id="btn-banner-close" aria-label="إغلاق">×</button>
+                <div class="banner-badge">إعلان / تنويه</div>
+                <h3 class="banner-title" id="banner-title">{{ PAUSE_BANNER.title or 'تابعنا للمزيد من الأعمال' }}</h3>
+                <p class="banner-desc" id="banner-desc">{{ PAUSE_BANNER.text or 'انضم إلى قناتنا الرسمية لمتابعة أحدث الحلقات بجودة 4K' }}</p>
+                <a href="{{ PAUSE_BANNER.link or '#' }}" target="_blank" rel="noopener noreferrer" class="btn-banner-action" id="btn-banner-link">زيارة الرابط ←</a>
+            </div>
+            {% endif %}
+
+            <!-- Custom Controls -->
+            <div class="player-controls" id="player-controls">
+                <div class="timeline-container" id="timeline" role="slider" tabindex="0" aria-label="موضع التشغيل" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <canvas class="timeline-buffered" id="buffered-bar" aria-hidden="true"></canvas>
+                    <canvas class="timeline-progress" id="progress-bar" aria-hidden="true"></canvas>
+                    <canvas class="timeline-tooltip-canvas" id="timeline-tooltip-canvas" aria-hidden="true"></canvas>
+                    <output class="sr-only" id="time-tooltip">00:00</output>
+                </div>
+
+                <div class="controls-row">
+                    <div class="controls-left">
+                        <button class="btn-ctrl" id="btn-play" title="تشغيل (Space/K)" aria-label="تشغيل">
+                            <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg id="icon-pause" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </button>
+
+                        <div class="volume-group">
+                            <button class="btn-ctrl" id="btn-mute" title="كتم الصوت (M)" aria-label="كتم الصوت">
+                                <svg id="icon-vol-high" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                <svg id="icon-vol-mute" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                            </button>
+                            <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="1" aria-label="مستوى الصوت">
+                        </div>
+
+                        <span class="time-display" id="time-display">00:00 / 00:00</span>
+                    </div>
+
+                    <div class="controls-right">
+                        <!-- Subtitles Selector -->
+                        <div class="menu-anchor">
+                            <button class="btn-ctrl" id="btn-subs" title="الترجمة" aria-label="الترجمة">
+                                <svg viewBox="0 0 24 24"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z"/></svg>
+                            </button>
+                            <div class="menu-popup" id="subs-menu">
+                                <div class="menu-item active" id="sub-opt-off">إيقاف (Off)</div>
+                            </div>
+                        </div>
+
+                        <!-- Settings -->
+                        <button class="btn-ctrl" id="btn-settings" type="button" title="الإعدادات" aria-label="إعدادات المشغل" aria-expanded="false" aria-controls="player-menu-panel">
+                            <svg viewBox="0 0 24 24"><path d="M10 2h4l.5 2.2 1.7.7 1.9-1.2 2.8 2.8-1.2 1.9.7 1.7L22 10v4l-2.2.5-.7 1.7 1.2 1.9-2.8 2.8-1.9-1.2-1.7.7L14 22h-4l-.5-2.2-1.7-.7-1.9 1.2-2.8-2.8 1.2-1.9-.7-1.7L2 14v-4l2.2-.5.7-1.7-1.2-1.9 2.8-2.8 1.9 1.2 1.7-.7L10 2zm2 7a3 3 0 100 6 3 3 0 000-6z"/></svg>
+                        </button>
+
+                        <!-- PiP -->
+                        <button class="btn-ctrl" id="btn-pip" title="صورة داخل صورة" aria-label="صورة داخل صورة">
+                            <svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg>
+                        </button>
+
+                        <!-- Fullscreen -->
+                        <button class="btn-ctrl" id="btn-fullscreen" title="ملء الشاشة (F)" aria-label="ملء الشاشة">
+                            <svg id="icon-fs-enter" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                            <svg id="icon-fs-exit" class="hidden" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Settings Slide-over Menu Panel -->
+                <div class="player-menu-panel" id="player-menu-panel" role="dialog" aria-label="إعدادات المشغل" aria-hidden="true">
+                    <section class="player-menu-screen is-active" data-screen="root">
+                        <div class="player-menu-heading">الإعدادات</div>
+                        <button class="player-menu-row" type="button" data-open-screen="quality"><span>الجودة</span><span id="quality-summary">تلقائي (Auto)</span></button>
+                        <button class="player-menu-row" type="button" data-open-screen="speed"><span>سرعة التشغيل</span><span id="speed-summary">طبيعي</span></button>
+                        <button class="player-menu-row" type="button" data-open-screen="subtitles"><span>الترجمة</span><span id="subtitle-summary">إيقاف</span></button>
+                    </section>
+                    <section class="player-menu-screen" data-screen="quality"><button class="player-menu-back" type="button" data-open-screen="root">→ الجودة</button><div id="quality-options"><div class="menu-popup" id="quality-menu"></div></div></section>
+                    <section class="player-menu-screen" data-screen="speed"><button class="player-menu-back" type="button" data-open-screen="root">→ سرعة التشغيل</button><div id="speed-options"><div class="menu-popup" id="speed-menu"></div></div></section>
+                    <section class="player-menu-screen" data-screen="subtitles"><button class="player-menu-back" type="button" data-open-screen="root">→ الترجمة</button><div id="subtitle-options"></div><button class="player-menu-row" type="button" data-open-screen="caption-style"><span>مظهر الترجمة</span><span>تخصيص</span></button></section>
+                    <section class="player-menu-screen caption-style-screen" data-screen="caption-style">
+                        <button class="player-menu-back" type="button" data-open-screen="subtitles">→ مظهر الترجمة</button>
+                        <label for="caption-size">حجم النص<select id="caption-size"><option value="small">صغير</option><option value="medium" selected>متوسط</option><option value="large">كبير</option><option value="xlarge">كبير جداً</option></select></label>
+                        <label for="caption-color">لون النص<select id="caption-color"><option value="white" selected>أبيض</option><option value="yellow">أصفر</option><option value="cyan">سماوي</option></select></label>
+                        <label for="caption-background">خلفية النص<select id="caption-background"><option value="off">بدون</option><option value="light">فاتحة</option><option value="medium">متوسطة</option><option value="dark" selected>داكنة</option></select></label>
+                        <label for="caption-opacity">شفافية الخلفية<select id="caption-opacity"><option value="0">0%</option><option value="25">25%</option><option value="50">50%</option><option value="75" selected>75%</option><option value="100">100%</option></select></label>
+                        <label for="caption-position">موضع الترجمة<select id="caption-position"><option value="bottom" selected>أسفل</option><option value="center">وسط الصورة</option><option value="top">أعلى</option></select></label>
+                        <button class="player-menu-row" id="caption-match-embedded" type="button">مطابقة نمط الترجمة الظاهرة داخل الفيديو</button>
+                        <button class="player-menu-row" id="caption-reset" type="button">إعادة الضبط</button>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Below-Player Metadata Section -->
+    {% if not EMBED_MODE %}<div class="watch-details-container">
+        <div class="watch-primary-meta">
+            <div class="watch-capabilities-bar">
+                {% if IS_4K %}
+                <span class="viewer-badge viewer-badge-4k">4K UHD</span>
+                {% endif %}
+                {% if HAS_ASS %}
+                <span class="viewer-badge viewer-badge-ass" title="ترجمة ASS متقدمة مع خطوط مدمجة كاملة">العربية · ASS متقدم (11 خط)</span>
+                {% endif %}
+                <span class="viewer-badge viewer-badge-neutral">HLS متكيف</span>
+            </div>
+
+            {% if LIBRARY_META %}
+            <div class="watch-library-meta">{{ LIBRARY_META }}</div>
+            {% endif %}
+
+            {% if PREV_EPISODE or NEXT_EPISODE %}
+            <div class="watch-episode-nav">
+                {% if PREV_EPISODE %}
+                <a href="{{ prefix or '' }}/watch/{{ PREV_EPISODE.share_id }}" class="watch-nav-btn" title="الحلقة السابقة: {{ PREV_EPISODE.title }}">
+                    ← الحلقة السابقة{% if PREV_EPISODE.episode_number_formatted %} ({{ PREV_EPISODE.episode_number_formatted }}){% endif %}
+                </a>
+                {% endif %}
+                {% if NEXT_EPISODE %}
+                <a href="{{ prefix or '' }}/watch/{{ NEXT_EPISODE.share_id }}" class="watch-nav-btn" title="الحلقة التالية: {{ NEXT_EPISODE.title }}">
+                    الحلقة التالية{% if NEXT_EPISODE.episode_number_formatted %} ({{ NEXT_EPISODE.episode_number_formatted }}){% endif %} →
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        {% if VIDEO_DESCRIPTION %}
+        <div class="watch-description-box">
+            <h3 class="watch-desc-heading">نبذة عن المحتوى</h3>
+            <p class="watch-desc-text">{{ VIDEO_DESCRIPTION }}</p>
+        </div>
+        {% endif %}
+
+        {% if MORE_EPISODES and MORE_EPISODES|length > 0 %}
+        <section class="viewer-row-section watch-more-section">
+            <div class="viewer-row-header">
+                <h2 class="viewer-row-title">حلقات أخرى من {{ SERIES_NAME or 'السلسلة' }}</h2>
+            </div>
+            <div class="viewer-row-container">
+                <div class="viewer-row-track">
+                    {% for ep in MORE_EPISODES %}
+                    <div class="viewer-row-item">
+                        <article class="viewer-card">
+                            <a href="{{ prefix or '' }}/watch/{{ ep.share_id }}" class="viewer-card-media watch-card-landscape">
+                                {% if ep.poster_url %}
+                                <img src="{{ ep.poster_url }}" alt="{{ ep.title }}" class="viewer-card-img" loading="lazy">
+                                {% else %}
+                                <div class="viewer-card-placeholder">
+                                    <svg class="viewer-card-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                </div>
+                                {% endif %}
+                                <span class="viewer-badge viewer-badge-neutral watch-ep-badge">حلقة {{ ep.episode_number_formatted or ep.episode_number or loop.index }}</span>
+                            </a>
+                            <div class="viewer-card-info">
+                                <h3 class="viewer-card-title"><bdi dir="auto">{{ ep.title }}</bdi></h3>
+                            </div>
+                        </article>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </div>{% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block extra_js %}
+<!-- Player V2 Data Configuration -->
+<script type="application/json" id="player-config">
+{
+    "directMediaUrl": {{ DIRECT_MEDIA_URL | tojson }},
+    "playbackToken": "{{ PLAYBACK_TOKEN }}",
+    "playbackUrl": "/api/v1/playback/{{ PLAYBACK_TOKEN }}/master.m3u8",
+    "shareId": "{{ SHARE_ID }}",
+    "subtitles": {{ SUBTITLES_JSON | safe }},
+    "isPasswordRequired": {{ 'true' if IS_PASSWORD_REQUIRED else 'false' }},
+    "primaryColor": {% if PRIMARY_COLOR %}"{{ PRIMARY_COLOR }}"{% else %}null{% endif %},
+    "watermarkText": {% if WATERMARK_TEXT %}"{{ WATERMARK_TEXT }}"{% else %}"ABOODVIDEO"{% endif %},
+    "skipIntroSeconds": {{ SKIP_INTRO_SECONDS if SKIP_INTRO_SECONDS is not none else 85 }},
+    "autoPlay": {{ 'true' if AUTO_PLAY else 'false' }},
+    "startTime": {{ START_TIME if START_TIME is not none else 'null' }},
+    "hasPauseBanner": {{ 'true' if PAUSE_BANNER else 'false' }}
+}
+</script>
+<script src="/static/js/player.js?v=github-readiness-20261019" defer></script>
+{% endblock %}

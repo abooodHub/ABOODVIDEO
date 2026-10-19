@@ -1,0 +1,37 @@
+{% extends "admin_base.html" %}
+{% block title %}المستخدمون والصلاحيات{% endblock %}
+{% block topbar_title %}المستخدمون والصلاحيات{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_platform.css?v=m6-admin-platform-20261016-fix2">{% endblock %}
+{% block content %}
+<section class="platform-page" aria-labelledby="users-heading" data-can-manage="{{ 'true' if can_manage_users else 'false' }}" data-user-id="{{ admin_user_id }}">
+  <header class="platform-heading">
+    <div><p class="platform-eyebrow">إدارة الحسابات</p><h1 id="users-heading">المستخدمون والصلاحيات</h1><p>عرض الحسابات والرتب وحالة الوصول. تغييرات الرتب والحسابات محصورة بالمالك.</p></div>
+    {% if can_manage_users %}<button class="btn btn-primary" id="user-create-open" type="button">إضافة مستخدم</button>{% endif %}
+  </header>
+  <div class="platform-toolbar">
+    <label for="users-search">البحث بالبريد أو اسم المستخدم</label>
+    <input id="users-search" type="search" maxlength="100" autocomplete="off">
+    <button id="users-refresh" class="btn btn-secondary" type="button">تحديث</button>
+  </div>
+  <p id="users-status" class="platform-status" role="status" aria-live="polite">جارٍ تحميل الحسابات…</p>
+  <div class="platform-table-wrap">
+    <table class="platform-table"><thead><tr><th scope="col">المستخدم</th><th scope="col">البريد</th><th scope="col">الرتبة</th><th scope="col">الحالة</th><th scope="col">تاريخ الإنشاء</th>{% if can_manage_users %}<th scope="col">الإجراء</th>{% endif %}</tr></thead><tbody id="users-rows"></tbody></table>
+  </div>
+  <nav class="platform-pagination" aria-label="صفحات المستخدمين"><button id="users-prev" class="btn btn-secondary" type="button">السابق</button><span id="users-page" aria-live="polite"></span><button id="users-next" class="btn btn-secondary" type="button">التالي</button></nav>
+</section>
+{% if can_manage_users %}
+<dialog class="platform-dialog" id="user-create-dialog" aria-labelledby="user-create-title">
+  <form id="user-create-form" method="dialog">
+    <h2 id="user-create-title">إضافة حساب</h2>
+    <label>اسم المستخدم<input name="username" minlength="3" maxlength="64" required autocomplete="username" pattern="[A-Za-z0-9_.\-]+"></label>
+    <label>البريد الإلكتروني<input name="email" type="email" maxlength="255" required autocomplete="email"></label>
+    <label>كلمة مرور أولية<input name="password" type="password" minlength="12" maxlength="256" required autocomplete="new-password"></label>
+    <label>الرتبة<select name="role"><option value="USER">مستخدم</option><option value="VIP">VIP</option><option value="ADMIN">مدير</option></select></label>
+    <p class="platform-muted">كلمة المرور تُخزّن بصيغة تجزئة آمنة. لا تعرضها الصفحة بعد الإرسال.</p>
+    <div class="platform-dialog-actions"><button class="btn btn-secondary" id="user-create-cancel" type="button">إلغاء</button><button class="btn btn-primary" type="submit">إنشاء الحساب</button></div>
+    <p id="user-create-error" class="platform-error" role="alert"></p>
+  </form>
+</dialog>
+{% endif %}
+{% endblock %}
+{% block extra_js %}<script src="/static/js/admin_platform.js?v=github-readiness-20261019" defer></script>{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "admin_base.html" %}
+{% block title %}سجل التدقيق{% endblock %}
+{% block topbar_title %}سجل التدقيق{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/css/admin_platform.css?v=m6-admin-platform-20261016-fix2">{% endblock %}
+{% block content %}
+<section class="platform-page" aria-labelledby="audit-heading">
+  <header class="platform-heading"><div><p class="platform-eyebrow">سجل غير قابل للتحرير من الواجهة</p><h1 id="audit-heading">سجل التدقيق</h1><p>الأحداث الإدارية معرّفة بطلبها ونتيجتها؛ السياق المعروض محدود إلى حقول آمنة.</p></div></header>
+  <form id="audit-filters" class="platform-toolbar">
+    <label for="audit-action">الحدث</label><input id="audit-action" name="action" maxlength="100" placeholder="مثال: USER_DISABLED">
+    <label for="audit-result">النتيجة</label><select id="audit-result" name="result"><option value="">الكل</option><option value="success">نجاح</option><option value="failure">فشل</option></select>
+    <button class="btn btn-secondary" type="submit">تطبيق</button>
+  </form>
+  <p id="audit-status" class="platform-status" role="status" aria-live="polite">جارٍ تحميل الأحداث…</p>
+  <div class="platform-table-wrap"><table class="platform-table"><thead><tr><th scope="col">الوقت</th><th scope="col">الحدث</th><th scope="col">الفاعل</th><th scope="col">الهدف</th><th scope="col">النتيجة</th><th scope="col">معرّف الطلب</th></tr></thead><tbody id="audit-rows"></tbody></table></div>
+  <nav class="platform-pagination" aria-label="صفحات التدقيق"><button id="audit-prev" class="btn btn-secondary" type="button">السابق</button><span id="audit-page" aria-live="polite"></span><button id="audit-next" class="btn btn-secondary" type="button">التالي</button></nav>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="/static/js/admin_platform.js?v=github-readiness-20261019" defer></script>{% endblock %}
