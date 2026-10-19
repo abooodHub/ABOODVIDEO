@@ -63,6 +63,7 @@ def test_language_switch_persists_and_runtime_preserves_values():
         assert result['user']=='إضافة محتوى <img src=x onerror=alert(1)>'
         assert result['object']['title']==result['user']
         assert result['label']=='Series name' and result['word']=='DELETE'
+        assert page.evaluate("AVi18n.t('2/5 مفقود')")=='2/5 missing'
         page.goto('http://127.0.0.1:18898/admin/login')
         expect(page.locator('html')).to_have_attribute('lang','en')
         page.locator('[data-language-select]').select_option('ar')

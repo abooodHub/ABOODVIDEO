@@ -1644,7 +1644,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tdName.appendChild(nameWrap);
 
             const tdType = document.createElement('td');
-            const typeBadge = createElement('span', item.type_label || item.type || window.AVi18n.t('عنصر'), ['badge']);
+            const typeBadge = createElement('span', window.AVi18n.t(item.type_label) || item.type || window.AVi18n.t('عنصر'), ['badge']);
             typeBadge.style.background = 'rgba(255,255,255,0.08)';
             tdType.appendChild(typeBadge);
 

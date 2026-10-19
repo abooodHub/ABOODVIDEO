@@ -2278,5 +2278,16 @@
   "الترتيب": "Sort order",
   "الانتهاء الأقرب": "Expiring soonest",
   "المشاركات في الصفحة": "Shares per page",
-  "صفحات المشاركات": "Share pages"
+  "صفحات المشاركات": "Share pages",
+  "رقم الحلقة غير محدد؛ يحتاج مراجعة": "Episode number not detected; review required",
+  "رقم الموسم في اسم الملف يختلف عن المجلد": "The season number in the filename differs from the folder",
+  "رقم حلقة مكرر داخل الموسم؛ احتُفظ بالملفين للمراجعة": "Duplicate episode number in this season; both files were kept for review",
+  "الرفع السابق انقطع والحزمة المحلية غير مكتملة؛ لن تتم إعادة الترميز تلقائياً.": "The previous upload was interrupted and the local package is incomplete; encoding will not restart automatically.",
+  "مساحة القرص غير كافية (محاكاة انخفاض المساحة)": "Insufficient disk space (simulated low disk space)",
+  "الحزمة المحلية غير متوافقة.": "The local package is incompatible.",
+  "تعذر التحقق من الاتصال وصلاحيات الرفع.": "Could not verify the connection and upload permissions.",
+  "تعذر إثبات تطابق الحزمة مع ملف المصدر.": "Could not confirm that the package matches the source file.",
+  "{0}/{1} مفقود": "{0}/{1} missing",
+  "خطوط مفقودة ({0}): {1}": "Missing fonts ({0}): {1}",
+  "خطوط مفقودة": "Missing fonts"
 }

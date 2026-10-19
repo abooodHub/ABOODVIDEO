@@ -509,7 +509,7 @@ window.AVi18n ||= {t: value => value, tpl: (parts, ...values) => parts.reduce((o
     function normalizeItem(raw) {
         if (!raw) return null;
         let type = raw.type || 'video';
-        let type_label = raw.type_label || '';
+        let type_label = window.AVi18n.t(raw.type_label) || '';
 
         // Canonical type normalization: 'folder', 'series', 'season', 'video'
         const lowerType = String(type).toLowerCase().trim();

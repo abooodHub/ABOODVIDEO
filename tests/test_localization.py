@@ -28,6 +28,12 @@ def test_catalog_matches_browser_catalog_and_preserves_placeholders():
         assert set(re.findall(r'\{\d+\}', key)) == set(re.findall(r'\{\d+\}', value)), key
 
 
+def test_dynamic_system_labels_preserve_values():
+    with use_language('en'):
+        assert gettext('2/5 مفقود') == '2/5 missing'
+        assert gettext('خطوط مفقودة (2): إضافة محتوى.ttf') == 'Missing fonts (2): إضافة محتوى.ttf'
+
+
 def test_all_template_literals_have_english_translations():
     files = list((PROJECT / 'backend/app/templates').glob('*.html'))
     files.append(PROJECT / 'studio/web/templates/index_v3.html')

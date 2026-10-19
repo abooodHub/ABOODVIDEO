@@ -40,7 +40,13 @@ def main():
                 services=dict(api='healthy', database='healthy', redis='healthy', storage='healthy', worker='healthy'),
                 latest_videos=videos, activity=[], generated_at=now)
     episodes=[dict(filename=f'Demo Episode {i:02}.mkv', episode_number=i, source_path=f'D:\\Media\\Demo\\Season 01\\Demo Episode {i:02}.mkv', relative_source_path=f'Season 01/Demo Episode {i:02}.mkv', source_bytes=1024**3, issues=[]) for i in range(1,5)]
+    if options.extended:
+        episodes[0]['issues']=['رقم الحلقة غير محدد؛ يحتاج مراجعة']
     fixtures = {
+        '/api/v1/drive/tree': {'tree':[], 'trash_count':0},
+        '/api/v1/drive/scope': {'items':[{'id':'00000000-0000-4000-8000-000000000001',
+            'name':'إضافة محتوى', 'type':'video','type_label':'فيديو','status':'READY','visibility':'PRIVATE'}],
+            'breadcrumbs':[], 'total_items':1},
         '/api/v1/admin/dashboard': data,
         '/api/v1/admin/transcodes': {'items': [], 'total': 0},
         '/api/v1/health': {'status': 'healthy', 'version': '1.1.0'},
@@ -122,6 +128,12 @@ def main():
             if page_id=='studio':
                 page.locator('#add-season').click()
                 page.wait_for_selector('.review-row')
+                if options.extended:
+                    assert page.locator('.review-issue').first.inner_text()==gettext_for_language('رقم الحلقة غير محدد؛ يحتاج مراجعة',options.language)
+            if page_id=='content':
+                page.wait_for_selector('.drive-table tbody tr[data-id]')
+                assert 'إضافة محتوى' in page.locator('.drive-table tbody').inner_text()
+                assert gettext_for_language('فيديو',options.language) in page.locator('.drive-table tbody').inner_text()
             page.wait_for_timeout(900)
             suffix='-en' if options.language=='en' else ''
             page.screenshot(path=str(OUT / (name+suffix+'.png')))
@@ -146,6 +158,11 @@ def main():
         browser.close()
     (OUT/('screenshots-en.json' if options.language=='en' else 'screenshots.json')).write_text(json.dumps(evidence,indent=2),encoding='utf-8')
     print(f'Checked {len(pages)} actual interfaces with offline synthetic data.')
+
+
+def gettext_for_language(message, locale):
+    with use_language(locale):
+        return gettext(message)
 
 
 if __name__ == '__main__':main()
