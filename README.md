@@ -2,7 +2,7 @@
 
 **English** · [العربية](README.ar.md)
 
-<p align="center"><img src="docs/assets/hero.svg" alt="ABOODVIDEO — Your media. Your platform." width="100%"></p>
+<p align="center"><img src="docs/assets/hero.svg" alt="ABOODVIDEO — Styled subtitles. No burn-in." width="100%"></p>
 
 <p align="center">
   <a href="https://github.com/abooodHub/ABOODVIDEO/releases"><img alt="Release 1.1.0" src="https://img.shields.io/badge/release-1.1.0-65dfc7?style=flat-square&labelColor=10212b"></a>
@@ -11,17 +11,26 @@
   <img alt="Arabic and English" src="https://img.shields.io/badge/languages-Arabic_RTL_%2B_English_LTR-10212b?style=flat-square">
 </p>
 
-<p align="center"><strong>Prepare, encode and upload on Windows. Manage and deliver video from your own server.</strong></p>
+<p align="center"><strong>Styled subtitles without burning them into your video.</strong><br>ASS/SSA styling, positioning and attached fonts — rendered in the player, with subtitles you can switch or hide.</p>
 
 <p align="center"><a href="#screenshots">Screenshots</a> · <a href="#quick-start">Install</a> · <a href="docs/INSTALLATION.md">Operations</a> · <a href="https://github.com/abooodHub/ABOODVIDEO/releases">Releases</a></p>
+
+## The headline feature: soft subtitles, without burn-in
+
+**Show styled subtitles over the video while keeping them separate from its image.** The player renders ASS/SSA styling, positioning and attached fonts, with WebVTT support as well. Viewers can switch subtitle tracks or turn them off.
+
+- **Preserve the video image:** subtitles are displayed by the player, not burned into the frames.
+- **Keep the intended look:** ASS/SSA styles, placement and attached fonts travel with the subtitle package.
+- **Give viewers control:** switch tracks or hide subtitles during playback.
+- **Prepare in Studio, play on the Platform:** package subtitle files and fonts on Windows, then upload them with the video.
 
 ## What is included?
 
 | | Platform | Windows Studio |
 | --- | --- | --- |
+| **Soft subtitles — no burn-in** | ASS/SSA styles, positioning, attached fonts and WebVTT; switch or hide tracks | Package subtitle files and fonts alongside the video |
 | Organization | Files, folders, series and seasons | Discover episodes and review the queue |
 | Video preparation | Server conversion or prepared HLS/MP4 imports | CPU/GPU encoder and conversion controls |
-| Subtitles | ASS/SSA, WebVTT and attached fonts | Select subtitles and fonts for upload packages |
 | Uploads | Resumable transfers and package validation | Persistent queue with explicit start controls |
 | Playback | Authorized HLS, MP4 and embeds | Prepare and upload to your own server |
 | Administration | Accounts, roles, storage and analytics | Connection settings and Windows DPAPI credentials |

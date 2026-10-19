@@ -2,7 +2,7 @@
 
 [English](README.md) · **العربية**
 
-<p align="center"><img src="docs/assets/hero.svg" alt="ABOODVIDEO — Your media. Your platform." width="100%"></p>
+<p align="center"><img src="docs/assets/hero.svg" alt="ABOODVIDEO — ترجمة احترافية بدون حرق" width="100%"></p>
 
 <p align="center">
   <a href="https://github.com/abooodHub/ABOODVIDEO/releases"><img alt="Release 1.1.0" src="https://img.shields.io/badge/release-1.1.0-65dfc7?style=flat-square&labelColor=10212b"></a>
@@ -11,9 +11,18 @@
   <img alt="Windows desktop and self-hosted platform" src="https://img.shields.io/badge/Windows_Studio_%2B_Self--hosted_Platform-10212b?style=flat-square">
 </p>
 
-<p align="center"><strong>من ملفاتك إلى منصة فيديو خاصة — التحويل والرفع والمشاهدة من مكان واحد.</strong><br>Prepare, encode and upload on Windows. Manage and deliver video from your own server.</p>
+<p align="center"><strong>ترجمة احترافية بدون حرقها داخل الفيديو.</strong><br>ستايل ASS/SSA ومواضع النص والخطوط المرفقة، مع إمكانية تبديل الترجمة أو إخفائها من المشغل.</p>
 
 <p align="center"><a href="#واجهة-المنصة--screenshots">الصور / Screenshots</a> · <a href="#البداية-السريعة--quick-start">التثبيت / Install</a> · <a href="docs/INSTALLATION.md">دليل التشغيل / Operations</a> · <a href="https://github.com/abooodHub/ABOODVIDEO/releases">الإصدارات / Releases</a></p>
+
+## الميزة الأهم: عرض الترجمة بدون حرق — Soft Subtitles
+
+**تظهر الترجمة فوق الفيديو داخل المشغل، وتبقى منفصلة عن صورة الفيديو نفسها.** يدعم المشغل ستايل ASS/SSA ومواضع النص والخطوط المرفقة، إضافة إلى WebVTT، ويمكن للمشاهد تبديل مسار الترجمة أو إخفاؤها.
+
+- **صورة الفيديو تبقى كما هي:** يعرض المشغل الترجمة دون دمجها في إطارات الفيديو.
+- **الحفاظ على شكل الترجمة:** الستايل ومواضع النص والخطوط المرفقة ضمن حزمة ASS/SSA.
+- **تحكم أثناء المشاهدة:** تبديل مسار الترجمة أو تشغيلها وإخفاؤها.
+- **من Studio إلى المنصة:** تجهيز ملفات الترجمة والخطوط في برنامج Windows ورفعها مع الفيديو.
 
 ## اللغات واتجاه الواجهة
 
@@ -25,9 +34,9 @@
 
 | | المنصة / Platform | البرنامج / Windows Studio |
 | --- | --- | --- |
+| **الترجمة بدون حرق** | عرض ASS/SSA بالستايل والمواضع والخطوط، وWebVTT، مع تبديل الترجمة وإخفائها | تجهيز ملفات الترجمة والخطوط ورفعها مع الفيديو |
 | تنظيم المحتوى | ملفات ومجلدات ومسلسلات ومواسم | اكتشاف حلقات المجلد ومراجعة الطابور |
 | تجهيز الفيديو | تحويل على الخادم أو استقبال HLS/MP4 جاهز | اختيار CPU/GPU والمشفّر وإعداد التحويل |
-| الترجمة | ASS/SSA وWebVTT والخطوط المرفقة | اختيار الترجمات والخطوط ضمن حزم الرفع |
 | الرفع | بروتوكول قابل للاستئناف مع تحقق من الحزمة | طابور محفوظ وتحكم صريح ببدء العمل |
 | المشاهدة | HLS وMP4 وتضمين مع تحقق من الصلاحيات | تجهيز الحزم ورفعها إلى خادمك |
 | الإدارة | حسابات وصلاحيات وتخزين وتحليلات | إعداد اتصال خاص بك ومفتاح محمي بـWindows DPAPI |
